@@ -5,7 +5,7 @@ import PDFViewer from '../PDFViewer';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-const PDFButton = ({ url, label }) => {
+const PDFButton = ({ url, label, type }) => {
     const [visible, setVisible] = React.useState(false);
 
     if (!url) return null;
@@ -16,6 +16,7 @@ const PDFButton = ({ url, label }) => {
                 onClick={() => setVisible(true)}
                 icon="pi pi-file-pdf"
                 label={label || 'View PDF'}
+                data-type={type}
             />
 
             <Dialog
@@ -33,12 +34,14 @@ const PDFButton = ({ url, label }) => {
 };
 
 const ViewButton = styled(Button)`
-  background: var(--primary-600);
   border: none;
   transition: all 0.2s ease;
-
+  height: 28px;
+  border-radius: 2px;
+    font-size: 14px;
+    padding: 0 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   &:hover {
-    background: var(--primary-700) !important;
     transform: translateY(-1px);
   }
 
@@ -53,7 +56,8 @@ const ViewButton = styled(Button)`
 
 PDFButton.propTypes = {
     url: PropTypes.string,
-    label: PropTypes.string
+    label: PropTypes.string,
+    type: PropTypes.string,
 };
 
 export default PDFButton;

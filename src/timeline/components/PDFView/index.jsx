@@ -14,6 +14,7 @@ const MultiplePdfViewer = ({ fileURL }) => {
             <PDFButton
                 key={`${pdf.url || ''}-${index}`}
                 url={pdf.url}
+                type={pdf.type}
                 label={pdf.label || 'View PDF'}
             />
         ))}
@@ -26,14 +27,6 @@ const Wrapper = styled.div`
   gap: 6px;
   flex-wrap: wrap;
   direction: rtl;
-  button {
-    height: 28px;
-    border-radius: 2px;
-    font-size: 14px;
-    padding: 0 8px;
-    min-width: fit-content;
-    flex-grow: 1;
-  }
 `;
 
 MultiplePdfViewer.propTypes = {
