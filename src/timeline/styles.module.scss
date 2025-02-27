@@ -1,0 +1,92 @@
+.app {
+  text-align: right;
+
+  .contentWrapper {
+    .content {
+      max-height: 250px;
+      overflow-y: auto;
+
+      direction: rtl;
+      text-align: right;
+      ol {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-inline-start: 20px;
+        margin: 4px;
+      }
+    }
+  }
+}
+
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .labelWrapper {
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+    align-items: center;
+    direction: rtl;
+    gap: 8px;
+  }
+}
+
+.topbar {
+  .btn {
+    font-size: 22px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      background: var(--primary-600);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .casesSelect {
+    min-width: 200px;
+    
+    :global(.p-dropdown) {
+      width: 100%;
+    }
+  }
+}
+
+.dialogPdf {
+  width: 96vw;
+  height: 98vh;
+  @media screen and (max-width: 768px) {
+    width: 100vw;
+    height: 100vh;
+  }
+}
+
+:global(.p-dialog) {
+  :global(.p-dialog-content) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    padding: 16px;
+  }
+  @media screen and (max-width: 768px) {
+    max-height: 100vh;
+    min-width: 90vw;
+  }
+}
+
+:global(.p-dialog-header) {
+  padding-bottom: 4px;
+}
