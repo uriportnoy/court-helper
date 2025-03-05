@@ -1,45 +1,47 @@
-import { useState, useCallback } from 'react';
-import styled from 'styled-components';
-import { FileUpload } from 'primereact/fileupload';
-import { InputText } from 'primereact/inputtext';
-import { ProgressBar } from 'primereact/progressbar';
-import { Button } from 'primereact/button';
-import { motion, AnimatePresence } from 'framer-motion';
-import { SimpleDropdown } from '../CasesDropdown';
-import { origins } from '../../common/common';
-import { useFileUploader} from "./useFileUploader.tsx";
-import {FileUploaderProps} from "./types.ts";
-
+import styled from "styled-components";
+import { FileUpload } from "primereact/fileupload";
+import { InputText } from "primereact/inputtext";
+import { ProgressBar } from "primereact/progressbar";
+import { Button } from "primereact/button";
+import { motion, AnimatePresence } from "framer-motion";
+import { SimpleDropdown } from "common/SimpleDropdown";
+import { origins } from "timeline/common";
+import { useFileUploader } from "./useFileUploader.tsx";
+import { FileUploaderProps } from "./types.ts";
+import { memo } from "react";
 
 const FileUploader = (props: FileUploaderProps) => {
-const {
-  isUploading,
-  uploadProgress,
-  label,
-  error,
-  handleUpload,
-  handleDelete,
-  handleLabelChange,
-} = useFileUploader(props);
-const {file, updateUrl} = props;
- const {url, type} = file;
+  const {
+    isUploading,
+    uploadProgress,
+    currentFile,
+    error,
+    handleUpload,
+    handleDelete,
+    handleTypeChange,
+    handleLabelChange,
+    saveFile,
+  } = useFileUploader(props);
+
+  const { url, type } = currentFile;
   return (
-    <Container>
+    <FileContainer
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+    >
       <InputGroup>
         <StyledInput
-          value={label}
-          onChange={(e) => handleLabelChange(e.target.value)}
+          value={currentFile.label}
+          onChange={handleLabelChange}
           placeholder="שם"
-          onBlur={() => {
-            updateUrl({
-              label,
-            });
-          }}
+          onBlur={saveFile}
         />
         <TypeDropdown
           options={origins}
           value={type}
-          onChange={(selected) => props.updateUrl({type: selected})}
+          onChange={handleTypeChange}
           placeholder="Source"
           isClearable={false}
         />
@@ -94,13 +96,21 @@ const {file, updateUrl} = props;
           </ErrorMessage>
         )}
       </AnimatePresence>
-    </Container>
+    </FileContainer>
   );
 };
 
-const Container = styled.div`
-  padding: 1rem;
-  position: relative;
+const FileContainer = styled(motion.div)`
+  background: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
 `;
 
 const InputGroup = styled.div`
@@ -190,4 +200,4 @@ const ErrorMessage = styled(motion.div)`
   text-align: center;
 `;
 
-export default FileUploader;
+export default memo(FileUploader);

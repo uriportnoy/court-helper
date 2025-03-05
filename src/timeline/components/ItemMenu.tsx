@@ -1,12 +1,20 @@
-import { useAppContext } from '../Context';
-import { deleteEvent } from '../firebase/events';
-import { FormDialog } from './AddNewEvent';
-import { Dialog } from 'primereact/dialog';
-import { Menu } from 'primereact/menu';
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useAppContext } from "timeline/Context";
+import { deleteEvent } from "../firebase/events";
+import { FormDialog } from "./AddNewEvent";
+import { Dialog } from "primereact/dialog";
+import { Menu } from "primereact/menu";
+import React, { useState } from "react";
 
-const ItemMenu = React.forwardRef((props, ref) => {
+interface ItemMenuProps {
+  id: string;
+  type: string;
+  title: string;
+  content: string;
+  date: string;
+  fileURL: string[];
+}
+
+const ItemMenu = React.forwardRef((props: ItemMenuProps, ref) => {
   const [visible, setVisible] = useState(false);
   const { loadEvents } = useAppContext();
   const openEditDialog = () => {
@@ -55,15 +63,6 @@ const ItemMenu = React.forwardRef((props, ref) => {
   );
 });
 
-ItemMenu.propTypes = {
-  id: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  title: PropTypes.string,
-  content: PropTypes.string,
-  date: PropTypes.string,
-  fileURL: PropTypes.array,
-};
-
-ItemMenu.displayName = 'ItemMenu';
+ItemMenu.displayName = "ItemMenu";
 
 export default ItemMenu;

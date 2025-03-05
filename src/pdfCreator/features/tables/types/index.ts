@@ -1,4 +1,4 @@
-import { Page } from '../../items/types';
+import { Page } from "pdfCreator/features/items/types";
 
 export interface TableProps {
   pages: Page[];

@@ -1,8 +1,8 @@
-import { useAppContext } from "../Context";
+import { useAppContext } from "timeline/Context";
 import DialogBtn from "../common/DialogBtn.tsx";
-import { addCase, updateCase } from "../firebase/cases";
+import { addCase, updateCase } from "../firebase/cases.js";
 import styles from "../styles.module.scss";
-import CasesDropdown from "./CasesDropdown";
+import CasesDropdown from "./CasesDropdown.js";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { InputMask } from "primereact/inputmask";
@@ -25,7 +25,7 @@ const result = {
   false: "נדחה",
 };
 const courts = ["שלום", "מחוזי", "העליון"];
-export default function ({ label = "+" }) {
+function AddNewCase({ label = "+" }) {
   const [selectedCase, setSelectedCase] = useState(null);
   const { cases: options } = useAppContext();
   useEffect(() => {
@@ -252,11 +252,13 @@ function printCases(cases = []) {
     console.log("\u202B==========================================");
     console.log(`\u202B${courtCases.length} תיקים ב${court}`);
     console.log(
-      `\u202Bמתוכם ${herCases.length} היא הגישה, ${herAccepted.length} התקבלו, ${herDeclined.length} נדחו`
+      `\u202Bמתוכם ${herCases.length} היא הגישה, ${herAccepted.length} התקבלו, ${herDeclined.length} נדחו`,
     );
     console.log("נדחו", herDeclined.map((it) => it.caseNumber).join(", "));
     console.log(
-      `\u202Bמתוכם ${myCases.length} אני הגשתי, ${mineAccepted.length} התקבלו, ${mineDeclined.length} נדחו`
+      `\u202Bמתוכם ${myCases.length} אני הגשתי, ${mineAccepted.length} התקבלו, ${mineDeclined.length} נדחו`,
     );
   });
 }
+
+export default AddNewCase;

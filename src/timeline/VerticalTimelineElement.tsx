@@ -1,24 +1,31 @@
-import { motion } from 'framer-motion';
-import PropTypes from 'prop-types';
-import React, { useRef } from 'react';
-import { InView } from 'react-intersection-observer';
-import styled from 'styled-components';
-import ItemMenu from './components/ItemMenu';
-import PDFViewer from './components/PDFView';
+import { motion } from "framer-motion";
+import React, { useRef } from "react";
+import { InView } from "react-intersection-observer";
+import styled from "styled-components";
+import ItemMenu from "./components/ItemMenu.tsx";
+import PDFViewer from "./components/PDFView";
+import { formatDate } from "./utils.ts";
 
 const icons = {
-  mine: { icon: 'home', color: 'var(--green-600)' },
-  notMine: { icon: 'directions', color: 'var(--red-600)' },
-  court: { icon: 'bolt', color: 'var(--yellow-600)' },
-  'trd-party': { icon: 'users', color: 'var(--blue-600)' },
+  mine: { icon: "home", color: "var(--green-600)" },
+  notMine: { icon: "directions", color: "var(--red-600)" },
+  court: { icon: "bolt", color: "var(--yellow-600)" },
+  "trd-party": { icon: "users", color: "var(--blue-600)" },
 };
 
+interface TimelineElementProps {
+  children?: React.ReactNode;
+  position?: string;
+  visible?: boolean;
+  item: Record<string, unknown>;
+}
+
 const VerticalTimelineElement = ({
-  children = '',
-  position = '',
+  children = "",
+  position = "",
   visible = false,
   item,
-}) => {
+}: TimelineElementProps) => {
   const menu = useRef(null);
   const {
     id,
@@ -42,11 +49,13 @@ const VerticalTimelineElement = ({
         <TimelineElementWrapper
           ref={ref}
           className={`vertical-timeline-element ${
-            position === 'left' ? 'element-left' : 'element-right'
+            position === "left" ? "element-left" : "element-right"
           }`}
           initial={{ opacity: 0, y: 50 }}
-          animate={inView || visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
+          animate={
+            inView || visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }
+          }
+          transition={{ duration: 0.5, ease: "easeOut" }}
           id={`timeline-${dateId}-${id}`}
           data-year={dateId}
         >
@@ -58,27 +67,19 @@ const VerticalTimelineElement = ({
           >
             <i className={`pi pi-${icons[type]?.icon}`} />
           </TimelineIcon>
-
           <ContentCard type={type}>
             <ItemMenu ref={menu} {...item} />
-            
-            <ContentHeader>
-              {children}
-            </ContentHeader>
-
-            {fileURL && fileURL.length > 0 && (
+            <ContentHeader>{children}</ContentHeader>
+            {fileURL && fileURL.length > 0 ? (
               <PDFSection>
-                <PDFViewer fileURL={fileURL} />
+                <PDFViewer fileURL={fileURL} date={date} />
               </PDFSection>
-            )}
-
+            ) : null}
             <MetadataSection>
               <DateDisplay>{formatDate(date)}</DateDisplay>
-              
               <CaseNumber>
                 {selectedCase.type} {caseNumber}
               </CaseNumber>
-
               {relatedCases && relatedCases.length > 0 && (
                 <RelatedItems>
                   <RelatedTitle>תיקים קשורים:</RelatedTitle>
@@ -87,7 +88,6 @@ const VerticalTimelineElement = ({
                   ))}
                 </RelatedItems>
               )}
-
               {relatedDates && relatedDates.length > 0 && (
                 <RelatedItems>
                   <RelatedTitle>תאריכים קשורים:</RelatedTitle>
@@ -96,7 +96,6 @@ const VerticalTimelineElement = ({
                   ))}
                 </RelatedItems>
               )}
-
               {groups && groups.length > 0 && (
                 <RelatedItems>
                   <RelatedTitle>קבוצות:</RelatedTitle>
@@ -146,7 +145,8 @@ const TimelineIcon = styled(motion.div)`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: ${props => icons[props.type]?.color || 'var(--primary-500)'};
+  background-color: ${(props) =>
+    icons[props.type]?.color || "var(--primary-500)"};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -163,7 +163,7 @@ const TimelineIcon = styled(motion.div)`
   @media (max-width: 768px) {
     width: 32px;
     height: 32px;
-    
+
     i {
       font-size: 1rem;
     }
@@ -174,15 +174,22 @@ const ContentCard = styled.div`
   flex: 1;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   position: relative;
-  border-left: 4px solid ${props => icons[props.type]?.color || 'var(--primary-500)'};
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 4px solid
+    ${(props) => icons[props.type]?.color || "var(--primary-500)"};
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 6px 8px -1px rgba(0, 0, 0, 0.1),
+      0 4px 6px -1px rgba(0, 0, 0, 0.06);
   }
 `;
 
@@ -245,24 +252,5 @@ const GroupTag = styled(RelatedTag)`
   background-color: var(--yellow-100);
   color: var(--yellow-800);
 `;
-
-function formatDate(dateStr) {
-  const date = new Date(dateStr);
-  return new Intl.DateTimeFormat('he-IL', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date);
-}
-
-VerticalTimelineElement.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-  position: PropTypes.string,
-  visible: PropTypes.bool,
-  item: PropTypes.object.isRequired,
-};
 
 export default VerticalTimelineElement;

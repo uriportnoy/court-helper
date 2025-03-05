@@ -1,8 +1,9 @@
 import { add, getAll, update } from "./crud";
+import { Case } from "../types.ts";
 
 const COLLECTION_NAME = "cases";
 
-export async function getAllCases() {
+export async function getAllCases(): Promise<Array<Case>> {
   const dbCases = await getAll(COLLECTION_NAME);
   return dbCases.sort((a, b) => {
     const dateA = parseDate(a.caseNumber);

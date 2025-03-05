@@ -3,8 +3,8 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import styled from "styled-components";
-import { origins } from "../../common/common";
-import { SimpleDropdown } from "../CasesDropdown";
+import { origins } from "timeline/common";
+import { SimpleDropdown } from "common/SimpleDropdown.js";
 
 const deleteFile = async (url) => {
   try {

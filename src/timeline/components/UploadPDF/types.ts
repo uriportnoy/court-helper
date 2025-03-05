@@ -5,7 +5,7 @@ export interface CurrentFile {
 }
 export interface FileUploaderProps {
   file: CurrentFile;
-  updateUrl: ( file: Partial<CurrentFile> ) => void;
-  deleteFile: () => void;
+  onFileDelete: () => void;
   fileName?: string;
+  updateFileList: (file: CurrentFile) => void;
 }

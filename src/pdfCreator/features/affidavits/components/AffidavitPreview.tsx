@@ -1,9 +1,9 @@
-import React from 'react';
-import { Page, View, Text, Image } from '@react-pdf/renderer';
-import { AffidavitPreviewProps } from '../types';
-import { affidavitStyles } from '../styles/affidavit';
-import { commonStyles } from '../../../styles/pdf/common';
-import { getAffidavitText, getLawyerText } from '../utils/text';
+import React from "react";
+import { Page, View, Text, Image } from "@react-pdf/renderer";
+import { AffidavitPreviewProps } from "pdfCreator/types";
+import { affidavitStyles } from "../styles/affidavit";
+import { commonStyles } from "../../../styles/pdf/common";
+import { getAffidavitText, getLawyerText } from "../utils/text";
 
 export const AffidavitPreview: React.FC<AffidavitPreviewProps> = ({ data }) => {
   return (
@@ -21,7 +21,7 @@ export const AffidavitPreview: React.FC<AffidavitPreviewProps> = ({ data }) => {
               commonStyles.signature,
               {
                 transform: `rotate(${getRandomPosition(-10, 10)})`,
-                width: '200px',
+                width: "200px",
               },
             ]}
           />
@@ -44,7 +44,7 @@ export const AffidavitPreview: React.FC<AffidavitPreviewProps> = ({ data }) => {
                 commonStyles.signature,
                 {
                   transform: `rotate(${getRandomPosition(-20, 20)})`,
-                  width: '280px',
+                  width: "280px",
                   top: `${getRandomPosition(-30, 0)}px`,
                   left: `${getRandomPosition(-60, -10)}px`,
                 },

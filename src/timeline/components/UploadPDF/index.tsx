@@ -1,57 +1,63 @@
-import styled from 'styled-components';
-import {Button} from 'primereact/button';
-import {AnimatePresence, motion} from 'framer-motion';
-import FileUploader from './FileUploader.tsx';
-import {CurrentFile} from "./types.ts";
+import styled from "styled-components";
+import { Button } from "primereact/button";
+import { AnimatePresence, motion } from "framer-motion";
+import FileUploader from "./FileUploader.tsx";
+import { CurrentFile } from "./types.ts";
 
 interface PDFUploaderProps {
   currentFiles: Array<CurrentFile>;
-  updateUrls: (data: Array<CurrentFile>) => void;
+  updateFiles: (data: Array<CurrentFile>) => void;
   defaultType?: string;
   fileName?: string;
 }
 
-function PDFUploader({currentFiles = [], updateUrls, fileName, defaultType}: PDFUploaderProps) {
+function PDFUploader({
+  currentFiles = [],
+  updateFiles,
+  fileName,
+  defaultType,
+}: PDFUploaderProps) {
   return (
-      <Wrapper>
-        <AnimatePresence>
-          {currentFiles.map((file, arrayIndex) => (
-              <FileContainer
-                  key={file.url || `temp-${arrayIndex}`}
-                  initial={{opacity: 0, y: 20}}
-                  animate={{opacity: 1, y: 0}}
-                  exit={{opacity: 0, y: -20}}
-                  transition={{duration: 0.3}}
-              >
-                <FileUploader
-                    file = {{...file, type: file.type || defaultType || ''}}
-                    fileName={fileName}
-                    updateUrl={(data: Partial<CurrentFile>) => {
-                      const updatedFiles = [...currentFiles];
-                      updatedFiles[arrayIndex] = {...updatedFiles[arrayIndex], ...data};
-                      updateUrls(updatedFiles);
-                    }}
-                    deleteFile={() => updateUrls(currentFiles.filter((f, idx) => idx !== arrayIndex))}
-                />
-              </FileContainer>
-          ))}
-        </AnimatePresence>
-        <ButtonGroup>
-          <ActionButton
-              icon="pi pi-plus"
-              onClick={() => {
-                updateUrls([...currentFiles, {
-                  label: 'הצג',
-                  url: '',
-                  type: defaultType || 'mine',
-                }]);
-              }}
-              disabled={currentFiles.length > 0 && !currentFiles[currentFiles.length - 1].url}
-              tooltip="Add new file"
-              severity="secondary"
+    <Wrapper>
+      <AnimatePresence>
+        {currentFiles.map((file, arrayIndex) => (
+          <FileUploader
+            key={file.url || `file_${arrayIndex}`}
+            file={{ ...file, type: file.type || defaultType || "" }}
+            fileName={fileName}
+            onFileDelete={() => {
+              updateFiles(currentFiles.filter((f, idx) => idx !== arrayIndex));
+            }}
+            updateFileList={(newFile) => {
+              const newFiles = [...currentFiles];
+              newFiles[arrayIndex] = newFile;
+              updateFiles(newFiles);
+            }}
           />
-        </ButtonGroup>
-      </Wrapper>
+        ))}
+      </AnimatePresence>
+      <ButtonGroup>
+        <ActionButton
+          icon="pi pi-plus"
+          onClick={() => {
+            updateFiles([
+              ...currentFiles,
+              {
+                label: "הצג",
+                url: "",
+                type: defaultType || "mine",
+              },
+            ]);
+          }}
+          disabled={
+            currentFiles.length > 0 &&
+            !currentFiles[currentFiles.length - 1].url
+          }
+          tooltip="Add new file"
+          severity="secondary"
+        />
+      </ButtonGroup>
+    </Wrapper>
   );
 }
 
@@ -63,19 +69,6 @@ const Wrapper = styled.div`
   background: var(--surface-50);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--surface-200);
-`;
-
-const FileContainer = styled(motion.div)`
-  background: white;
-  border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
-  }
 `;
 
 const ButtonGroup = styled.div`

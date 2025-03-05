@@ -1,5 +1,5 @@
-import { useAppContext } from "../Context";
-import { addCase } from "../firebase/cases";
+import { useAppContext } from "timeline/Context";
+import { addCase } from "../firebase/cases.ts";
 import { useMemo, useState } from "react";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
@@ -32,7 +32,7 @@ export default function CasesDropdown({
         label: `(${item.court}) ${item.caseNumber}`,
         value: item,
       })),
-    [casesOptions]
+    [casesOptions],
   );
 
   const currentOption = dropdownOptions
@@ -80,32 +80,3 @@ export default function CasesDropdown({
     </>
   );
 }
-
-export const SimpleDropdown = ({
-  options,
-  onChange,
-  value,
-  valKey,
-  labelKey,
-  ...props
-}) => {
-  const _options = options.map((item) => ({
-    label: labelKey ? item[labelKey] : item,
-    value: valKey ? item[valKey] : item,
-  }));
-  const currentOption = value
-    ? _options.find((op) => (op.value || op) === value)
-    : null;
-
-  return (
-    <Select
-      value={currentOption}
-      onChange={(selected) => onChange(selected?.value)}
-      options={_options}
-      isClearable
-        menuPosition="fixed"
-      isSearchable={false}
-      {...props}
-    />
-  );
-};

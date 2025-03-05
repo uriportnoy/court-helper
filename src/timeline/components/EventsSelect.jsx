@@ -1,4 +1,4 @@
-import { useAppContext } from "../Context";
+import { useAppContext } from "timeline/Context";
 import Select from "react-select";
 
 export default function EventsSelect({ onChange, value, ...props }) {
