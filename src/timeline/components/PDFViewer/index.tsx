@@ -93,7 +93,7 @@ const PDFViewer = ({ url }) => {
         // If this is the first render and scale is at initial value,
         // update the scale to match what was actually used
         if (scale === initialScale && !isZoomedIn) {
-          setScale(finalScale);
+          // setScale(finalScale);
         }
       } catch (error) {
         console.error("Error rendering page:", error);
@@ -202,6 +202,7 @@ const PDFViewer = ({ url }) => {
         ref={containerRef}
         className={isPinchZooming ? "pinch-zooming" : ""}
         $allowOverflow={isZoomedIn}
+        data-auto={"viewer-content"}
       >
         {isLoading && <LoadingAnimation />}
         <CanvasWrapper
@@ -210,6 +211,7 @@ const PDFViewer = ({ url }) => {
             transformOrigin: "center",
             cursor: isZoomedIn ? "grab" : "default",
           }}
+          data-auto="canvas-wrapper"
         >
           <canvas ref={canvasRef}></canvas>
         </CanvasWrapper>
@@ -246,6 +248,7 @@ const ViewerContainer = styled.div`
 const ViewerContent = styled.div`
   flex: 1;
   overflow: ${(props) => (props.$allowOverflow ? "auto" : "hidden")};
+  overflow: auto;
   padding: 1rem;
   display: flex;
   justify-content: center;

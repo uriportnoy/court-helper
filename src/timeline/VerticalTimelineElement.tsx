@@ -58,6 +58,8 @@ const VerticalTimelineElement = ({
           transition={{ duration: 0.5, ease: "easeOut" }}
           id={`timeline-${dateId}-${id}`}
           data-year={dateId}
+          data-id={id}
+          data-relation={selectedCase.court}
         >
           <TimelineIcon
             type={type}
@@ -67,9 +69,14 @@ const VerticalTimelineElement = ({
           >
             <i className={`pi pi-${icons[type]?.icon}`} />
           </TimelineIcon>
-          <ContentCard type={type}>
+          <ContentCard type={type} data-auto="content-card">
             <ItemMenu ref={menu} {...item} />
-            <ContentHeader>{children}</ContentHeader>
+            <ItemCourt>
+              {selectedCase.court === "שלום" && "*"}
+              {selectedCase.court === "מחוזי" && "**"}
+              {selectedCase.court === "העליון" && "***"}
+            </ItemCourt>
+            <ContentHeader data-auto="content-header">{children}</ContentHeader>
             {fileURL && fileURL.length > 0 ? (
               <PDFSection>
                 <PDFViewer fileURL={fileURL} date={date} />
@@ -104,11 +111,15 @@ const VerticalTimelineElement = ({
                   ))}
                 </RelatedItems>
               )}
-
               {relatedEvent && (
                 <RelatedItems>
                   <RelatedTitle>אירוע קשור:</RelatedTitle>
-                  <RelatedTag>{relatedEvent}</RelatedTag>
+                  <RelatedTag
+                    onClick={() => scrollAndMarkItem(relatedEvent)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {relatedEvent}
+                  </RelatedTag>
                 </RelatedItems>
               )}
             </MetadataSection>
@@ -118,6 +129,15 @@ const VerticalTimelineElement = ({
     </InView>
   );
 };
+
+function scrollAndMarkItem(relatedEvent: string) {
+  const element = document.querySelector(`[data-id="${relatedEvent}"]`);
+  element.scrollIntoView({ behavior: "smooth", block: "center" });
+  element.classList.add("highlight");
+  setTimeout(() => {
+    element.classList.remove("highlight");
+  }, 1500);
+}
 
 const TimelineElementWrapper = styled(motion.div)`
   position: relative;
@@ -133,14 +153,22 @@ const TimelineElementWrapper = styled(motion.div)`
   &.element-right {
     flex-direction: row-reverse;
   }
-
+  &.highlight [data-auto="content-card"] > * {
+    background-color: yellow !important;
+    transition: all 0.5s;
+  }
   @media (max-width: 768px) {
     flex-direction: row !important;
     margin: 1.5em 0;
     gap: 1rem;
   }
 `;
-
+const ItemCourt = styled.div`
+font-size: 2rem;
+    position: absolute;
+    left: 10px;
+}
+`;
 const TimelineIcon = styled(motion.div)`
   width: 40px;
   height: 40px;
