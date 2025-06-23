@@ -63,15 +63,8 @@ const PDFViewer = ({ url }) => {
           height: viewport.height,
         });
 
-        // Calculate container dimensions
-        const containerWidth = containerRef.current.clientWidth - 32;
-
-        // Calculate the scale that would fit the PDF in the container
-        const containerScale = containerWidth / viewport.width;
-
-        // Use the container scale as a minimum to ensure PDF is visible
-        // but allow user to zoom in further if they've manually set a higher scale
-        const finalScale = Math.max(containerScale * 0.9, scale);
+        // Use the user's scale directly for zoom
+        const finalScale = scale;
 
         const scaledViewport = page.getViewport({
           scale: finalScale,
@@ -89,12 +82,6 @@ const PDFViewer = ({ url }) => {
         }).promise;
 
         setPageNum(num);
-
-        // If this is the first render and scale is at initial value,
-        // update the scale to match what was actually used
-        if (scale === initialScale && !isZoomedIn) {
-          // setScale(finalScale);
-        }
       } catch (error) {
         console.error("Error rendering page:", error);
         setError("Failed to render page. Please try again.");
@@ -205,15 +192,14 @@ const PDFViewer = ({ url }) => {
         data-auto={"viewer-content"}
       >
         {isLoading && <LoadingAnimation />}
-        <CanvasWrapper
-          style={{
-            transform: `translate(${panPosition.x}px, ${panPosition.y}px) scale(${scale})`,
-            transformOrigin: "center",
-            cursor: isZoomedIn ? "grab" : "default",
-          }}
-          data-auto="canvas-wrapper"
-        >
-          <canvas ref={canvasRef}></canvas>
+        <CanvasWrapper data-auto="canvas-wrapper">
+          <canvas
+            ref={canvasRef}
+            style={{
+              cursor: isZoomedIn ? "grab" : "default",
+              display: "block"
+            }}
+          />
         </CanvasWrapper>
       </ViewerContent>
 
@@ -247,12 +233,8 @@ const ViewerContainer = styled.div`
 
 const ViewerContent = styled.div`
   flex: 1;
-  overflow: ${(props) => (props.$allowOverflow ? "auto" : "hidden")};
   overflow: auto;
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 2rem 0;
   background: var(--surface-100);
   -webkit-overflow-scrolling: touch;
   position: relative;
@@ -264,17 +246,8 @@ const ViewerContent = styled.div`
 `;
 
 const CanvasWrapper = styled.div`
-  transition: transform 0.05s ease;
-  will-change: transform;
-
-  canvas {
-    max-width: 100%;
-    height: auto !important;
-    box-shadow: var(--shadow-lg);
-    background: white;
-    border-radius: var(--border-radius-sm);
-    transform-origin: center;
-  }
+  margin: 0 auto;
+  width: fit-content;
 `;
 
 const ControlBar = styled.div`

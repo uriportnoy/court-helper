@@ -16,6 +16,7 @@ import { InputText } from "primereact/inputtext";
 import { cloneElement, useState } from "react";
 import styled from "styled-components";
 import { useImmer } from "use-immer";
+import AITextButton from "./AITextButton";
 
 export default function AddNewEvent({ btnClassName, caseNumber }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -201,6 +202,14 @@ export const FormDialog = ({ eventData = {}, close }) => {
           placeholder={"כותרת משנה"}
         />
       </LabelWrapper>
+      <AITextButton
+        originalText={state.content}
+        onRewrite={(text) => {
+          setState((draft) => {
+            draft.content = text;
+          });
+        }}
+      />
       <LabelWrapper title={"בארוכה"}>
         <TextEditor
           value={state.content}

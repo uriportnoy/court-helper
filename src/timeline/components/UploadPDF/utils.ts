@@ -1,4 +1,4 @@
-export function getFileNameAndExtension(fileName) {
+export function getFileNameAndExtension(fileName: string) {
   const regex = /^(.*)\.([^.]+)$/;
   const match = fileName.match(regex);
   if (match) {

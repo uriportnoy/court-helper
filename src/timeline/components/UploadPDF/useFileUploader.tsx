@@ -23,15 +23,18 @@ export function useFileUploader({
 
   const { label } = currentFile;
   const handleUpload = useCallback(
-    async (event) => {
+    async (event: HTMLInputElement) => {
       setIsUploading(true);
       setError(null);
       const files = event.files;
-
+      if (!files || files.length === 0) {
+        return;
+      }
       try {
-        const { name, ext } = getFileNameAndExtension(files[0].name);
+        const { name, ext } = getFileNameAndExtension(files[0].name) || {};
         const storage = getStorage();
-        const finalFileName = fileName || `${name}_${label || "untitled"}`;
+        const finalFileName =
+          fileName || `${name || "name"}_${label || "untitled"}`;
         const folderName = ext === "pdf" ? "pdfs" : ext;
         const storageRef = ref(storage, `${folderName}/${finalFileName}`);
         const uploadTask = uploadBytesResumable(storageRef, files[0]);
@@ -97,9 +100,9 @@ export function useFileUploader({
         draft.label = e.target.value;
       });
     },
-    handleTypeChange: (selected) => {
+    handleTypeChange: (newType: string) => {
       setCurrentFile((draft) => {
-        draft.type = selected.value;
+        draft.type = newType;
         updateFileList({ ...draft });
       });
     },
