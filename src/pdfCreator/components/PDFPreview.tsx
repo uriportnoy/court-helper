@@ -1,8 +1,8 @@
-import React from 'react';
-import { PDFViewer } from '@react-pdf/renderer';
-import { PDFPreviewProps } from 'pdfCreator/types';
-import { useDebounce } from 'use-debounce';
-import PDFContent from './PDFContent';
+import React from "react";
+import { PDFViewer } from "@react-pdf/renderer";
+import { PDFPreviewProps } from "pdfCreator/types";
+import { useDebounce } from "use-debounce";
+import PDFContent from "./PDFContent";
 
 const PDFPreview: React.FC<PDFPreviewProps> = ({
   pages,
@@ -14,7 +14,7 @@ const PDFPreview: React.FC<PDFPreviewProps> = ({
   const [debouncedDeclarationData] = useDebounce(declarationData, 500);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-lg overflow-hidden">
       <PDFViewer className="w-full h-[800px] rounded">
         <PDFContent
           pages={debouncedPages}

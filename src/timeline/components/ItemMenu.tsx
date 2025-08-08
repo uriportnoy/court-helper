@@ -5,7 +5,7 @@ import { Dialog } from "primereact/dialog";
 import { Menu } from "primereact/menu";
 import React, { useState } from "react";
 
-interface ItemMenuProps {
+export interface ItemMenuProps {
   id: string;
   type: string;
   title: string;
