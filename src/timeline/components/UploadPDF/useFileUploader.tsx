@@ -20,7 +20,7 @@ export function useFileUploader({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [currentFile, setCurrentFile] = useImmer(file);
   const [error, setError] = useState<string | null>(null);
-
+ 
   const { label } = currentFile;
   const handleUpload = useCallback(
     async (event: HTMLInputElement) => {
