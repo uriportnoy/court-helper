@@ -12,27 +12,41 @@ interface PDFViewerProps {
   className?: string;
   type: string;
   item: ItemMenuProps;
+  contentView?: boolean;
 }
 export default function PDFViewer({
   url,
   title = "PDF Document",
   className = "",
   type,
-  item
+  item,
+  contentView
 }: PDFViewerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile] = useState(
     /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
   );
 
-  const PdfViewer = isMobile ? PDFViewerMobile : PDFViewerDesktop;
+  // const PdfViewer = isMobile ? PDFViewerMobile : PDFViewerDesktop;
+  if (contentView) {
+    return (
+      <PDFViewerDesktop
+        isOpen
+        onClose={() => setIsOpen(false)}
+        url={url}
+        title={title}
+        item={item}
+        contentView={contentView}
+      />
+    );
+  }
   return (
     <>
       <ViewButton onClick={() => setIsOpen(true)} data-type={type}>
         <FileText className="w-4 h-4" />
         {title}
       </ViewButton>
-      <PdfViewer
+      <PDFViewerDesktop
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         url={url}

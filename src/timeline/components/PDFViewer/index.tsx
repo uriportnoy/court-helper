@@ -9,8 +9,16 @@ import ErrorDisplay from "./ErrorDisplay";
 import usePinchZoom from "./utils/usePinchZoom";
 import PDFViewerTopBar from "./PDFViewerTopBar.tsx";
 import { getInitialScale } from "./utils";
+import PageRangeExtractor from "../PDFComponent/PageRangeExtractor.tsx";
+import { default as NativePDFViewer } from "../PDFComponent/PDFViewer.tsx";
+import { ItemMenuProps } from "../ItemMenu.tsx";
 
-const PDFViewer = ({ url }) => {
+interface PDFViewerProps {
+  url: string;
+  item: ItemMenuProps;
+  type: string;
+}
+const PDFViewer = ({ url, item, type }: PDFViewerProps) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [pdfDoc, setPdfDoc] = useState(null);
@@ -40,6 +48,8 @@ const PDFViewer = ({ url }) => {
     isPinchZooming,
     isZoomedIn,
   } = pinchProps;
+
+  const [showNativePDFViewer, setShowNativePDFViewer] = useState(url.includes('docx'));
 
   const renderPage = useCallback(
     async (num) => {
@@ -151,7 +161,7 @@ const PDFViewer = ({ url }) => {
     let mounted = true;
 
     const initPDF = async () => {
-      if (!mounted) return;
+      if (!mounted || showNativePDFViewer) return;
       await loadPDF();
     };
 
@@ -160,7 +170,7 @@ const PDFViewer = ({ url }) => {
     return () => {
       mounted = false;
     };
-  }, [loadPDF]);
+  }, [loadPDF, showNativePDFViewer]);
 
   useEffect(() => {
     if (pdfDoc && pageNum) {
@@ -184,24 +194,32 @@ const PDFViewer = ({ url }) => {
         initialScale={initialScale}
         pageNum={pageNum}
         numPages={numPages}
+        item={item}
+        showNativePDFViewer={showNativePDFViewer}
+        setShowNativePDFViewer={setShowNativePDFViewer}
       />
-      <ViewerContent
-        ref={containerRef}
-        className={isPinchZooming ? "pinch-zooming" : ""}
-        $allowOverflow={isZoomedIn}
-        data-auto={"viewer-content"}
-      >
-        {isLoading && <LoadingAnimation />}
-        <CanvasWrapper data-auto="canvas-wrapper">
-          <canvas
-            ref={canvasRef}
-            style={{
-              cursor: isZoomedIn ? "grab" : "default",
-              display: "block"
-            }}
-          />
-        </CanvasWrapper>
-      </ViewerContent>
+      {showNativePDFViewer && (
+        <NativePDFViewer url={url} item={item} type={type} contentView />
+      )}
+      {!showNativePDFViewer && (
+        <ViewerContent
+          ref={containerRef}
+          className={isPinchZooming ? "pinch-zooming" : ""}
+          $allowOverflow={isZoomedIn}
+          data-auto={"viewer-content"}
+        >
+          {isLoading && <LoadingAnimation />}
+          <CanvasWrapper data-auto="canvas-wrapper">
+            <canvas
+              ref={canvasRef}
+              style={{
+                cursor: isZoomedIn ? "grab" : "default",
+                display: "block"
+              }}
+            />
+          </CanvasWrapper>
+        </ViewerContent>
+      )}
 
       {numPages > 1 && (
         <ControlBar>

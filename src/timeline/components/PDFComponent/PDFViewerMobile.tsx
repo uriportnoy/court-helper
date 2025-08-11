@@ -13,13 +13,15 @@ interface PDFViewerMobileProps {
   url: string;
   title: string;
   item: ItemMenuProps;
+  contentView: boolean;
 }
 export default function PDFViewerMobile({
   isOpen,
   onClose,
   url,
   title,
-  item
+  item,
+  contentView
 }: PDFViewerMobileProps) {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,6 +42,31 @@ export default function PDFViewerMobile({
 
   const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
 
+  if (contentView) {
+    return (
+      <PDFContent>
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+          <Loader2 className="w-8 h-8 text-gray-500 animate-spin" />
+        </div>
+      )}
+      <div className="w-full h-full overflow-hidden touch-none">
+        <div
+          className="w-full h-full overflow-auto"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          <iframe
+            src={viewerUrl}
+            className={`w-full h-full border-none transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
+            onLoad={() => setIsLoading(false)}
+            title={title}
+            allow="fullscreen"
+          />
+        </div>
+      </div>
+    </PDFContent>
+    );
+  }
   return (
     <Dialog
       visible={isOpen}

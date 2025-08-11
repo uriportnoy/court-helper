@@ -3,7 +3,26 @@ import { downloadPDF, shareFile } from "./utils/share";
 import { AnimatePresence } from "framer-motion";
 import ShareMenu from "./ShareMenu";
 import styled from "styled-components";
+import PageRangeExtractor from "../PDFComponent/PageRangeExtractor";
+import { ItemMenuProps } from "../ItemMenu.tsx";
+import { FileText,   } from "lucide-react";
 
+interface PDFViewerTopBarProps {
+  url: string;
+  scale: number;
+  rotation: number;
+  panPosition: { x: number; y: number };
+  pageNum: number;
+  numPages: number;
+  isLoading: boolean;
+  handleZoom: (delta: number) => void;
+  handleRotate: () => void;
+  handleResetView: () => void;
+  initialScale: number;
+  item: ItemMenuProps;
+  showNativePDFViewer: boolean;
+  setShowNativePDFViewer: (show: boolean) => void;
+}
 function PDFViewerTopBar({
   url,
   scale,
@@ -16,7 +35,10 @@ function PDFViewerTopBar({
   handleRotate,
   handleResetView,
   initialScale,
-}) {
+  item,
+  showNativePDFViewer,
+  setShowNativePDFViewer,
+}: PDFViewerTopBarProps) {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [downloadStatus, setDownloadStatus] = useState(null);
   const [shareStatus, setShareStatus] = useState(null);
@@ -123,6 +145,19 @@ function PDFViewerTopBar({
             }`}
           />
         </ToolButton>
+        <ToolButton
+          onClick={() => setShowNativePDFViewer(!showNativePDFViewer)}
+          title="Show Native PDF Viewer"
+          disabled={isLoading}
+        >
+         {showNativePDFViewer ? <FileText className="w-4 h-4" /> : <FileText className="w-4 h-4 active" />}
+        </ToolButton>
+        <PageRangeExtractor
+          url={url}
+          title={item.title}
+          item={item}
+          totalPages={numPages} // You can get this from the iframe if needed
+        />
 
         <ToolButton
           onClick={toggleShareMenu}
@@ -139,7 +174,6 @@ function PDFViewerTopBar({
           )}
         </AnimatePresence>
       </ToolGroup>
-
       <PageInfo>
         Page {pageNum} of {numPages || "?"}
       </PageInfo>

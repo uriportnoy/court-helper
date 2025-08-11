@@ -4,10 +4,13 @@ import { Button } from "primereact/button";
 import PDFViewer from "../PDFViewer";
 import styled from "styled-components";
 import { FileURL } from "timeline/types";
+import { ItemMenuProps } from "../ItemMenu.tsx";
 
-interface PDFButtonProps extends FileURL {}
+interface PDFButtonProps extends FileURL {
+  item: ItemMenuProps;
+}
 
-const PDFButton = ({ url, label, type, date }: PDFButtonProps) => {
+const PDFButton = ({ url, label, type, date, item }: PDFButtonProps) => {
   const [visible, setVisible] = React.useState(false);
   useEffect(() => {
     if (visible) {
@@ -35,7 +38,7 @@ const PDFButton = ({ url, label, type, date }: PDFButtonProps) => {
         style={{ width: "90vw", height: "90vh" }}
         contentStyle={{ height: "calc(90vh - 6rem)", padding: 0 }}
       >
-        <PDFViewer url={url} />
+        <PDFViewer url={url} item={item} type={type} />
       </Dialog>
     </>
   );

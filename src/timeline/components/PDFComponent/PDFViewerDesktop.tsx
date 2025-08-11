@@ -6,6 +6,7 @@ import ShareMenu from "./ShareMenu";
 import styles from "./pdf.module.scss";
 import { downloadPDF } from "./utils";
 import { ItemMenuProps } from "../ItemMenu";
+import styled from "styled-components";
 
 interface PDFViewerDesktopProps {
   isOpen: boolean;
@@ -13,18 +14,20 @@ interface PDFViewerDesktopProps {
   url: string;
   title: string;
   item: ItemMenuProps;
+  contentView?: boolean;
 }
 export default function PDFViewerDesktop({
   isOpen,
   onClose,
   url,
   title,
-  item
+  item,
+  contentView
 }: PDFViewerDesktopProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
-
+  const [viewerUrl] = useState(`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`);
   useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
@@ -44,8 +47,13 @@ export default function PDFViewerDesktop({
     }
   };
 
-  const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
-
+  if (contentView) {
+    return (
+      <IFrameWrapper className="max-w-7xl h-[95vh] p-0 flex flex-col overflow-hidden bg-white border-0 shadow-2xl">
+        <iframe src={viewerUrl} className="w-full h-full border-none" />
+      </IFrameWrapper>
+    );
+  }
   return (
     <Dialog
       visible={isOpen}
@@ -86,7 +94,7 @@ export default function PDFViewerDesktop({
         </div>
       }
     >
-      <div className="max-w-7xl h-[95vh] p-0 flex flex-col overflow-hidden bg-white border-0 shadow-2xl">
+      <IFrameWrapper className="max-w-7xl h-[95vh] p-0 flex flex-col overflow-hidden bg-white border-0 shadow-2xl">
         {/* PDF Container */}
         <div className="flex-1 bg-gray-200 relative">
           {isLoading && (
@@ -115,7 +123,14 @@ export default function PDFViewerDesktop({
           url={url}
           title={title}
         />
-      </div>
+      </IFrameWrapper>
     </Dialog>
   );
 }
+
+const IFrameWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  border: none;
+  margin: 0 auto;
+`;

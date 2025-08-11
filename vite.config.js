@@ -34,6 +34,9 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     exclude: ["lucide-react"],
   },
+  server: {
+    port: 3999,
+  },
   resolve: {
     alias: {
       "lodash/get": "lodash/get.js",
