@@ -1,17 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Paginator } from "primereact/paginator";
-import * as pdfjsLib from "pdfjs-dist/build/pdf";
+import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.min";
 import { auth } from "../../firebase";
 import LoadingAnimation from "./LoadingAnimation";
 import ErrorDisplay from "./ErrorDisplay";
 import usePinchZoom from "./utils/usePinchZoom";
 import PDFViewerTopBar from "./PDFViewerTopBar.tsx";
-import { getInitialScale } from "./utils";
-import PageRangeExtractor from "../PDFComponent/PageRangeExtractor.tsx";
 import { default as NativePDFViewer } from "../PDFComponent/PDFViewer.tsx";
 import { ItemMenuProps } from "../ItemMenu.tsx";
+import { getInitialScale } from "./utils";
 
 interface PDFViewerProps {
   url: string;
@@ -199,7 +198,9 @@ const PDFViewer = ({ url, item, type }: PDFViewerProps) => {
         setShowNativePDFViewer={setShowNativePDFViewer}
       />
       {showNativePDFViewer && (
-        <NativePDFViewer url={url} item={item} type={type} contentView />
+        <IFrameWrapper className="max-w-7xl h-[95vh] p-0 flex flex-col overflow-hidden bg-white border-0 shadow-2xl">
+          <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`} className="w-full h-full border-none" />
+        </IFrameWrapper>
       )}
       {!showNativePDFViewer && (
         <ViewerContent
@@ -220,7 +221,6 @@ const PDFViewer = ({ url, item, type }: PDFViewerProps) => {
           </CanvasWrapper>
         </ViewerContent>
       )}
-
       {numPages > 1 && (
         <ControlBar>
           <Paginator
@@ -292,6 +292,14 @@ const ControlBar = styled.div`
       }
     }
   }
+`;
+
+
+const IFrameWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  border: none;
+  margin: 0 auto;
 `;
 
 export default PDFViewer;

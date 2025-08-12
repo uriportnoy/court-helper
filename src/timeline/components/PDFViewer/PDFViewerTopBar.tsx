@@ -5,7 +5,7 @@ import ShareMenu from "./ShareMenu";
 import styled from "styled-components";
 import PageRangeExtractor from "../PDFComponent/PageRangeExtractor";
 import { ItemMenuProps } from "../ItemMenu.tsx";
-import { FileText,   } from "lucide-react";
+import { FileText, } from "lucide-react";
 
 interface PDFViewerTopBarProps {
   url: string;
@@ -70,7 +70,7 @@ function PDFViewerTopBar({
   }, []);
 
   return (
-    <ToolBar>
+    <ToolBar>{!showNativePDFViewer &&
       <ToolGroup>
         <ToolButton
           onClick={() => handleZoom(-0.1)}
@@ -87,10 +87,10 @@ function PDFViewerTopBar({
         >
           <i className="pi pi-plus" />
         </ToolButton>
-      </ToolGroup>
+      </ToolGroup>}
 
       <ToolGroup>
-        <ToolButton onClick={handleRotate} disabled={isLoading} title="Rotate">
+       {!showNativePDFViewer && <> <ToolButton onClick={handleRotate} disabled={isLoading} title="Rotate">
           <i className="pi pi-refresh" />
         </ToolButton>
 
@@ -107,6 +107,7 @@ function PDFViewerTopBar({
         >
           <i className="pi pi-undo" />
         </ToolButton>
+        </>}
 
         <ToolButton
           onClick={handleDownload}
@@ -115,15 +116,14 @@ function PDFViewerTopBar({
           className={downloadStatus ? `status-${downloadStatus}` : ""}
         >
           <i
-            className={`pi ${
-              downloadStatus === "downloading"
-                ? "pi-spin pi-spinner"
-                : downloadStatus === "success"
-                  ? "pi-check"
-                  : downloadStatus === "error"
-                    ? "pi-times"
-                    : "pi-download"
-            }`}
+            className={`pi ${downloadStatus === "downloading"
+              ? "pi-spin pi-spinner"
+              : downloadStatus === "success"
+                ? "pi-check"
+                : downloadStatus === "error"
+                  ? "pi-times"
+                  : "pi-download"
+              }`}
           />
         </ToolButton>
 
@@ -134,15 +134,14 @@ function PDFViewerTopBar({
           className={shareStatus ? `status-${shareStatus}` : ""}
         >
           <i
-            className={`pi ${
-              shareStatus === "sharing"
-                ? "pi-spin pi-spinner"
-                : shareStatus === "success"
-                  ? "pi-check"
-                  : shareStatus === "error"
-                    ? "pi-times"
-                    : "pi-share-alt"
-            }`}
+            className={`pi ${shareStatus === "sharing"
+              ? "pi-spin pi-spinner"
+              : shareStatus === "success"
+                ? "pi-check"
+                : shareStatus === "error"
+                  ? "pi-times"
+                  : "pi-share-alt"
+              }`}
           />
         </ToolButton>
         <ToolButton
@@ -150,7 +149,7 @@ function PDFViewerTopBar({
           title="Show Native PDF Viewer"
           disabled={isLoading}
         >
-         {showNativePDFViewer ? <FileText className="w-4 h-4" /> : <FileText className="w-4 h-4 active" />}
+          {showNativePDFViewer ? <FileText className="w-4 h-4" /> : <FileText className="w-4 h-4 active" />}
         </ToolButton>
         <PageRangeExtractor
           url={url}
@@ -174,9 +173,11 @@ function PDFViewerTopBar({
           )}
         </AnimatePresence>
       </ToolGroup>
-      <PageInfo>
-        Page {pageNum} of {numPages || "?"}
-      </PageInfo>
+      {!showNativePDFViewer &&
+        <PageInfo>
+          Page {pageNum} of {numPages || "?"}
+        </PageInfo>
+      }
     </ToolBar>
   );
 }

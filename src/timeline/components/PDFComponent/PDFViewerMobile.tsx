@@ -45,26 +45,26 @@ export default function PDFViewerMobile({
   if (contentView) {
     return (
       <PDFContent>
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
-          <Loader2 className="w-8 h-8 text-gray-500 animate-spin" />
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+            <Loader2 className="w-8 h-8 text-gray-500 animate-spin" />
+          </div>
+        )}
+        <div className="w-full h-full overflow-hidden touch-none">
+          <div
+            className="w-full h-full overflow-auto"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
+            <iframe
+              src={viewerUrl}
+              className={`w-full h-full border-none transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
+              onLoad={() => setIsLoading(false)}
+              title={title}
+              allow="fullscreen"
+            />
+          </div>
         </div>
-      )}
-      <div className="w-full h-full overflow-hidden touch-none">
-        <div
-          className="w-full h-full overflow-auto"
-          style={{ WebkitOverflowScrolling: "touch" }}
-        >
-          <iframe
-            src={viewerUrl}
-            className={`w-full h-full border-none transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
-            onLoad={() => setIsLoading(false)}
-            title={title}
-            allow="fullscreen"
-          />
-        </div>
-      </div>
-    </PDFContent>
+      </PDFContent>
     );
   }
   return (

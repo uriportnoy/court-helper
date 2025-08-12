@@ -1,8 +1,7 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import styled from "styled-components";
 import PDFButton from "./PDFButton.tsx";
 import { CurrentFile } from "../UploadPDF/types.ts";
-import { default as PDFViewerr } from "../../components/PDFComponent/PDFViewer.tsx";
 import { ItemMenuProps } from "../ItemMenu.tsx";
 
 interface PdfType {
@@ -19,14 +18,13 @@ const MultiplePdfViewer = ({ fileURL, date, item }: PdfType) => {
     <Wrapper>
       {fileURL.map((pdf, index) => {
         return <Fragment key={`${pdf.url || ""}-${index}`}>
-           <PDFButton
+          <PDFButton
             url={pdf.url}
             type={pdf.type}
             date={date}
             label={pdf.label || "View PDF"}
             item={item}
           />
-          {/* <PDFViewerr url={pdf.url} title={pdf.label} type={pdf.type} item={item} /> */}
         </Fragment>
       })}
     </Wrapper>
