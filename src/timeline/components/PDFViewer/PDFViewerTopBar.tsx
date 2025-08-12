@@ -90,23 +90,23 @@ function PDFViewerTopBar({
       </ToolGroup>}
 
       <ToolGroup>
-       {!showNativePDFViewer && <> <ToolButton onClick={handleRotate} disabled={isLoading} title="Rotate">
+        {!showNativePDFViewer && <> <ToolButton onClick={handleRotate} disabled={isLoading} title="Rotate">
           <i className="pi pi-refresh" />
         </ToolButton>
 
-        <ToolButton
-          onClick={handleResetView}
-          disabled={
-            isLoading ||
-            (scale === initialScale &&
-              rotation === 0 &&
-              panPosition.x === 0 &&
-              panPosition.y === 0)
-          }
-          title="Reset View"
-        >
-          <i className="pi pi-undo" />
-        </ToolButton>
+          <ToolButton
+            onClick={handleResetView}
+            disabled={
+              isLoading ||
+              (scale === initialScale &&
+                rotation === 0 &&
+                panPosition.x === 0 &&
+                panPosition.y === 0)
+            }
+            title="Reset View"
+          >
+            <i className="pi pi-undo" />
+          </ToolButton>
         </>}
 
         <ToolButton
