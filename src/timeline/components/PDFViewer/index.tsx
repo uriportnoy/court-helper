@@ -185,6 +185,8 @@ const PDFViewer = ({ url, item, type }: PDFViewerProps) => {
     return <ErrorDisplay message={error} onRetry={handleRetry} />;
   }
 
+  const isCustomViewer = !showNativePDFViewer;
+
   return (
     <ViewerContainer>
       <PDFViewerTopBar
@@ -202,7 +204,7 @@ const PDFViewer = ({ url, item, type }: PDFViewerProps) => {
           <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`} className="w-full h-full border-none" />
         </IFrameWrapper>
       )}
-      {!showNativePDFViewer && (
+      {isCustomViewer && (
         <ViewerContent
           ref={containerRef}
           className={isPinchZooming ? "pinch-zooming" : ""}
@@ -221,7 +223,7 @@ const PDFViewer = ({ url, item, type }: PDFViewerProps) => {
           </CanvasWrapper>
         </ViewerContent>
       )}
-      {numPages > 1 && (
+      {isCustomViewer &&numPages > 1 && (
         <ControlBar>
           <Paginator
             first={pageNum - 1}
