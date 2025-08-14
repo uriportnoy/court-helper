@@ -8,7 +8,6 @@ import LoadingAnimation from "./LoadingAnimation";
 import ErrorDisplay from "./ErrorDisplay";
 import usePinchZoom from "./utils/usePinchZoom";
 import PDFViewerTopBar from "./PDFViewerTopBar.tsx";
-import { default as NativePDFViewer } from "../PDFComponent/PDFViewer.tsx";
 import { ItemMenuProps } from "../ItemMenu.tsx";
 import { getInitialScale } from "./utils";
 
@@ -223,7 +222,7 @@ const PDFViewer = ({ url, item, type }: PDFViewerProps) => {
           </CanvasWrapper>
         </ViewerContent>
       )}
-      {isCustomViewer &&numPages > 1 && (
+      {isCustomViewer && numPages > 1 && (
         <ControlBar>
           <Paginator
             first={pageNum - 1}

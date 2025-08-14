@@ -5,6 +5,7 @@ import PDFViewer from "../PDFViewer";
 import styled from "styled-components";
 import { FileURL } from "timeline/types";
 import { ItemMenuProps } from "../ItemMenu.tsx";
+import { getCurrentDevice } from "../PDFViewer/utils/index.ts";
 
 interface PDFButtonProps extends FileURL {
   item: ItemMenuProps;
@@ -22,6 +23,7 @@ const PDFButton = ({ url, label, type, date, item }: PDFButtonProps) => {
   }, [visible]);
 
   if (!url) return null;
+  const size = getCurrentDevice() === "mobile" ?  100 : 90;
   return (
     <>
       <ViewButton
@@ -35,8 +37,8 @@ const PDFButton = ({ url, label, type, date, item }: PDFButtonProps) => {
         onHide={() => setVisible(false)}
         header={`${label} ${date}` || "PDF Document"}
         maximizable
-        style={{ width: "90vw", height: "90vh" }}
-        contentStyle={{ height: "calc(90vh - 6rem)", padding: 0 }}
+        style={{ width: `${size}vw`, height: `${size}vh` }}
+        contentStyle={{ height: `calc(${size}vh - 6rem)`, padding: 0 }}
       >
         <PDFViewer url={url} item={item} type={type} />
       </Dialog>
