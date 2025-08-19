@@ -25,7 +25,7 @@ const ItemMenu = React.forwardRef((props: ItemMenuProps, ref) => {
       <Dialog
         header="Header"
         visible={visible}
-        style={{ width: "50vw" }}
+        style={{ width: "100vw" }}
         onHide={() => {
           if (!visible) {
             return;
