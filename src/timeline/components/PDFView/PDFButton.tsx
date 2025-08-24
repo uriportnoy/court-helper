@@ -40,7 +40,7 @@ const PDFButton = ({ url, label, type, date, item }: PDFButtonProps) => {
         style={{ width: `${size}vw`, height: `${size}vh` }}
         contentStyle={{ height: `calc(${size}vh - 6rem)`, padding: 0 }}
       >
-        <PDFViewer url={url} item={item} type={type} />
+        <PDFViewer url={url} item={item} type={type} label={label} />
       </Dialog>
     </>
   );

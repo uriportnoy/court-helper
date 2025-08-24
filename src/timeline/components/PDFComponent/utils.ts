@@ -4,7 +4,7 @@ import { PDFDocument } from "pdf-lib";
 
 export const downloadPDF = async (url: string, fileTitle: string, item: ItemMenuProps) => {
   const downloadName = ((item.title || item.type || 'document') + '_' + fileTitle).replaceAll(' ', '_');  
-  const isDocxFile = url.includes('/docx')
+  const isDocxFile = url.includes('/docx');
   try {
     const response = await fetch(url);
     if (!response.ok) {

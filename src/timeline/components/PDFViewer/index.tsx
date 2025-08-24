@@ -15,8 +15,9 @@ interface PDFViewerProps {
   url: string;
   item: ItemMenuProps;
   type: string;
+  label: string;
 }
-const PDFViewer = ({ url, item, type }: PDFViewerProps) => {
+const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [pdfDoc, setPdfDoc] = useState(null);
@@ -197,6 +198,7 @@ const PDFViewer = ({ url, item, type }: PDFViewerProps) => {
         item={item}
         showNativePDFViewer={showNativePDFViewer}
         setShowNativePDFViewer={setShowNativePDFViewer}
+        label={label}
       />
       {showNativePDFViewer && (
         <IFrameWrapper className="max-w-7xl h-[95vh] p-0 flex flex-col overflow-hidden bg-white border-0 shadow-2xl">
