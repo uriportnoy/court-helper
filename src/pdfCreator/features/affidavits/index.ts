@@ -1,3 +1,3 @@
-export * from './components/AffidavitForm';
-export * from './components/AffidavitPreview';
-export * from './utils/date';
+export * from "./components/AffidavitForm";
+export * from "./components/AffidavitPreview";
+export * from "./utils/date";

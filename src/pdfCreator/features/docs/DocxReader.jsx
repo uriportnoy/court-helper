@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import JSZip from 'jszip';
+import React, { useState } from "react";
+import JSZip from "jszip";
 
 const DocxReader = ({ onLoad }) => {
   const [file, setFile] = useState(null);
@@ -25,7 +25,7 @@ const DocxReader = ({ onLoad }) => {
         console.error(error);
       }
     };
-    reader.onerror = (err) => console.error('File reading error:', err);
+    reader.onerror = (err) => console.error("File reading error:", err);
     reader.readAsArrayBuffer(uploadedFile);
   };
 
@@ -51,7 +51,7 @@ const DocxReader = ({ onLoad }) => {
         lastPage += 2;
         matches.set(attachment, {
           id: crypto.randomUUID(),
-          description: '',
+          description: "",
           position: attachment,
           pageNumber: lastPage,
           hint,
@@ -66,18 +66,18 @@ const DocxReader = ({ onLoad }) => {
     if (str.charCodeAt(0) === 65279) {
       str = str.substr(1);
     }
-    return new DOMParser().parseFromString(str, 'text/xml');
+    return new DOMParser().parseFromString(str, "text/xml");
   }
 
   async function getParagraphs(content) {
     const zip = await JSZip.loadAsync(content);
-    const xml = str2xml(await zip.file('word/document.xml').async('text'));
+    const xml = str2xml(await zip.file("word/document.xml").async("text"));
     // const xml = str2xml(zip.files['word/document.xml'].asText());
-    const paragraphsXml = xml.getElementsByTagName('w:p');
+    const paragraphsXml = xml.getElementsByTagName("w:p");
     const paragraphs = [];
     for (let i = 0; i < paragraphsXml.length; i++) {
-      let fullText = '';
-      const textsXml = paragraphsXml[i].getElementsByTagName('w:t');
+      let fullText = "";
+      const textsXml = paragraphsXml[i].getElementsByTagName("w:t");
       for (let j = 0; j < textsXml.length; j++) {
         const textXml = textsXml[j];
         if (textXml.childNodes.length) {
@@ -100,7 +100,7 @@ const DocxReader = ({ onLoad }) => {
       ) : (
         <button
           className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          onClick={() => document.getElementById('fileInput').click()}
+          onClick={() => document.getElementById("fileInput").click()}
         >
           Upload File
         </button>
@@ -110,7 +110,7 @@ const DocxReader = ({ onLoad }) => {
         type="file"
         accept=".docx"
         onChange={onFileChange}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
       />
     </div>
   );

@@ -1,16 +1,21 @@
-import React from 'react';
+import React from "react";
 
 interface DescriptionInputProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-export const DescriptionInput: React.FC<DescriptionInputProps> = ({ value, onChange }) => {
-  const [description,setDescription] = React.useState(value);
+export const DescriptionInput: React.FC<DescriptionInputProps> = ({
+  value,
+  onChange,
+}) => {
+  const [description, setDescription] = React.useState(value);
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <label className="block text-sm font-medium text-gray-700 mb-1">תיאור</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        תיאור
+      </label>
       <textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}

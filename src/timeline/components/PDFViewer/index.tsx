@@ -48,7 +48,9 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
     isZoomedIn,
   } = pinchProps;
 
-  const [showNativePDFViewer, setShowNativePDFViewer] = useState(url.includes('docx'));
+  const [showNativePDFViewer, setShowNativePDFViewer] = useState(
+    url.includes("docx"),
+  );
 
   const renderPage = useCallback(
     async (num) => {
@@ -202,7 +204,10 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
       />
       {showNativePDFViewer && (
         <IFrameWrapper className="max-w-7xl h-[95vh] p-0 flex flex-col overflow-hidden bg-white border-0 shadow-2xl">
-          <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`} className="w-full h-full border-none" />
+          <iframe
+            src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
+            className="w-full h-full border-none"
+          />
         </IFrameWrapper>
       )}
       {isCustomViewer && (
@@ -218,7 +223,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
               ref={canvasRef}
               style={{
                 cursor: isZoomedIn ? "grab" : "default",
-                display: "block"
+                display: "block",
               }}
             />
           </CanvasWrapper>
@@ -296,7 +301,6 @@ const ControlBar = styled.div`
     }
   }
 `;
-
 
 const IFrameWrapper = styled.div`
   width: 100%;

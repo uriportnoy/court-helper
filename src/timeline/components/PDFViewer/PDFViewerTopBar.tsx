@@ -45,18 +45,20 @@ function PDFViewerTopBar({
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [downloadStatus, setDownloadStatus] = useState(null);
   const [shareStatus, setShareStatus] = useState(null);
-console.log(  url,
-  scale,
-  rotation,
-  panPosition,
-  pageNum,
-  numPages,
-  isLoading,
-  handleZoom,
-  handleRotate,
-  handleResetView,
-  initialScale,
-  item,);
+  console.log(
+    url,
+    scale,
+    rotation,
+    panPosition,
+    pageNum,
+    numPages,
+    isLoading,
+    handleZoom,
+    handleRotate,
+    handleResetView,
+    initialScale,
+    item,
+  );
 
   const handleDownload = useCallback(async () => {
     setDownloadStatus("downloading");
@@ -144,10 +146,10 @@ console.log(  url,
               downloadStatus === "downloading"
                 ? "pi-spin pi-spinner"
                 : downloadStatus === "success"
-                ? "pi-check"
-                : downloadStatus === "error"
-                ? "pi-times"
-                : "pi-download"
+                  ? "pi-check"
+                  : downloadStatus === "error"
+                    ? "pi-times"
+                    : "pi-download"
             }`}
           />
         </ToolButton>
@@ -163,10 +165,10 @@ console.log(  url,
               shareStatus === "sharing"
                 ? "pi-spin pi-spinner"
                 : shareStatus === "success"
-                ? "pi-check"
-                : shareStatus === "error"
-                ? "pi-times"
-                : "pi-share-alt"
+                  ? "pi-check"
+                  : shareStatus === "error"
+                    ? "pi-times"
+                    : "pi-share-alt"
             }`}
           />
         </ToolButton>

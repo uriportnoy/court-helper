@@ -17,15 +17,17 @@ const MultiplePdfViewer = ({ fileURL, date, item }: PdfType) => {
   return (
     <Wrapper>
       {fileURL.map((pdf, index) => {
-        return <Fragment key={`${pdf.url || ""}-${index}`}>
-          <PDFButton
-            url={pdf.url}
-            type={pdf.type}
-            date={date}
-            label={pdf.label || "View PDF"}
-            item={item}
-          />
-        </Fragment>
+        return (
+          <Fragment key={`${pdf.url || ""}-${index}`}>
+            <PDFButton
+              url={pdf.url}
+              type={pdf.type}
+              date={date}
+              label={pdf.label || "View PDF"}
+              item={item}
+            />
+          </Fragment>
+        );
       })}
     </Wrapper>
   );

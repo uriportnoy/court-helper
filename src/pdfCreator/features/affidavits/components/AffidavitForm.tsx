@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { AffidavitProps } from '../types';
-import { parseDate, formatDate } from '../utils/date';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState } from "react";
+import { AffidavitProps } from "../types";
+import { parseDate, formatDate } from "../utils/date";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export const AffidavitForm: React.FC<AffidavitProps> = ({ data, onChange }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -30,7 +30,7 @@ export const AffidavitForm: React.FC<AffidavitProps> = ({ data, onChange }) => {
             <span className="text-gray-600">עו"ד {data.lawyer}</span>
             <span className="text-gray-400">•</span>
             <span className="text-gray-600">
-              {data.isRemote ? 'מרחוק' : 'פרונטלי'}
+              {data.isRemote ? "מרחוק" : "פרונטלי"}
             </span>
           </div>
           <div className="text-gray-400">
@@ -118,8 +118,8 @@ export const AffidavitForm: React.FC<AffidavitProps> = ({ data, onChange }) => {
                   onClick={() => onChange({ ...data, isRemote: true })}
                   className={`px-3 py-2 text-sm font-medium rounded-md ${
                     data.isRemote
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                      : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                      ? "bg-blue-50 text-blue-700 border border-blue-200"
+                      : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
                   }`}
                 >
                   אישור עו"ד מרחוק
@@ -128,8 +128,8 @@ export const AffidavitForm: React.FC<AffidavitProps> = ({ data, onChange }) => {
                   onClick={() => onChange({ ...data, isRemote: false })}
                   className={`px-3 py-2 text-sm font-medium rounded-md ${
                     !data.isRemote
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                      : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                      ? "bg-blue-50 text-blue-700 border border-blue-200"
+                      : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
                   }`}
                 >
                   אישור עו"ד פרונטלי

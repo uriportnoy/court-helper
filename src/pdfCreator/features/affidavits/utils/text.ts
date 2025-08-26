@@ -1,7 +1,7 @@
-import { DeclarationData } from 'pdfCreator/types';
+import { DeclarationData } from "pdfCreator/types";
 
 export const getAffidavitText = (data: DeclarationData): string => {
-  const type = data.comment || 'תגובתי';
+  const type = data.comment || "תגובתי";
   return `אני הח"מ, ${data.name}, ת.ז. ${data.id} לאחר שהוזהרתי כי עליי להצהיר את האמת וכי אהיה צפוי לעונשים הקבועים בחוק אם לא אעשה כן, מצהיר בזה כי כל העובדות המפורטות ב${type} מיום ${data.date}, אמת ונכון.`;
 };
 

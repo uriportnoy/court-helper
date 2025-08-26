@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { ItemProps } from '../types';
-import { Trash2, GripVertical, ArrowDown, ArrowUp } from 'lucide-react';
-import { PageNumberControl } from './PageNumberControl';
+import React, { useState } from "react";
+import { ItemProps } from "../types";
+import { Trash2, GripVertical, ArrowDown, ArrowUp } from "lucide-react";
+import { PageNumberControl } from "./PageNumberControl";
 
 export const ItemForm: React.FC<ItemProps> = ({
   page,
@@ -51,7 +51,7 @@ export const ItemForm: React.FC<ItemProps> = ({
   };
 
   const handleDescriptionKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleDescriptionBlur();
     }
@@ -60,13 +60,13 @@ export const ItemForm: React.FC<ItemProps> = ({
   const getDropIndicator = () => {
     if (!draggedPage || draggedPage.id === page.id) return null;
 
-    const direction = draggedPage.position < page.position ? 'down' : 'up';
-    const Icon = direction === 'down' ? ArrowDown : ArrowUp;
+    const direction = draggedPage.position < page.position ? "down" : "up";
+    const Icon = direction === "down" ? ArrowDown : ArrowUp;
 
     return (
       <div
         className={`absolute ${
-          direction === 'down' ? '-bottom-3' : '-top-3'
+          direction === "down" ? "-bottom-3" : "-top-3"
         } left-1/2 transform -translate-x-1/2 z-10`}
       >
         <div className="relative">
@@ -82,22 +82,22 @@ export const ItemForm: React.FC<ItemProps> = ({
     <div
       draggable={!isEditing}
       onDragStart={(e) => {
-        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.effectAllowed = "move";
         onDragStart(e, page);
       }}
       onDragOver={(e) => {
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
+        e.dataTransfer.dropEffect = "move";
         onDragOver(e);
       }}
       onDragEnd={onDragEnd}
       onDrop={(e) => onDrop(e, page)}
       className={`relative border rounded-lg p-2 transition-all duration-200 ${
-        isDragging ? 'opacity-50 scale-95 rotate-1' : ''
+        isDragging ? "opacity-50 scale-95 rotate-1" : ""
       } ${
         isDragOver
-          ? 'border-blue-500 border-2 transform scale-105'
-          : 'border-gray-200'
+          ? "border-blue-500 border-2 transform scale-105"
+          : "border-gray-200"
       }`}
     >
       {isDragOver && getDropIndicator()}
@@ -111,14 +111,14 @@ export const ItemForm: React.FC<ItemProps> = ({
             value={page.hint}
             readOnly
             style={{
-              position: 'absolute',
-              height: '100px',
-              top: '-100px',
-              width: '98%',
-              boxShadow: '1px 1px 1px 1px #eee',
-              resize: 'none',
-              pointerEvents: 'none',
-              padding: '4px',
+              position: "absolute",
+              height: "100px",
+              top: "-100px",
+              width: "98%",
+              boxShadow: "1px 1px 1px 1px #eee",
+              resize: "none",
+              pointerEvents: "none",
+              padding: "4px",
             }}
           />
         )}
@@ -143,7 +143,7 @@ export const ItemForm: React.FC<ItemProps> = ({
               onClick={handleDescriptionClick}
               className="px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded cursor-text min-h-[28px]"
             >
-              {page.description || 'הוסף תיאור...'}
+              {page.description || "הוסף תיאור..."}
             </div>
           )}
         </div>

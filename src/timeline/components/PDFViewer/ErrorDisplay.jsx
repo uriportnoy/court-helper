@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
-import styled from 'styled-components';
+import { motion } from "framer-motion";
+import styled from "styled-components";
 
 const ErrorDisplay = ({ message, onRetry }) => (
   <ErrorWrapper
@@ -16,7 +16,7 @@ const ErrorDisplay = ({ message, onRetry }) => (
           transition={{
             duration: 2,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         >
           <i className="pi pi-exclamation-triangle" />
@@ -61,7 +61,7 @@ const ErrorContent = styled.div`
 const IconWrapper = styled.div`
   font-size: 3rem;
   color: var(--red-600);
-  
+
   i {
     display: block;
   }
@@ -84,11 +84,11 @@ const RetryButton = styled(motion.button)`
   font-weight: 500;
   font-size: 1rem;
   transition: background 0.2s ease;
-  
+
   &:hover {
     background: var(--primary-700);
   }
-  
+
   i {
     font-size: 1.125rem;
   }

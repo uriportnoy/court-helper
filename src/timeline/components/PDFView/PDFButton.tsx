@@ -23,7 +23,7 @@ const PDFButton = ({ url, label, type, date, item }: PDFButtonProps) => {
   }, [visible]);
 
   if (!url) return null;
-  const size = getCurrentDevice() === "mobile" ?  100 : 90;
+  const size = getCurrentDevice() === "mobile" ? 100 : 90;
   return (
     <>
       <ViewButton

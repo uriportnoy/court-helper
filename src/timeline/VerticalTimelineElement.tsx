@@ -79,7 +79,7 @@ const VerticalTimelineElement = ({
             <ContentHeader data-auto="content-header">{children}</ContentHeader>
             {fileURL && fileURL.length > 0 ? (
               <PDFSection>
-                <PDFViewer fileURL={fileURL} date={date} item={item}/>
+                <PDFViewer fileURL={fileURL} date={date} item={item} />
               </PDFSection>
             ) : null}
             <MetadataSection>

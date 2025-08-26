@@ -1,5 +1,5 @@
-import { DeclarationData } from 'pdfCreator/types';
-import { Page } from './page';
+import { DeclarationData } from "pdfCreator/types";
+import { Page } from "./page";
 
 export interface PDFSettings {
   showTable: boolean;

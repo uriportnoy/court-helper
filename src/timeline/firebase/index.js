@@ -5,7 +5,7 @@ import {
   signInWithPopup as signIn,
   getRedirectResult as _getRedirectResult,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import "./migration";
@@ -35,4 +35,11 @@ export const getRedirectResult = () => _getRedirectResult(auth);
 export const onAuthStateChanged = (callback) =>
   auth.onAuthStateChanged(callback);
 
-export { app, storage, auth, provider, createUserWithEmailAndPassword ,   signInWithEmailAndPassword};
+export {
+  app,
+  storage,
+  auth,
+  provider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+};

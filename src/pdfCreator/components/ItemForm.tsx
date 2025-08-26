@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { ItemProps } from '../types';
-import { Trash2, GripVertical } from 'lucide-react';
-import { PageNumberControl } from './PageNumberControl';
+import React, { useState } from "react";
+import { ItemProps } from "../types";
+import { Trash2, GripVertical } from "lucide-react";
+import { PageNumberControl } from "./PageNumberControl";
 
 export const ItemForm: React.FC<ItemProps> = ({
   page,
@@ -27,8 +27,8 @@ export const ItemForm: React.FC<ItemProps> = ({
         ? page.position
         : page.position - 1
       : draggedPage.position < page.position
-      ? page.position - 1
-      : page.position;
+        ? page.position - 1
+        : page.position;
   };
 
   const displayPosition = isDragging ? page.position : getPreviewPosition();
@@ -44,8 +44,8 @@ export const ItemForm: React.FC<ItemProps> = ({
       onDragEnd={onDragEnd}
       onDrop={(e) => onDrop(e, page)}
       className={`relative border rounded-lg p-4 transition-all duration-200 
-        ${isDragging ? 'opacity-50 scale-95 rotate-1' : ''} 
-        ${isDragOver ? 'border-blue-500 border-2 scale-105' : 'border-gray-200'}`}
+        ${isDragging ? "opacity-50 scale-95 rotate-1" : ""} 
+        ${isDragOver ? "border-blue-500 border-2 scale-105" : "border-gray-200"}`}
     >
       <div className="flex items-center gap-4">
         <div className="cursor-grab hover:bg-gray-100 p-2 rounded transition-colors">
@@ -67,7 +67,7 @@ export const ItemForm: React.FC<ItemProps> = ({
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
+                if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
                   setIsEditing(false);
                   if (description !== page.description) {
@@ -84,7 +84,7 @@ export const ItemForm: React.FC<ItemProps> = ({
               onClick={() => setIsEditing(true)}
               className="px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded cursor-text min-h-[38px]"
             >
-              {page.description || 'הוסף תיאור...'}
+              {page.description || "הוסף תיאור..."}
             </div>
           )}
         </div>

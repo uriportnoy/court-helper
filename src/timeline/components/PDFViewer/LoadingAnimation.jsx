@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
-import styled from 'styled-components';
+import { motion } from "framer-motion";
+import styled from "styled-components";
 
 const LoadingAnimation = () => (
   <LoadingWrapper
@@ -17,7 +17,7 @@ const LoadingAnimation = () => (
           transition={{
             duration: 2,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         >
           <i className="pi pi-file-pdf" />
@@ -36,7 +36,7 @@ const LoadingAnimation = () => (
         transition={{
           repeat: Infinity,
           duration: 1.5,
-          ease: "easeInOut"
+          ease: "easeInOut",
         }}
       />
     </LoadingContent>
@@ -67,7 +67,7 @@ const LoadingContent = styled.div`
 const IconWrapper = styled.div`
   font-size: 3rem;
   color: var(--primary-600);
-  
+
   i {
     display: block;
   }

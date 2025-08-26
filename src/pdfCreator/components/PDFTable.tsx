@@ -1,15 +1,17 @@
-import React from 'react';
-import { Page, View, Text } from '@react-pdf/renderer';
-import { Page as PageType } from '../types';
-import { tableStyles } from '../styles/pdf/table';
+import React from "react";
+import { Page, View, Text } from "@react-pdf/renderer";
+import { Page as PageType } from "../types";
+import { tableStyles } from "../styles/pdf/table";
 
 interface PDFTableProps {
   pages: PageType[];
 }
 
-const PDFTable: React.FC<PDFTableProps> = ({ pages } = {
-  pages: []
-}) => {
+const PDFTable: React.FC<PDFTableProps> = (
+  { pages } = {
+    pages: [],
+  },
+) => {
   const sortedPages = [...pages].sort((a, b) => a.position - b.position);
 
   return (

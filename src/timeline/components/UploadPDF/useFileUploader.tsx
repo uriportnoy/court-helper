@@ -20,7 +20,7 @@ export function useFileUploader({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [currentFile, setCurrentFile] = useImmer(file);
   const [error, setError] = useState<string | null>(null);
- 
+
   const { label } = currentFile;
   const handleUpload = useCallback(
     async (event: HTMLInputElement) => {
@@ -33,9 +33,9 @@ export function useFileUploader({
       try {
         const { name, ext } = getFileNameAndExtension(files[0].name) || {};
         const storage = getStorage();
-        const finalFileName = fileName 
-        ? `${fileName}_${label || "untitled"}_${Date.now()}` // Add timestamp for uniqueness
-        : `${name || "name"}_${label || "untitled"}_${Date.now()}`;
+        const finalFileName = fileName
+          ? `${fileName}_${label || "untitled"}_${Date.now()}` // Add timestamp for uniqueness
+          : `${name || "name"}_${label || "untitled"}_${Date.now()}`;
         const folderName = ext === "pdf" ? "pdfs" : ext;
         const storageRef = ref(storage, `${folderName}/${finalFileName}`);
         const uploadTask = uploadBytesResumable(storageRef, files[0]);

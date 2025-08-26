@@ -1,9 +1,9 @@
 import Center from "./Center";
-import LoginForm from './LoginForm';
+import LoginForm from "./LoginForm";
 import { Toast } from "primereact/toast";
 import { cloneElement, useEffect, useRef, useState } from "react";
-import styled from 'styled-components';
-import PropTypes from 'prop-types';
+import styled from "styled-components";
+import PropTypes from "prop-types";
 import {
   onAuthStateChanged,
   signInWithPopup,
@@ -66,7 +66,9 @@ function AppWithLogin({ children }) {
 
   const signIn = async () => {
     try {
-      const result = await (isMobile() ? signInWithRedirect() : signInWithPopup());
+      const result = await (isMobile()
+        ? signInWithRedirect()
+        : signInWithPopup());
       const currentUser = result.user;
       setUser(currentUser);
       setHasAccess(ALLOW_USERS.includes(currentUser.email));
@@ -146,14 +148,14 @@ const GoogleSignInButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  
+
   &:hover {
     background-color: var(--surface-100);
     border-color: var(--surface-400);
   }
 
   .pi-google {
-    color: #DB4437;
+    color: #db4437;
   }
 `;
 
@@ -164,18 +166,18 @@ const Divider = styled.div`
   margin: var(--spacing-md) 0;
   color: var(--surface-500);
   font-size: 0.875rem;
-  
+
   &::before,
   &::after {
-    content: '';
+    content: "";
     flex: 1;
     border-bottom: 1px solid var(--surface-200);
   }
-  
+
   &::before {
     margin-right: var(--spacing-md);
   }
-  
+
   &::after {
     margin-left: var(--spacing-md);
   }

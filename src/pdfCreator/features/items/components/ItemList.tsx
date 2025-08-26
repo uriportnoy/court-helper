@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { ItemListProps } from '../types';
-import { ItemForm } from './ItemForm';
-import { getSortedPages } from '../utils/sorting';
+import React, { useEffect, useState } from "react";
+import { ItemListProps } from "../types";
+import { ItemForm } from "./ItemForm";
+import { getSortedPages } from "../utils/sorting";
 
 export const ItemList: React.FC<ItemListProps> = ({
   pages,
@@ -19,14 +19,14 @@ export const ItemList: React.FC<ItemListProps> = ({
   const [renderKey, setRenderKey] = useState(0);
 
   useEffect(() => {
-    setRenderKey(prev => prev + 1);
+    setRenderKey((prev) => prev + 1);
   }, [pages]);
 
   const sortedPages = getSortedPages(pages);
 
   const handleDrop = (e: React.DragEvent, page: Page) => {
     onDrop(e, page);
-    setRenderKey(prev => prev + 1);
+    setRenderKey((prev) => prev + 1);
   };
 
   return (

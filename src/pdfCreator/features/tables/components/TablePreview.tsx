@@ -1,10 +1,13 @@
-import React from 'react';
-import { TablePreviewProps } from '../types';
-import { getSortedPages } from '../../items/utils/sorting';
-import { tableStyles } from '../styles/table';
-import { Page, View, Text } from '@react-pdf/renderer';
+import React from "react";
+import { TablePreviewProps } from "../types";
+import { getSortedPages } from "../../items/utils/sorting";
+import { tableStyles } from "../styles/table";
+import { Page, View, Text } from "@react-pdf/renderer";
 
-export const TablePreview: React.FC<TablePreviewProps> = ({ pages, className }) => {
+export const TablePreview: React.FC<TablePreviewProps> = ({
+  pages,
+  className,
+}) => {
   const sortedPages = getSortedPages(pages);
 
   return (
@@ -29,11 +32,11 @@ export const TablePreview: React.FC<TablePreviewProps> = ({ pages, className }) 
           </View>
 
           {sortedPages.map((page, index) => (
-            <View 
-              key={page.id} 
+            <View
+              key={page.id}
               style={[
                 tableStyles.row,
-                index === sortedPages.length - 1 && tableStyles.lastRow
+                index === sortedPages.length - 1 && tableStyles.lastRow,
               ]}
             >
               <View style={[tableStyles.cell, tableStyles.indexCell]}>

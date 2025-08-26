@@ -21,7 +21,7 @@ export default function PDFViewerMobile({
   url,
   title,
   item,
-  contentView
+  contentView,
 }: PDFViewerMobileProps) {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

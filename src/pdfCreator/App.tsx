@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { PDFSettings, DeclarationData } from 'pdfCreator/types';
-import { getCurrentDate } from './features/affidavits';
+import React, { useState } from "react";
+import { PDFSettings, DeclarationData } from "pdfCreator/types";
+import { getCurrentDate } from "./features/affidavits";
 import {
   createNewPage,
   updatePagePositions,
   updatePageNumbers,
-} from './features/items';
-import { generatePDF } from './utils/pdf';
-import Header from './components/Header';
-import { ItemList } from './features/items';
-import PDFPreview from './components/PDFPreview';
-import { AffidavitForm } from './features/affidavits';
-import { Page } from './features/items/types';
-import './index.css';
+} from "./features/items";
+import { generatePDF } from "./utils/pdf";
+import Header from "./components/Header";
+import { ItemList } from "./features/items";
+import PDFPreview from "./components/PDFPreview";
+import { AffidavitForm } from "./features/affidavits";
+import { Page } from "./features/items/types";
+import "./index.css";
 
 function App() {
   const [pages, setPages] = useState<Page[]>(() => {
-    return JSON.parse(localStorage.getItem('court-locl-storage') || '[]');
+    return JSON.parse(localStorage.getItem("court-locl-storage") || "[]");
   });
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
   const [draggedPage, setDraggedPage] = useState<Page | null>(null);
@@ -28,11 +28,11 @@ function App() {
     withSignature: false,
   });
   const [declarationData, setDeclarationData] = useState<DeclarationData>({
-    name: 'אורי פורטנוי',
-    id: '201410438',
+    name: "אורי פורטנוי",
+    id: "201410438",
     date: getCurrentDate(),
-    lawyer: 'טלי בן יקיר',
-    comment: 'תגובתי',
+    lawyer: "טלי בן יקיר",
+    comment: "תגובתי",
     isRemote: true,
     withSignature: true,
   });
@@ -50,11 +50,11 @@ function App() {
     const updatedPage = { ...pageToUpdate, ...updates };
 
     // If pageNumber is being updated, handle sequential updates
-    if ('pageNumber' in updates && updates.pageNumber !== undefined) {
+    if ("pageNumber" in updates && updates.pageNumber !== undefined) {
       const updatedPages = updatePageNumbers(
         pages,
         updatedPage,
-        pageToUpdate.pageNumber
+        pageToUpdate.pageNumber,
       );
       setPages(updatedPages);
     } else {
@@ -100,7 +100,7 @@ function App() {
 
   const handleGeneratePDF = async () => {
     try {
-      localStorage.setItem('court-locl-storage', JSON.stringify(pages));
+      localStorage.setItem("court-locl-storage", JSON.stringify(pages));
       await generatePDF({
         pages,
         selectedPageId: null,
@@ -108,12 +108,12 @@ function App() {
         declarationData,
       });
     } catch (error) {
-      console.error('Failed to generate PDF:', error);
+      console.error("Failed to generate PDF:", error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8" style={{direction: 'rtl'}}>
+    <div className="min-h-screen bg-gray-50 p-8" style={{ direction: "rtl" }}>
       <div className="max-w-7xl mx-auto">
         <Header
           pdfSettings={pdfSettings}

@@ -1,2 +1,2 @@
-export * from './components/TablePreview';
-export * from './types';
+export * from "./components/TablePreview";
+export * from "./types";

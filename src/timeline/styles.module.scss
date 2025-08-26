@@ -59,7 +59,7 @@
 
   .casesSelect {
     min-width: 200px;
-    
+
     :global(.p-dropdown) {
       width: 100%;
     }
@@ -91,17 +91,14 @@
     position: relative;
     padding: 0;
     padding: 12px;
-
   }
   @media screen and (max-width: 768px) {
     :global(.p-dialog-content) {
       height: 100vh;
       width: 100vw;
     }
-   
   }
 }
-
 
 $mine: #aaffa0;
 $notMine: #ffa797;
@@ -110,7 +107,7 @@ $trd-party: #e0ceff;
 
 @mixin data-origin-styles($color) {
   background: $color;
-  &:hover{
+  &:hover {
     background: color.adjust($color, $lightness: -10%, $space: hsl);
   }
 }
@@ -130,4 +127,3 @@ $trd-party: #e0ceff;
 [data-type="trd-party"] {
   @include data-origin-styles($trd-party);
 }
-

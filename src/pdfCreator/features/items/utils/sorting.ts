@@ -1,4 +1,4 @@
-import { Page } from '../types';
+import { Page } from "../types";
 
 export const getSortedPages = (pages: Page[] = []): Page[] => {
   return [...pages].sort((a, b) => a.position - b.position);
@@ -16,7 +16,7 @@ const calculatePageSpans = (pages: Page[]): Map<string, number> => {
     if (nextPage) {
       spans.set(
         currentPage.id,
-        Math.max(1, nextPage.pageNumber - currentPage.pageNumber)
+        Math.max(1, nextPage.pageNumber - currentPage.pageNumber),
       );
     } else {
       // For the last page, keep its current span (distance from previous page)
@@ -24,7 +24,7 @@ const calculatePageSpans = (pages: Page[]): Map<string, number> => {
       if (prevPage) {
         spans.set(
           currentPage.id,
-          Math.max(1, currentPage.pageNumber - prevPage.pageNumber)
+          Math.max(1, currentPage.pageNumber - prevPage.pageNumber),
         );
       } else {
         spans.set(currentPage.id, 1); // Single page
@@ -38,7 +38,7 @@ const calculatePageSpans = (pages: Page[]): Map<string, number> => {
 export const updatePageNumbers = (
   pages: Page[],
   updatedPage: Page,
-  oldPageNumber: number
+  oldPageNumber: number,
 ): Page[] => {
   const sortedPages = getSortedPages(pages);
   const pageIndex = sortedPages.findIndex((p) => p.id === updatedPage.id);
@@ -63,7 +63,7 @@ export const updatePageNumbers = (
 export const updatePagePositions = (
   pages: Page[],
   draggedPage: Page,
-  targetPage: Page
+  targetPage: Page,
 ): Page[] => {
   const sortedPages = getSortedPages(pages);
   const draggedIndex = sortedPages.findIndex((p) => p.id === draggedPage.id);
@@ -116,7 +116,7 @@ export const createNewPage = (pages: Page[]): Page => {
   return {
     id: crypto.randomUUID(),
     position: newPosition,
-    description: '',
+    description: "",
     pageNumber: newPageNumber,
   };
 };

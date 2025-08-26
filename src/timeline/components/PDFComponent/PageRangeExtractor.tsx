@@ -18,7 +18,7 @@ export default function PageRangeExtractor({
   url,
   title,
   item,
-  totalPages = 0
+  totalPages = 0,
 }: PageRangeExtractorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [pageRange, setPageRange] = useState("");
@@ -40,7 +40,12 @@ export default function PageRangeExtractor({
         throw new Error("Invalid page range");
       }
 
-      await extractPDFPages(url, pages, `${title}_pages_${pageRange.replace(/[^0-9,-]/g, '_')}`, item);
+      await extractPDFPages(
+        url,
+        pages,
+        `${title}_pages_${pageRange.replace(/[^0-9,-]/g, "_")}`,
+        item,
+      );
       setIsOpen(false);
       setPageRange("");
     } catch (err: any) {
@@ -52,15 +57,21 @@ export default function PageRangeExtractor({
 
   const parsePageRange = (range: string, maxPages: number): number[] => {
     const pages: number[] = [];
-    const parts = range.split(',');
+    const parts = range.split(",");
 
     for (const part of parts) {
       const trimmed = part.trim();
-      
-      if (trimmed.includes('-')) {
+
+      if (trimmed.includes("-")) {
         // Range like "1-5"
-        const [start, end] = trimmed.split('-').map(n => parseInt(n.trim()));
-        if (isNaN(start) || isNaN(end) || start < 1 || end > maxPages || start > end) {
+        const [start, end] = trimmed.split("-").map((n) => parseInt(n.trim()));
+        if (
+          isNaN(start) ||
+          isNaN(end) ||
+          start < 1 ||
+          end > maxPages ||
+          start > end
+        ) {
           throw new Error(`Invalid range: ${trimmed}`);
         }
         for (let i = start; i <= end; i++) {
@@ -100,13 +111,13 @@ export default function PageRangeExtractor({
         visible={isOpen}
         onHide={() => setIsOpen(false)}
         header="Extract PDF Pages"
-        style={{ width: '35vw' }}
+        style={{ width: "35vw" }}
       >
         <ExtractorContent>
           <Description>
             Select specific pages to extract into a new PDF file.
           </Description>
-          
+
           <InputGroup>
             <Label>Page Range:</Label>
             <StyledInput
@@ -120,9 +131,7 @@ export default function PageRangeExtractor({
             </HelpText>
           </InputGroup>
 
-          {error && (
-            <ErrorMessage>{error}</ErrorMessage>
-          )}
+          {error && <ErrorMessage>{error}</ErrorMessage>}
 
           <ButtonGroup>
             <Button
@@ -162,7 +171,7 @@ const StyledDialog = styled(Dialog)`
 const ExtractButton = styled(Button)`
   border: none;
   transition: all 0.2s ease;
-  
+
   &:hover {
     transform: translateY(-1px);
   }

@@ -1,38 +1,38 @@
-import { StyleSheet } from '@react-pdf/renderer';
+import { StyleSheet } from "@react-pdf/renderer";
 
 export const commonStyles = StyleSheet.create({
   page: {
     padding: 40,
-    fontFamily: 'David',
-    direction: 'rtl',
+    fontFamily: "David",
+    direction: "rtl",
   },
   titleContainer: {
     marginBottom: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   signatureContainer: {
-    position: 'relative',
+    position: "relative",
     marginTop: 20,
-    alignItems: 'center',
-    alignSelf: 'flex-start',
+    alignItems: "center",
+    alignSelf: "flex-start",
     paddingTop: 60,
   },
   signatureLine: {
     borderBottomWidth: 1,
-    borderBottomColor: '#000',
+    borderBottomColor: "#000",
     width: 150,
     marginBottom: 5,
   },
   signatureText: {
     fontSize: 12,
-    textAlign: 'center',
-    fontFamily: 'David',
+    textAlign: "center",
+    fontFamily: "David",
   },
   boldText: {
-    fontFamily: 'David-Bold',
+    fontFamily: "David-Bold",
   },
   signature: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
   },
 });

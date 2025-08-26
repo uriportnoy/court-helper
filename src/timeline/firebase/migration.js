@@ -11,7 +11,7 @@ export const updateDocuments = async (
   collectionName,
   cbData,
   test = true,
-  action = "update"
+  action = "update",
 ) => {
   const db = getFirestore();
 
@@ -38,7 +38,7 @@ export const updateDocuments = async (
         "Processing document:",
         docSnap.id,
         "with data:",
-        docSnap.data()
+        docSnap.data(),
       );
       const newData = cbData(docSnap.data());
       console.log("New data to update:", newData);
@@ -67,7 +67,7 @@ export const updateDocuments = async (
 async function deleteFromDocument(collectionName, attributeToDelete) {
   if (!collectionName || !attributeToDelete) {
     console.error(
-      "could not delete attribute, missing collectionName or attributeToDelete"
+      "could not delete attribute, missing collectionName or attributeToDelete",
     );
     return;
   }
@@ -86,7 +86,7 @@ async function deleteFromDocument(collectionName, attributeToDelete) {
 
     await batch.commit();
     console.log(
-      `Successfully deleted attribute "${attributeToDelete}" from all documents in collection "${collectionName}"`
+      `Successfully deleted attribute "${attributeToDelete}" from all documents in collection "${collectionName}"`,
     );
   } catch (error) {
     console.error("Error deleting attribute:", error);

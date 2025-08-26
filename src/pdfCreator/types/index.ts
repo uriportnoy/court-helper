@@ -1,3 +1,3 @@
-export * from './page';
-export * from './pdf';
-export * from './declaration';
+export * from "./page";
+export * from "./pdf";
+export * from "./declaration";

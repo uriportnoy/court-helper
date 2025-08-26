@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import CreatableSelect from "react-select/creatable";
@@ -32,7 +32,7 @@ const MultipleSelect = ({
         onChange={(cases) => {
           onChange(
             cases.map((selected) => selected.value),
-            cases
+            cases,
           );
         }}
         options={_options}
