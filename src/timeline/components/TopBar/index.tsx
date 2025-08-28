@@ -12,8 +12,15 @@ import { filterConfig } from "./utils.ts";
 interface FilterConfig {
   filters: Record<string, any>;
   setFilters: (filters: Record<string, any>) => void;
+  ascending: boolean;
+  setAscending: (ascending: boolean) => void;
 }
-function TopBar({ filters, setFilters }: FilterConfig) {
+function TopBar({
+  filters,
+  setFilters,
+  ascending,
+  setAscending,
+}: FilterConfig) {
   const { loadEvents, groups, timelineData } = useAppContext();
   const [expandedFilters, setExpandedFilters] = useState(false);
   const [selectedYear, setSelectedYear] = useState(null);
@@ -34,7 +41,7 @@ function TopBar({ filters, setFilters }: FilterConfig) {
 
   const eventsByYear = useMemo(() => {
     const sorted = [...timelineData].sort(
-      (a, b) => new Date(a.date) - new Date(b.date),
+      (a, b) => new Date(a.date) - new Date(b.date)
     );
     return sorted.reduce((acc, event) => {
       const year = new Date(event.date).getFullYear();
@@ -94,6 +101,7 @@ function TopBar({ filters, setFilters }: FilterConfig) {
       value: year,
     }));
   }, [years, eventsByYear]);
+
   const renderFilter = (filter) => {
     const baseInputClasses =
       "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-sm";
@@ -173,6 +181,15 @@ function TopBar({ filters, setFilters }: FilterConfig) {
               className="w-10 h-10 rounded-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors"
             />
             <span onClick={clearFilters}>נקה</span>
+            <Button
+              icon={
+                ascending ? "pi pi-sort-amount-up" : "pi pi-sort-amount-down"
+              }
+              onClick={() => setAscending(!ascending)}
+              className="w-10 h-10 p-0 rounded-full"
+              severity="secondary"
+              aria-label={ascending ? "סדר יורד" : "סדר עולה"}
+            />
           </div>
 
           <div className="flex-1 overflow-x-auto">

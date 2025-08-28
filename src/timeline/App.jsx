@@ -9,8 +9,15 @@ import TopBar from "./components/TopBar";
 import useTimelineApp from "./useTImelineApp";
 
 function TimelineApp() {
-  const { timelineData, isLoaded, filters, setFilters, contextData } =
-    useTimelineApp();
+  const {
+    timelineData,
+    isLoaded,
+    filters,
+    setFilters,
+    contextData,
+    ascending,
+    setAscending,
+  } = useTimelineApp();
 
   if (!isLoaded) {
     return <Center>Loading...</Center>;
@@ -19,7 +26,12 @@ function TimelineApp() {
   return (
     <Provider value={contextData}>
       <div className={styles.app}>
-        <TopBar filters={filters} setFilters={setFilters} />
+        <TopBar
+          filters={filters}
+          setFilters={setFilters}
+          ascending={ascending}
+          setAscending={setAscending}
+        />
         <VerticalTimeline>
           {timelineData.map((item) => (
             <VerticalTimelineElement key={item.id} item={item}>

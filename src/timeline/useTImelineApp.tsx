@@ -12,14 +12,19 @@ export default function useTimelineApp() {
   const [cases, setCases] = useState([]);
   const [groups, setGroups] = useState([]);
   const [filters, setFilters] = useImmer({});
+  const [ascending, setAscending] = useState(true);
 
   const filterTimelineData = useCallback(() => {
+    const sortedEvents = [...allEvents].sort((a, b) => {
+      const aDate = new Date(a.date);
+      const bDate = new Date(b.date);
+      return ascending ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
+    });
     if (!filters || Object.keys(filters).length === 0) {
-      setTimelineData(allEvents);
+      setTimelineData(sortedEvents);
       return;
     }
-
-    const filteredData = allEvents.filter((item) => {
+    const filteredData = sortedEvents.filter((item) => {
       return Object.entries(filters).every(([key, value]) => {
         // Handle text search
         if (key === "text") {
@@ -72,7 +77,7 @@ export default function useTimelineApp() {
     });
 
     setTimelineData(filteredData);
-  }, [filters, allEvents]);
+  }, [filters, allEvents, ascending]);
 
   const loadEvents = useCallback(async () => {
     const events = await getEvents();
@@ -93,7 +98,7 @@ export default function useTimelineApp() {
   // Apply filters whenever filters or events change
   useEffect(() => {
     filterTimelineData();
-  }, [filterTimelineData, filters, allEvents]);
+  }, [filterTimelineData, filters, allEvents, ascending]);
 
   // Initial data load
   useEffect(() => {
@@ -113,6 +118,8 @@ export default function useTimelineApp() {
     isLoaded,
     filters,
     setFilters,
+    ascending,
+    setAscending,
     contextData: {
       loadEvents,
       allEvents,
