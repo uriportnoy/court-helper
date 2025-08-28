@@ -45,7 +45,7 @@ const FileUploader = (props: FileUploaderProps) => {
           placeholder="Source"
           isClearable={false}
         />
-        {url?.length && (
+        {url?.length ?  (
          <> <DeleteButton
             icon="pi pi-trash"
             severity="danger"
@@ -60,7 +60,7 @@ const FileUploader = (props: FileUploaderProps) => {
             }}
           /> */}
           </>
-        )}
+        ) : null}
       </InputGroup>
       {!url?.length && (
         <UploadSection>
