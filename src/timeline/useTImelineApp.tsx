@@ -18,7 +18,9 @@ export default function useTimelineApp() {
     const sortedEvents = [...allEvents].sort((a, b) => {
       const aDate = new Date(a.date);
       const bDate = new Date(b.date);
-      return ascending ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
+      return ascending
+        ? aDate.getTime() - bDate.getTime()
+        : bDate.getTime() - aDate.getTime();
     });
     if (!filters || Object.keys(filters).length === 0) {
       setTimelineData(sortedEvents);

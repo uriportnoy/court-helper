@@ -27,8 +27,8 @@ const ItemMenu = React.forwardRef((props: ItemMenuProps, ref) => {
         visible={visible}
         style={{
           width: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-            ? "48vw"
-            : "100vw",
+            ? "100vw"
+            : "48vw",
         }}
         onHide={() => {
           if (!visible) {

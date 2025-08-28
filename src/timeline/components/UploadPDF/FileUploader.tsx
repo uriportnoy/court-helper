@@ -45,8 +45,24 @@ const FileUploader = (props: FileUploaderProps) => {
           placeholder="Source"
           isClearable={false}
         />
+        {url?.length && (
+         <> <DeleteButton
+            icon="pi pi-trash"
+            severity="danger"
+            onClick={handleDelete}
+            disabled={isUploading}
+          />
+          {/* <Button
+            icon="pi pi-copy"
+            severity="secondary"
+            onClick={() => {
+              navigator.clipboard.writeText(url);
+            }}
+          /> */}
+          </>
+        )}
       </InputGroup>
-      {!url?.length ? (
+      {!url?.length && (
         <UploadSection>
           <StyledFileUpload
             mode="basic"
@@ -74,16 +90,6 @@ const FileUploader = (props: FileUploaderProps) => {
             )}
           </AnimatePresence>
         </UploadSection>
-      ) : (
-        <ViewSection>
-          <FileUrl>{url}</FileUrl>
-          <DeleteButton
-            icon="pi pi-trash"
-            severity="danger"
-            onClick={handleDelete}
-            disabled={isUploading}
-          />
-        </ViewSection>
       )}
       <AnimatePresence>
         {error && (
@@ -116,7 +122,6 @@ const FileContainer = styled(motion.div)`
 const InputGroup = styled.div`
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
 `;
 
 const StyledInput = styled(InputText)`
