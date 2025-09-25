@@ -4,12 +4,12 @@ import { Paginator } from "primereact/paginator";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.min";
 import { auth } from "../../firebase";
-import LoadingAnimation from "./LoadingAnimation";
 import ErrorDisplay from "./ErrorDisplay";
 import usePinchZoom from "./utils/usePinchZoom";
 import PDFViewerTopBar from "./PDFViewerTopBar.tsx";
 import { ItemMenuProps } from "../ItemMenu.tsx";
 import { getInitialScale } from "./utils";
+import AppLoader from "common/AppLoader.tsx";
 
 interface PDFViewerProps {
   url: string;
@@ -49,7 +49,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
   } = pinchProps;
 
   const [showNativePDFViewer, setShowNativePDFViewer] = useState(
-    url.includes("docx"),
+    url.includes("docx")
   );
 
   const renderPage = useCallback(
@@ -101,7 +101,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
         setIsLoading(false);
       }
     },
-    [pdfDoc, scale, rotation, isZoomedIn, setScale],
+    [pdfDoc, scale, rotation, isZoomedIn, setScale]
   );
 
   const loadPDF = useCallback(async () => {
@@ -205,7 +205,9 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
       {showNativePDFViewer && (
         <IFrameWrapper className="max-w-7xl h-[95vh] p-0 flex flex-col overflow-hidden bg-white border-0 shadow-2xl">
           <iframe
-            src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
+            src={`https://docs.google.com/gview?url=${encodeURIComponent(
+              url
+            )}&embedded=true`}
             className="w-full h-full border-none"
           />
         </IFrameWrapper>
@@ -217,7 +219,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
           $allowOverflow={isZoomedIn}
           data-auto={"viewer-content"}
         >
-          {isLoading && <LoadingAnimation />}
+          {isLoading && <AppLoader text="Loading PDF..." overlay size={100} />}
           <CanvasWrapper data-auto="canvas-wrapper">
             <canvas
               ref={canvasRef}

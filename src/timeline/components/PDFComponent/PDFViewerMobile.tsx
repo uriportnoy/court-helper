@@ -6,6 +6,7 @@ import ShareMenu from "./ShareMenu";
 import { downloadPDF } from "./utils.ts";
 import styled from "styled-components";
 import { ItemMenuProps } from "../ItemMenu.tsx";
+import AppLoader from "../../../common/AppLoader";
 
 interface PDFViewerMobileProps {
   isOpen: boolean;
@@ -46,8 +47,8 @@ export default function PDFViewerMobile({
     return (
       <PDFContent>
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
-            <Loader2 className="w-8 h-8 text-gray-500 animate-spin" />
+          <div className="absolute inset-0 z-10">
+            <AppLoader text="Loading PDF..." overlay size={80} />
           </div>
         )}
         <div className="w-full h-full overflow-hidden touch-none">
@@ -97,8 +98,8 @@ export default function PDFViewerMobile({
       <div className="w-full h-full max-w-none max-h-none p-0 m-0 bg-white border-0">
         <PDFContent>
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
-              <Loader2 className="w-8 h-8 text-gray-500 animate-spin" />
+            <div className="absolute inset-0 z-10">
+              <AppLoader text="טוען PDF..." overlay size={80} />
             </div>
           )}
           <div className="w-full h-full overflow-hidden touch-none">

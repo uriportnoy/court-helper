@@ -72,6 +72,8 @@ export default function CasesDropdown({
         isLoading={isLoading}
         options={dropdownOptions}
         placeholder={"בחר תיק"}
+        menuPlacement="auto"
+        isRtl={true}
         onCreateOption={isCreatable ? handleCreate : () => null}
         isClearable
         styles={colourStyles}

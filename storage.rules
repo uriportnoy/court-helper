@@ -1,10 +1,29 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+    // Allow authenticated users to read and write files in the important folder
+    match /important/{caseNumber}/{fileName} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Allow authenticated users to read and write general PDF files
+    match /pdfs/{fileName} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Allow authenticated users to read and write other file types (docx, etc.)
+    match /{fileType}/{fileName} {
+      allow read, write: if request.auth != null 
+        && (fileType == "docx" || fileType == "doc" || fileType == "txt");
+    }
+    
+    // Allow authenticated users to read and write files in cases folder (backward compatibility)
+    match /cases/{caseNumber}/files/{fileName} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Deny access to all other paths
     match /{allPaths=**} {
       allow read, write: if false;
     }

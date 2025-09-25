@@ -1,6 +1,7 @@
 import LoginWrapper from "./LoginWrapper";
 import { default as TimelineApp } from "./timeline/App";
 import { default as PDFCreator } from "./pdfCreator/App";
+import Cases from "./timeline/components/Cases";
 import { Menubar } from "primereact/menubar";
 import { useState } from "react";
 import styled from "styled-components";
@@ -8,10 +9,23 @@ import PropTypes from "prop-types";
 
 const PDF = "PDF";
 const TIMELINE = "Timeline";
+const CASES = "Cases";
 
 function MainApp({ logout }) {
   const [selection, setSelection] = useState(TIMELINE);
   const items = [
+    {
+      label: "ציר זמן",
+      icon: "pi pi-calendar",
+      disabled: selection === TIMELINE,
+      command: () => setSelection(TIMELINE),
+    },
+    {
+      label: "תיקים",
+      icon: "pi pi-folder",
+      disabled: selection === CASES,
+      command: () => setSelection(CASES),
+    },
     {
       label: "PDF",
       icon: "pi pi-file-pdf",
@@ -19,13 +33,7 @@ function MainApp({ logout }) {
       command: () => setSelection(PDF),
     },
     {
-      label: "Timeline",
-      icon: "pi pi-calendar",
-      disabled: selection === TIMELINE,
-      command: () => setSelection(TIMELINE),
-    },
-    {
-      label: "Sign out",
+      label: "התנתק",
       icon: "pi pi-sign-out",
       command: logout,
       className: "sign-out-button",
@@ -36,7 +44,9 @@ function MainApp({ logout }) {
     <AppWrapper>
       <StyledMenubar model={items} />
       <MainContent>
-        {selection === TIMELINE ? <TimelineApp /> : <PDFCreator />}
+        {selection === TIMELINE && <TimelineApp />}
+        {selection === CASES && <Cases />}
+        {selection === PDF && <PDFCreator />}
       </MainContent>
     </AppWrapper>
   );

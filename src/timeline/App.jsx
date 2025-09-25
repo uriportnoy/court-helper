@@ -7,6 +7,7 @@ import Center from "../Center";
 import { Provider } from "./Context";
 import TopBar from "./components/TopBar";
 import useTimelineApp from "./useTImelineApp";
+import AppLoader from "../common/AppLoader";
 
 function TimelineApp() {
   const {
@@ -20,7 +21,11 @@ function TimelineApp() {
   } = useTimelineApp();
 
   if (!isLoaded) {
-    return <Center>Loading...</Center>;
+    return (
+      <Center>
+        <AppLoader text="טוען נתוני ציר זמן..." size={100} />
+      </Center>
+    );
   }
   console.log("timelineData", timelineData);
   return (
