@@ -53,7 +53,6 @@ export const FormDialog = ({ eventData = {}, close }) => {
   });
   const { loadEvents, cases: options, groups } = useAppContext();
 
-  console.log("state", state);
   const addNewEvent = async () => {
     setIsLoading(true);
     const createdData = {
@@ -142,6 +141,7 @@ export const FormDialog = ({ eventData = {}, close }) => {
             });
           }}
           value={state.relatedEvent}
+          itemData={state}
         />
       </LabelWrapper>
       <LabelWrapper title={"תאריך"}>
@@ -236,14 +236,21 @@ export const FormDialog = ({ eventData = {}, close }) => {
       </LabelWrapper>
       <BottomBar>
         <Button
-          label={isEditMode ? "עדכן" : "הוסף"}
-          onClick={isEditMode ? updateEventData : addNewEvent}
+          label={state?.id ? "עדכן" : "הוסף"}
+          onClick={() => {
+            // Determine action based on current state at the moment of click
+            if (state?.id) {
+              updateEventData();
+            } else {
+              addNewEvent();
+            }
+          }}
           disabled={
             !state.selectedCase || !state.type || !state.date || !state.title
           }
           loading={isLoading}
         />
-        {isEditMode && (
+        {state?.id && (
           <Button
             label={"שכפל"}
             outlined
@@ -251,7 +258,9 @@ export const FormDialog = ({ eventData = {}, close }) => {
               setState((draft) => {
                 delete draft.id;
                 draft.fileURL = [];
-                draft.content = "";
+                if (!draft.title.includes("- עותק")) {
+                  draft.title = `${draft.title} - עותק`;
+                }
               });
             }}
           />
