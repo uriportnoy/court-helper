@@ -80,7 +80,7 @@ function AddNewCase({ label = "הוסף תיק", initialCase = null, onClose }: 
       life: 3000
     });
   };
-
+  console.log(selectedCase);
   return (
     <>
       <DialogBtn title={label} header="ניהול תיקים" type="court">
