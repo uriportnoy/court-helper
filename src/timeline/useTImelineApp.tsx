@@ -12,7 +12,7 @@ export default function useTimelineApp() {
   const [cases, setCases] = useState([]);
   const [groups, setGroups] = useState([]);
   const [filters, setFilters] = useImmer({});
-  const [ascending, setAscending] = useState(true);
+  const [ascending, setAscending] = useState(false);
 
   const filterTimelineData = useCallback(() => {
     const sortedEvents = [...allEvents].sort((a, b) => {
