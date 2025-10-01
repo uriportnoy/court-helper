@@ -16,6 +16,262 @@ import PDFButton from "./PDFView/PDFButton";
 import FileUploader from "./UploadPDF/FileUploader";
 import AppLoader from "../../common/AppLoader";
 import AddNewCase from "./AddNewCase";
+import { Dropdown } from "primereact/dropdown";
+import { InputMask } from "primereact/inputmask";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Toast } from "primereact/toast";
+import { useRef } from "react";
+import Switch from "react-switch";
+import { useImmer } from "use-immer";
+
+// Constants from AddNewCase
+const courtsArray = ["שלום", "מחוזי", "עליון"];
+const courts = courtsArray.map(court => ({ label: court, value: court }));
+const caseTypesArray = [
+  `תלה״מ`,
+  `עמ״ש`,
+  `ש״ש`,
+  `רמ״ש`,
+  `י״ס`,
+  `ע״ל`,
+  `תמ״ש`,
+  `בע״מ`,
+  "אחר",
+];
+
+// Format options for dropdown
+const caseTypes = caseTypesArray.map(type => ({ label: type, value: type }));
+
+interface EditCaseFormProps {
+  initialCase: Case;
+  onClose: () => void;
+}
+
+const EditCaseForm: React.FC<EditCaseFormProps> = ({ initialCase, onClose }) => {
+  const [caseInfo, setCaseInfo] = useImmer<Case>(initialCase);
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useRef<Toast>(null);
+
+  const showSuccess = (message: string) => {
+    toast.current?.show({
+      severity: "success",
+      summary: "הצלחה",
+      detail: message,
+      life: 3000,
+    });
+  };
+
+  const showError = (message: string) => {
+    toast.current?.show({
+      severity: "error",
+      summary: "שגיאה",
+      detail: message,
+      life: 3000,
+    });
+  };
+
+  const validateForm = (): boolean => {
+    if (!caseInfo.caseNumber.trim()) {
+      showError("מספר תיק נדרש");
+      return false;
+    }
+    if (!caseInfo.court) {
+      showError("בחירת בית משפט נדרשת");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      const caseData: Case = {
+        ...caseInfo,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await updateCase(caseData);
+      showSuccess("התיק עודכן בהצלחה!");
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+    } catch (error) {
+      console.error("Error updating case:", error);
+      showError("עדכון התיק נכשל. אנא נסה שוב.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <EditFormContainer>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <FormHeader>
+          <h3>ערוך תיק</h3>
+          <p>עדכן את פרטי התיק למטה</p>
+        </FormHeader>
+
+        <FormSection>
+          <FormGrid>
+            <FormField>
+              <label>מספר תיק *</label>
+              <StyledInputMask
+                value={caseInfo.caseNumber}
+                onChange={(e) => {
+                  setCaseInfo((draft) => {
+                    draft.caseNumber = e.value || "";
+                  });
+                }}
+                mask="99999-99-99"
+                placeholder="הכנס מספר תיק (לדוגמה: 12345-01-23)"
+              />
+            </FormField>
+
+            <FormField>
+              <label>סוג התיק</label>
+              <Dropdown
+                value={caseInfo.type}
+                onChange={(e) => {
+                  setCaseInfo((draft) => {
+                    draft.type = e.value;
+                  });
+                }}
+                options={caseTypes}
+                placeholder="בחר סוג תיק"
+                className="w-full"
+              />
+            </FormField>
+
+            <FormField>
+              <label>בית משפט *</label>
+              <Dropdown
+                value={caseInfo.court}
+                onChange={(e) => {
+                  setCaseInfo((draft) => {
+                    draft.court = e.value;
+                  });
+                }}
+                options={courts}
+                placeholder="בחר בית משפט"
+                className="w-full"
+              />
+            </FormField>
+          </FormGrid>
+
+          <FormField>
+            <label>תיאור</label>
+            <StyledTextarea
+              value={caseInfo.description || ""}
+              onChange={(e) => {
+                setCaseInfo((draft) => {
+                  draft.description = e.target.value;
+                });
+              }}
+              placeholder="תיאור קצר של התיק..."
+              rows={3}
+            />
+          </FormField>
+
+          <ToggleSection>
+            <ToggleGroup>
+              <ToggleField>
+                <ToggleLabel>
+                  <ToggleTitle>בעלות על התיק</ToggleTitle>
+                  <ToggleDescription>
+                    {caseInfo.isMyCase ? "זה התיק שלי" : "זה התיק שלהם"}
+                  </ToggleDescription>
+                </ToggleLabel>
+                <ModernSwitch
+                  onChange={() => {
+                    setCaseInfo((draft) => {
+                      draft.isMyCase = !draft.isMyCase;
+                    });
+                  }}
+                  checked={caseInfo.isMyCase}
+                  offColor="#ef4444"
+                  onColor="#10b981"
+                  offHandleColor="#dc2626"
+                  onHandleColor="#059669"
+                  uncheckedIcon={false}
+                  checkedIcon={false}
+                  width={48}
+                  height={24}
+                />
+              </ToggleField>
+
+              <ToggleField>
+                <ToggleLabel>
+                  <ToggleTitle>סטטוס התיק</ToggleTitle>
+                  <ToggleDescription>
+                    {caseInfo.isOpen ? "התיק פתוח" : "התיק סגור"}
+                  </ToggleDescription>
+                </ToggleLabel>
+                <ModernSwitch
+                  onChange={() => {
+                    setCaseInfo((draft) => {
+                      draft.isOpen = !draft.isOpen;
+                    });
+                  }}
+                  checked={caseInfo.isOpen}
+                  offColor="#ef4444"
+                  onColor="#10b981"
+                  offHandleColor="#dc2626"
+                  onHandleColor="#059669"
+                  uncheckedIcon={false}
+                  checkedIcon={false}
+                  width={48}
+                  height={24}
+                />
+              </ToggleField>
+
+              {!caseInfo.isOpen && (
+                <ToggleField>
+                  <ToggleLabel>
+                    <ToggleTitle>תוצאת התיק</ToggleTitle>
+                    <ToggleDescription>
+                      {caseInfo.appealAccepted ? "התיק נזכה" : "התיק הפסיד"}
+                    </ToggleDescription>
+                  </ToggleLabel>
+                  <ModernSwitch
+                    onChange={() => {
+                      setCaseInfo((draft) => {
+                        draft.appealAccepted = !draft.appealAccepted;
+                      });
+                    }}
+                    checked={caseInfo.appealAccepted}
+                    offColor="#ef4444"
+                    onColor="#10b981"
+                    offHandleColor="#dc2626"
+                    onHandleColor="#059669"
+                    uncheckedIcon={false}
+                    checkedIcon={false}
+                    width={48}
+                    height={24}
+                  />
+                </ToggleField>
+              )}
+            </ToggleGroup>
+          </ToggleSection>
+
+          <ActionButton
+            label="עדכן תיק"
+            onClick={handleSave}
+            loading={isLoading}
+            icon="pi pi-save"
+            className="p-button-lg"
+          />
+        </FormSection>
+      </motion.div>
+      <Toast ref={toast} position="top-right" />
+    </EditFormContainer>
+  );
+};
 
 const Cases: React.FC = () => {
   const [cases, setCases] = useState<Case[]>([]);
@@ -141,7 +397,6 @@ const Cases: React.FC = () => {
             placeholder="חפש תיקים..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            icon="pi pi-search"
           />
           <AddNewCase label="הוסף תיק חדש" />
         </HeaderActions>
@@ -161,7 +416,7 @@ const Cases: React.FC = () => {
                 <CardHeader>
                   <CaseNumber>
                     <i className="pi pi-folder" />
-                    {caseItem.caseNumber}
+                    {caseItem.type ? `${caseItem.type} ${caseItem.caseNumber}` : caseItem.caseNumber}
                   </CaseNumber>
                   <CaseActions>
                     <Button
@@ -232,7 +487,14 @@ const Cases: React.FC = () => {
                               label={file.name}
                               type={file.type}
                               date=""
-                              item={{ id: caseItem.id, title: caseItem.caseNumber }}
+                              item={{ 
+                                id: caseItem.id || "", 
+                                title: caseItem.caseNumber,
+                                type: caseItem.type || "",
+                                content: caseItem.description || "",
+                                date: caseItem.updatedAt || "",
+                                fileURL: [file.fileUrl]
+                              }}
                             />
                             <Button
                               icon="pi pi-trash"
@@ -302,6 +564,25 @@ const Cases: React.FC = () => {
             }}
           />
         </FileUploadDialog>
+      </Dialog>
+
+      {/* Edit Case Dialog */}
+      <Dialog
+        visible={!!editingCase}
+        onHide={() => setEditingCase(null)}
+        header="ערוך תיק"
+        style={{ width: "min(600px, 90vw)" }}
+        modal
+      >
+        {editingCase && (
+          <EditCaseForm
+            initialCase={editingCase}
+            onClose={() => {
+              setEditingCase(null);
+              loadCases();
+            }}
+          />
+        )}
       </Dialog>
 
       <ConfirmDialog />
@@ -522,6 +803,140 @@ const FileUploadDialog = styled.div`
   p {
     margin-bottom: 1.5rem;
     color: var(--text-color-secondary);
+  }
+`;
+
+// Edit Form Styled Components
+const EditFormContainer = styled.div`
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  direction: rtl;
+`;
+
+const FormHeader = styled.div`
+  margin-bottom: 2rem;
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-color-secondary);
+  }
+`;
+
+const FormSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+const FormGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const FormField = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+`;
+
+const StyledInputMask = styled(InputMask)`
+  padding: 0.75rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--surface-300);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem var(--primary-50);
+  }
+`;
+
+const StyledTextarea = styled(InputTextarea)`
+  padding: 0.75rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--surface-300);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  resize: vertical;
+
+  &:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem var(--primary-50);
+  }
+`;
+
+const ToggleSection = styled.div`
+  margin: 1rem 0;
+`;
+
+const ToggleGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--surface-50);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--surface-200);
+`;
+
+const ToggleField = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const ToggleLabel = styled.div`
+  flex: 1;
+`;
+
+const ToggleTitle = styled.div`
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+`;
+
+const ToggleDescription = styled.div`
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+`;
+
+const ModernSwitch = styled(Switch)`
+  .react-switch-handle {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  }
+`;
+
+const ActionButton = styled(Button)`
+  margin-top: 1rem;
+  padding: 0.75rem 2rem;
+  font-weight: 500;
+  border-radius: var(--border-radius);
+
+  .p-button-label {
+    font-weight: 500;
   }
 `;
 
