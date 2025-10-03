@@ -13,6 +13,7 @@ export interface Case {
   caseNumber: string;
   court: string;
   description: string;
+  relation: string;
   appealAccepted: boolean;
   isMyCase: boolean;
   isOpen: boolean;

@@ -45,20 +45,6 @@ function PDFViewerTopBar({
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [downloadStatus, setDownloadStatus] = useState(null);
   const [shareStatus, setShareStatus] = useState(null);
-  console.log(
-    url,
-    scale,
-    rotation,
-    panPosition,
-    pageNum,
-    numPages,
-    isLoading,
-    handleZoom,
-    handleRotate,
-    handleResetView,
-    initialScale,
-    item,
-  );
 
   const handleDownload = useCallback(async () => {
     setDownloadStatus("downloading");

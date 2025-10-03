@@ -21,6 +21,33 @@
   }
 }
 
+.emptyState {
+  text-align: center;
+  padding: 3rem 2rem;
+  max-width: 400px;
+  margin: 0 auto;
+
+  .emptyIcon {
+    margin-bottom: 1.5rem;
+    opacity: 0.6;
+  }
+
+  .emptyTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    margin-top: 0;
+  }
+
+  .emptyMessage {
+    font-size: 1rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
 .formWrapper {
   display: flex;
   flex-direction: column;

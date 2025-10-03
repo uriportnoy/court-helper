@@ -32,6 +32,17 @@ export const filterConfig = [
     type: "text",
     label: "חיפוש",
     field: "text",
-    searchFields: ["title", "content", "caseNumber", "subtitle"],
+    searchFields: [
+      "title", 
+      "content", 
+      "caseNumber", 
+      "subtitle", 
+      "date",
+      "selectedCase.description",
+      "selectedCase.relation", 
+      "selectedCase.type",
+      "selectedCase.id",
+      "groups[].label"
+    ],
   },
 ];

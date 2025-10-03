@@ -4,16 +4,18 @@ import get from "lodash/get";
 import { getEvents } from "./firebase/events.ts";
 import { getAllCases } from "./firebase/cases.ts";
 import { getAll } from "./firebase/crud";
+import { TimelineData, Case, Group } from "./types";
 
 export default function useTimelineApp() {
-  const [allEvents, setAllEvents] = useState([]);
-  const [timelineData, setTimelineData] = useState([]);
+  const [allEvents, setAllEvents] = useState<TimelineData[]>([]);
+  const [timelineData, setTimelineData] = useState<TimelineData[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [cases, setCases] = useState([]);
-  const [groups, setGroups] = useState([]);
-  const [filters, setFilters] = useImmer({});
+  const [cases, setCases] = useState<Case[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [filters, setFilters] = useImmer<Record<string, any>>({});
   const [ascending, setAscending] = useState(false);
 
+  console.log(filters)
   const filterTimelineData = useCallback(() => {
     const sortedEvents = [...allEvents].sort((a, b) => {
       const aDate = new Date(a.date);
@@ -22,6 +24,9 @@ export default function useTimelineApp() {
         ? aDate.getTime() - bDate.getTime()
         : bDate.getTime() - aDate.getTime();
     });
+
+    console.log("Filtering with filters:", filters);
+    
     if (!filters || Object.keys(filters).length === 0) {
       setTimelineData(sortedEvents);
       return;
@@ -30,16 +35,52 @@ export default function useTimelineApp() {
       return Object.entries(filters).every(([key, value]) => {
         // Handle text search
         if (key === "text") {
-          if (!value || value.length <= 2) return true;
+          if (!value || typeof value !== "string" || value.length <= 2)
+            return true;
 
-          const searchFields = ["title", "content", "caseNumber", "subTitle"];
-          return searchFields.some((field) => {
-            const fieldValue = item[field];
+          const searchValue = value.toLowerCase();
+
+          // Direct field searches
+          const directFields = [
+            "title",
+            "content",
+            "caseNumber",
+            "subtitle",
+            "date",
+          ] as const;
+          const directFieldMatch = directFields.some((field) => {
+            const fieldValue = (item as any)[field];
             return (
               fieldValue &&
-              fieldValue.toLowerCase().includes(value.toLowerCase())
+              fieldValue.toString().toLowerCase().includes(searchValue)
             );
           });
+          const selectedCase = item.selectedCase as Case;
+          const { description, relation, type, id, caseNumber } = selectedCase;
+          // Search in selectedCase nested fields
+          const selectedCaseMatch =
+            item.selectedCase &&
+            [
+              description,
+              relation, // May exist in actual data but not in type
+              type,
+              id,
+              caseNumber,
+            ].some(
+              (fieldValue) =>
+                fieldValue &&
+                fieldValue.toString().toLowerCase().includes(searchValue)
+            );
+
+          // Search in groups labels
+          const groupsMatch =
+            item.groups &&
+            item.groups.some(
+              (group: any) =>
+                group.label && group.label.toLowerCase().includes(searchValue)
+            );
+
+          return directFieldMatch || selectedCaseMatch || groupsMatch;
         }
 
         // Handle case number filter
@@ -56,10 +97,10 @@ export default function useTimelineApp() {
         if (key === "groups") {
           if (!item.groups || item.groups.length === 0) return false;
 
-          return item.groups.some((group) => {
+          return item.groups.some((group: any) => {
             const groupId =
               group.value?.value?.value || group.value?.value || group.value;
-            return value.includes(groupId);
+            return Array.isArray(value) && value.includes(groupId);
           });
         }
 
@@ -83,7 +124,7 @@ export default function useTimelineApp() {
 
   const loadEvents = useCallback(async () => {
     const events = await getEvents();
-    setAllEvents(events);
+    setAllEvents(events as TimelineData[]);
   }, []);
 
   const loadCases = useCallback(async () => {
@@ -94,7 +135,7 @@ export default function useTimelineApp() {
 
   const loadGroups = useCallback(async () => {
     const loadedGroups = await getAll("groups");
-    setGroups(loadedGroups);
+    setGroups(loadedGroups as Group[]);
   }, []);
 
   // Apply filters whenever filters or events change

@@ -20,10 +20,10 @@ interface PDFViewerProps {
 const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
-  const [pdfDoc, setPdfDoc] = useState(null);
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [pageNum, setPageNum] = useState(1);
-  const [numPages, setNumPages] = useState(null);
-  const [error, setError] = useState(null);
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const renderingRef = useRef(false);
   const [pdfDimensions, setPdfDimensions] = useState({ width: 0, height: 0 });
@@ -51,6 +51,8 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
   const [showNativePDFViewer, setShowNativePDFViewer] = useState(
     url.includes("docx")
   );
+  const [nativePdfLoading, setNativePdfLoading] = useState(false);
+  const [nativePdfError, setNativePdfError] = useState<string | null>(null);
 
   const renderPage = useCallback(
     async (num) => {
@@ -183,6 +185,38 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
     await loadPDF();
   }, [loadPDF]);
 
+  const handleNativePdfLoad = useCallback(() => {
+    setNativePdfLoading(false);
+    setNativePdfError(null);
+  }, []);
+
+  const handleNativePdfError = useCallback(() => {
+    setNativePdfLoading(false);
+    setNativePdfError("Failed to load PDF in native viewer. Please try again or switch to custom viewer.");
+  }, []);
+
+  const handleNativePdfRetry = useCallback(() => {
+    setNativePdfLoading(true);
+    setNativePdfError(null);
+    // Force iframe reload by changing src
+    const iframe = document.querySelector('iframe[src*="docs.google.com"]') as HTMLIFrameElement;
+    if (iframe) {
+      const currentSrc = iframe.src;
+      iframe.src = '';
+      setTimeout(() => {
+        iframe.src = currentSrc;
+      }, 100);
+    }
+  }, []);
+
+  // Reset native PDF states when switching viewers
+  useEffect(() => {
+    if (showNativePDFViewer) {
+      setNativePdfLoading(true);
+      setNativePdfError(null);
+    }
+  }, [showNativePDFViewer]);
+
   if (error) {
     return <ErrorDisplay message={error} onRetry={handleRetry} />;
   }
@@ -204,12 +238,25 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
       />
       {showNativePDFViewer && (
         <IFrameWrapper className="max-w-7xl h-[95vh] p-0 flex flex-col overflow-hidden bg-white border-0 shadow-2xl">
-          <iframe
-            src={`https://docs.google.com/gview?url=${encodeURIComponent(
-              url
-            )}&embedded=true`}
-            className="w-full h-full border-none"
-          />
+          {nativePdfError ? (
+            <ErrorDisplay message={nativePdfError} onRetry={handleNativePdfRetry} />
+          ) : (
+            <>
+              {nativePdfLoading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-90">
+                  <AppLoader text="Loading PDF in native viewer..." size={80} />
+                </div>
+              )}
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                  url
+                )}&embedded=true`}
+                className="w-full h-full border-none"
+                onLoad={handleNativePdfLoad}
+                onError={handleNativePdfError}
+              />
+            </>
+          )}
         </IFrameWrapper>
       )}
       {isCustomViewer && (
@@ -309,6 +356,7 @@ const IFrameWrapper = styled.div`
   height: 100%;
   border: none;
   margin: 0 auto;
+  position: relative;
 `;
 
 export default PDFViewer;

@@ -37,27 +37,41 @@ function TimelineApp() {
           ascending={ascending}
           setAscending={setAscending}
         />
-        <VerticalTimeline>
-          {timelineData.map((item) => (
-            <VerticalTimelineElement key={item.id} item={item}>
-              <div className={styles.contentWrapper}>
-                <h3 className="vertical-timeline-element-title">
-                  {item.title}
-                </h3>
-                {item.subtitle && (
-                  <h4 className="vertical-timeline-element-subtitle">
-                    {item.subtitle}
-                  </h4>
-                )}
-                {item.description && <p>{item.description}</p>}
-                <div
-                  dangerouslySetInnerHTML={{ __html: item.content }}
-                  className={styles.content}
-                />
+        {timelineData.length === 0 ? (
+          <Center>
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>
+                <i className="pi pi-calendar-times" style={{ fontSize: '4rem', color: '#6b7280' }} />
               </div>
-            </VerticalTimelineElement>
-          ))}
-        </VerticalTimeline>
+              <h3 className={styles.emptyTitle}>אין נתונים להצגה</h3>
+              <p className={styles.emptyMessage}>
+                לא נמצאו אירועים בציר הזמן. נסה לשנות את הסינון או להוסיף אירועים חדשים.
+              </p>
+            </div>
+          </Center>
+        ) : (
+          <VerticalTimeline>
+            {timelineData.map((item) => (
+              <VerticalTimelineElement key={item.id} item={item}>
+                <div className={styles.contentWrapper}>
+                  <h3 className="vertical-timeline-element-title">
+                    {item.title}
+                  </h3>
+                  {item.subtitle && (
+                    <h4 className="vertical-timeline-element-subtitle">
+                      {item.subtitle}
+                    </h4>
+                  )}
+                  {item.description && <p>{item.description}</p>}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: item.content }}
+                    className={styles.content}
+                  />
+                </div>
+              </VerticalTimelineElement>
+            ))}
+          </VerticalTimeline>
+        )}
       </div>
     </Provider>
   );

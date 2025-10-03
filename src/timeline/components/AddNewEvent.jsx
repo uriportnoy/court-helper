@@ -59,10 +59,8 @@ export const FormDialog = ({ eventData = {}, close }) => {
       ...state,
       fileURL: state.fileURL.filter((file) => !!file.url),
     };
-    console.log("addNewEvent:", state);
     addEvent(createdData)
       .then((createdId) => {
-        console.log(createdId);
         setState((draft) => {
           draft.id = createdId;
         });
@@ -79,7 +77,6 @@ export const FormDialog = ({ eventData = {}, close }) => {
       ...state,
       fileURL: state.fileURL.filter((file) => !!file.url),
     };
-    console.log("updateEventData:", updatedData);
 
     setIsLoading(true);
     updateEvent(updatedData)
@@ -102,7 +99,6 @@ export const FormDialog = ({ eventData = {}, close }) => {
           }
           onChange={(selectedCase) => {
             setState((draft) => {
-              console.log(selectedCase);
               draft.selectedCase = selectedCase;
               draft.caseNumber = selectedCase.caseNumber;
             });

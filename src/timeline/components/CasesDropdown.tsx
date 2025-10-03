@@ -61,7 +61,6 @@ export default function CasesDropdown({
       });
     });
   };
-  console.log(dropdownOptions);
   return (
     <>
       <Component

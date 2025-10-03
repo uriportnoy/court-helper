@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useDebounce from "../../../common/useDebounce";
 import { InputText } from "primereact/inputtext";
 
@@ -15,15 +15,21 @@ function TextFilter({
   className,
 }: TextFilterProps) {
   const [text, setText] = useState(value || "");
-  const onTextChange = useDebounce(() => onChange(text), 300);
+  const onTextChange = useDebounce((newText: string) => onChange(newText), 300);
+
+  // Sync internal state with external value prop (for when filters are cleared)
+  useEffect(() => {
+    setText(value || "");
+  }, [value]);
 
   return (
     <InputText
       type="text"
       value={text}
       onChange={(e) => {
-        setText(e.target.value);
-        onTextChange(e.target.value);
+        const newValue = e.target.value;
+        setText(newValue);
+        onTextChange(newValue);
       }}
       onBlur={(e) => onTextChange(e.target.value)}
       placeholder={placeholder}

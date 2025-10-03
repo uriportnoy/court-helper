@@ -21,20 +21,6 @@ import Switch from "react-switch";
 import styled from "styled-components";
 import { useImmer } from "use-immer";
 
-const relation = {
-  true: "My Case vs Them",
-  false: "Their Case vs Me",
-};
-
-const status = {
-  true: "Open",
-  false: "Closed",
-};
-
-const result = {
-  true: "Won",
-  false: "Lost",
-};
 
 const courts = ["שלום", "מחוזי", "עליון"];
 
@@ -88,7 +74,6 @@ function AddNewCase({
       life: 3000,
     });
   };
-  console.log(selectedCase);
   return (
     <>
       <DialogBtn title={label} header="ניהול תיקים" type="court">

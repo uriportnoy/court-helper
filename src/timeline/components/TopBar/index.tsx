@@ -8,6 +8,7 @@ import { MultiSelect } from "primereact/multiselect";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import TextFilter from "./TextFilter.js";
 import { filterConfig } from "./utils.ts";
+import ReactDOM from "react-dom";
 
 interface FilterConfig {
   filters: Record<string, any>;
@@ -81,7 +82,7 @@ function TopBar({
   const onSetFilters = (key, val) => {
     scrollToTop();
     setFilters((draft) => {
-      if (!val || (Array.isArray(val) && val.length === 0)) {
+      if (!val || (Array.isArray(val) && val.length === 0) || val === "") {
         delete draft[key];
         return;
       }
@@ -165,8 +166,11 @@ function TopBar({
         return null;
     }
   };
+  if (!document.getElementById("topbar-body-anchor")) {
+    return null;
+  }
 
-  return (
+  return ReactDOM.createPortal(
     <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm  shadow-sm">
       <div className="px-4 py-3">
         <div className="flex items-center justify-between gap-4">
@@ -211,13 +215,13 @@ function TopBar({
                     key={year}
                     onClick={() => scrollToYear(year)}
                     className={`
-                    px-3 py-1.5 rounded-full text-sm font-medium transition-all
-                    ${
-                      selectedYear === year
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }
-                  `}
+                  px-3 py-1.5 rounded-full text-sm font-medium transition-all
+                  ${
+                    selectedYear === year
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }
+                `}
                   >
                     {year}
                     <span className="ml-1 text-xs opacity-75">
@@ -240,13 +244,13 @@ function TopBar({
 
         <div
           className={`
-            grid gap-4 transition-all duration-300 ease-in-out
-            ${
-              expandedFilters
-                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 opacity-100 max-h-96 mt-4"
-                : "max-h-0 opacity-0 overflow-hidden"
-            }
-          `}
+          grid gap-4 transition-all duration-300 ease-in-out
+          ${
+            expandedFilters
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 opacity-100 max-h-96 mt-4"
+              : "max-h-0 opacity-0 overflow-hidden"
+          }
+        `}
         >
           {filterConfig.map((filter) => (
             <div key={filter.field} className="min-w-[200px]">
@@ -258,7 +262,8 @@ function TopBar({
           ))}
         </div>
       </div>
-    </div>
+    </div>,
+    document.getElementById("topbar-body-anchor")!
   );
 }
 
