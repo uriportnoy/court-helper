@@ -47,12 +47,15 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
     isPinchZooming,
     isZoomedIn,
   } = pinchProps;
-
+  const isDocxFile = url.includes("docx");  
   const [showNativePDFViewer, setShowNativePDFViewer] = useState(
-    url.includes("docx")
+    true
   );
   const [nativePdfLoading, setNativePdfLoading] = useState(false);
   const [nativePdfError, setNativePdfError] = useState<string | null>(null);
+  const [nativeZoomPercent, setNativeZoomPercent] = useState(100);
+  const nativeIframeRef = useRef<HTMLIFrameElement>(null);
+  const nativeZoomContainerRef = useRef<HTMLDivElement>(null);
 
   const renderPage = useCallback(
     async (num) => {
@@ -199,7 +202,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
     setNativePdfLoading(true);
     setNativePdfError(null);
     // Force iframe reload by changing src
-    const iframe = document.querySelector('iframe[src*="docs.google.com"]') as HTMLIFrameElement;
+    const iframe = document.querySelector('iframe[allow="fullscreen"]') as HTMLIFrameElement;
     if (iframe) {
       const currentSrc = iframe.src;
       iframe.src = '';
@@ -214,7 +217,174 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
     if (showNativePDFViewer) {
       setNativePdfLoading(true);
       setNativePdfError(null);
+      setNativeZoomPercent(100);
     }
+  }, [showNativePDFViewer]);
+
+  // Helper to update the iframe URL hash with a zoom parameter (e.g. #zoom=125)
+  const updateIframeZoom = useCallback((percent: number) => {
+    const iframe = nativeIframeRef.current;
+    if (!iframe) return;
+    try {
+      const currentSrc = iframe.src;
+      // Some browsers treat fragment updates as navigation to same resource without full reload
+      const url = new URL(currentSrc);
+      const rawHash = (url.hash || '').replace(/^#/, '');
+      const parts = rawHash ? rawHash.split('&') : [];
+      const map = new Map<string, string>();
+      parts.forEach(p => {
+        const [k, v] = p.split('=');
+        if (k) map.set(k, v ?? '');
+      });
+      map.set('zoom', String(Math.round(percent)));
+      const newHash = Array.from(map.entries()).map(([k, v]) => v ? `${k}=${v}` : k).join('&');
+      const newSrc = `${url.origin}${url.pathname}${url.search}${newHash ? '#' + newHash : ''}`;
+      if (newSrc !== currentSrc) {
+        iframe.src = newSrc;
+      }
+    } catch {
+      // Fallback: append/replace hash manually if URL constructor fails
+      const idx = iframe.src.indexOf('#');
+      const base = idx >= 0 ? iframe.src.slice(0, idx) : iframe.src;
+      iframe.src = `${base}#zoom=${Math.round(percent)}`;
+    }
+  }, []);
+
+  // Handle zoom events for native PDF viewer
+  useEffect(() => {
+    if (!showNativePDFViewer || !nativeZoomContainerRef.current) return;
+
+    const zoomContainer = nativeZoomContainerRef.current;
+    let isContainerFocused = false;
+
+    // Track when user is focused on the PDF container
+    const handleContainerFocus = () => {
+      isContainerFocused = true;
+    };
+
+    const handleContainerBlur = () => {
+      isContainerFocused = false;
+    };
+
+    const handleContainerMouseEnter = () => {
+      isContainerFocused = true;
+    };
+
+    const handleContainerMouseLeave = () => {
+      isContainerFocused = false;
+    };
+
+    // Handle keyboard zoom (Ctrl +/-) - only when container is focused
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!(isContainerFocused && (e.ctrlKey || e.metaKey))) return;
+
+      const isPlus = e.key === '+' || e.key === '=' || e.code === 'Equal' || e.code === 'NumpadAdd';
+      const isMinus = e.key === '-' || e.code === 'Minus' || e.code === 'NumpadSubtract';
+      const isZero = e.key === '0' || e.code === 'Digit0' || e.code === 'Numpad0';
+
+      if (isPlus || isMinus || isZero) {
+        // Aggressively stop browser zoom
+        e.preventDefault();
+        e.stopPropagation();
+        // @ts-ignore
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        // @ts-ignore
+        (e as any).returnValue = false;
+      }
+
+      if (isPlus) {
+        setNativeZoomPercent(prev => {
+          const next = Math.min(prev + 10, 300);
+          updateIframeZoom(next);
+          return next;
+        });
+      } else if (isMinus) {
+        setNativeZoomPercent(prev => {
+          const next = Math.max(prev - 10, 50);
+          updateIframeZoom(next);
+          return next;
+        });
+      } else if (isZero) {
+        setNativeZoomPercent(() => {
+          const next = 100;
+          updateIframeZoom(next);
+          return next;
+        });
+      }
+    };
+
+    // Handle wheel zoom (Ctrl + scroll)
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -10 : 10;
+        setNativeZoomPercent(prev => {
+          const next = Math.max(50, Math.min(300, prev + delta));
+          updateIframeZoom(next);
+          return next;
+        });
+      }
+    };
+
+    // Handle touch zoom (pinch)
+    let lastTouchDistance = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        lastTouchDistance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
+        );
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const currentDistance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
+        );
+        
+        if (lastTouchDistance > 0) {
+          const scale = currentDistance / lastTouchDistance;
+          setNativeZoomPercent(prev => {
+            const next = Math.max(50, Math.min(300, Math.round(prev * scale)));
+            updateIframeZoom(next);
+            return next;
+          });
+        }
+        lastTouchDistance = currentDistance;
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener('keydown', handleKeyDown, { capture: true });
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    zoomContainer.addEventListener('wheel', handleWheel, { passive: false });
+    zoomContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+    zoomContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+    
+    // Focus tracking events
+    zoomContainer.addEventListener('mouseenter', handleContainerMouseEnter);
+    zoomContainer.addEventListener('mouseleave', handleContainerMouseLeave);
+    zoomContainer.addEventListener('focus', handleContainerFocus);
+    zoomContainer.addEventListener('blur', handleContainerBlur);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown, { capture: true } as any);
+      window.removeEventListener('keydown', handleKeyDown, { capture: true } as any);
+      zoomContainer.removeEventListener('wheel', handleWheel);
+      zoomContainer.removeEventListener('touchstart', handleTouchStart);
+      zoomContainer.removeEventListener('touchmove', handleTouchMove);
+      zoomContainer.removeEventListener('mouseenter', handleContainerMouseEnter);
+      zoomContainer.removeEventListener('mouseleave', handleContainerMouseLeave);
+      zoomContainer.removeEventListener('focus', handleContainerFocus);
+      zoomContainer.removeEventListener('blur', handleContainerBlur);
+    };
   }, [showNativePDFViewer]);
 
   if (error) {
@@ -247,14 +417,24 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
                   <AppLoader text="Loading PDF in native viewer..." size={80} />
                 </div>
               )}
-              <iframe
-                src={`https://docs.google.com/gview?url=${encodeURIComponent(
-                  url
-                )}&embedded=true`}
-                className="w-full h-full border-none"
-                onLoad={handleNativePdfLoad}
-                onError={handleNativePdfError}
-              />
+              <div 
+                ref={nativeZoomContainerRef}
+                className="w-full h-full relative"
+                tabIndex={0}
+                style={{ 
+                  overflow: nativeZoomPercent > 100 ? 'auto' : 'hidden',
+                  outline: 'none'
+                }}
+              >
+                <iframe
+                  ref={nativeIframeRef}
+                  src={`${url}#zoom=${nativeZoomPercent}`}
+                  className="w-full h-full border-none"
+                  onLoad={handleNativePdfLoad}
+                  onError={handleNativePdfError}
+                  allow="fullscreen"
+                />
+              </div>
             </>
           )}
         </IFrameWrapper>
