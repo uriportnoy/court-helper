@@ -10,6 +10,7 @@ import PDFViewerTopBar from "./PDFViewerTopBar.tsx";
 import { ItemMenuProps } from "../ItemMenu.tsx";
 import { getInitialScale } from "./utils";
 import AppLoader from "common/AppLoader.tsx";
+import { useMemo } from "react";
 
 interface PDFViewerProps {
   url: string;
@@ -56,6 +57,11 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
   const [nativeZoomPercent, setNativeZoomPercent] = useState(100);
   const nativeIframeRef = useRef<HTMLIFrameElement>(null);
   const nativeZoomContainerRef = useRef<HTMLDivElement>(null);
+
+  const isMobile = useMemo(
+    () => /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent),
+    []
+  );
 
   const renderPage = useCallback(
     async (num) => {
@@ -252,7 +258,8 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
 
   // Handle zoom events for native PDF viewer
   useEffect(() => {
-    if (!showNativePDFViewer || !nativeZoomContainerRef.current) return;
+    if (!showNativePDFViewer || !nativeZoomContainerRef.current || isMobile)
+      return;
 
     const zoomContainer = nativeZoomContainerRef.current;
     let isContainerFocused = false;
@@ -385,7 +392,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
       zoomContainer.removeEventListener('focus', handleContainerFocus);
       zoomContainer.removeEventListener('blur', handleContainerBlur);
     };
-  }, [showNativePDFViewer]);
+  }, [showNativePDFViewer, isMobile]);
 
   if (error) {
     return <ErrorDisplay message={error} onRetry={handleRetry} />;
@@ -428,7 +435,11 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
               >
                 <iframe
                   ref={nativeIframeRef}
-                  src={`${url}#zoom=${nativeZoomPercent}`}
+                  src={
+                    isMobile
+                      ? `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(url)}`
+                      : `${url}#zoom=${nativeZoomPercent}`
+                  }
                   className="w-full h-full border-none"
                   onLoad={handleNativePdfLoad}
                   onError={handleNativePdfError}

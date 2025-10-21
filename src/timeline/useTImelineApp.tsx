@@ -147,14 +147,37 @@ export default function useTimelineApp() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        await Promise.all([loadEvents(), loadCases(), loadGroups()]);
+        // Fetch all data first
+        const [events, loadedCases, loadedGroups] = await Promise.all([
+          getEvents(),
+          getAllCases(),
+          getAll("groups"),
+        ]);
+
+        // Set states synchronously before flipping isLoaded
+        setAllEvents(events as TimelineData[]);
+        setCases(loadedCases);
+        setGroups(loadedGroups as Group[]);
+
+        // Initialize timelineData immediately to avoid empty flash
+        const sortedEvents = [...(events as TimelineData[])].sort((a, b) => {
+          const aDate = new Date(a.date);
+          const bDate = new Date(b.date);
+          return ascending
+            ? aDate.getTime() - bDate.getTime()
+            : bDate.getTime() - aDate.getTime();
+        });
+        setTimelineData(sortedEvents);
+
+        // Only after states are set, mark as loaded
         setIsLoaded(true);
       } catch (error) {
         console.error("Error loading data:", error);
       }
     };
     loadData();
-  }, [loadEvents, loadCases, loadGroups]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     timelineData,
