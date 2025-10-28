@@ -111,7 +111,6 @@ export default function PageRangeExtractor({
         visible={isOpen}
         onHide={() => setIsOpen(false)}
         header="Extract PDF Pages"
-        style={{ width: "35vw" }}
       >
         <ExtractorContent>
           <Description>

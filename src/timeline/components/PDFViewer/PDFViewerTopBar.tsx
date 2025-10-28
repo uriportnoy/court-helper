@@ -43,33 +43,25 @@ function PDFViewerTopBar({
   label,
 }: PDFViewerTopBarProps) {
   const [showShareMenu, setShowShareMenu] = useState(false);
-  const [downloadStatus, setDownloadStatus] = useState(null);
-  const [shareStatus, setShareStatus] = useState(null);
-  console.log(
-    url,
-    scale,
-    rotation,
-    panPosition,
-    pageNum,
-    numPages,
-    isLoading,
-    handleZoom,
-    handleRotate,
-    handleResetView,
-    initialScale,
-    item,
-  );
+  const [downloadStatus, setDownloadStatus] = useState<"downloading" | "success" | "error" | null>(null);
+  const [shareStatus, setShareStatus] = useState<"sharing" | "success" | "error" | null>(null);
+  const [printStatus, setPrintStatus] = useState<"printing" | "success" | "error" | null>(null);
 
   const handleDownload = useCallback(async () => {
     setDownloadStatus("downloading");
-    const success = await downloadPDF(url, item.title + "_" + label, item);
-    setDownloadStatus(success ? "success" : "error");
+    try {
+      await downloadPDF(url, item.title + "_" + label, item);
+      setDownloadStatus("success");
+    } catch (error) {
+      console.error('Download failed:', error);
+      setDownloadStatus("error");
+    }
 
     // Reset status after a delay
     setTimeout(() => {
       setDownloadStatus(null);
     }, 2000);
-  }, [url]);
+  }, [url, item.title, label]);
 
   const handleShare = useCallback(async () => {
     setShareStatus("sharing");
@@ -86,8 +78,47 @@ function PDFViewerTopBar({
     setShowShareMenu((prev) => !prev);
   }, []);
 
+  const handlePrint = useCallback(async () => {
+    setPrintStatus("printing");
+    
+    try {
+      // Open PDF in a new window
+      const printWindow = window.open(url, '_blank');
+      
+      if (printWindow) {
+        // Wait a moment for the PDF to start loading, then trigger print
+        setTimeout(() => {
+          printWindow.print();
+          setPrintStatus("success");
+          
+          // Reset status after a delay
+          setTimeout(() => {
+            setPrintStatus(null);
+          }, 2000);
+        }, 1500);
+      } else {
+        // Popup was blocked
+        setPrintStatus("error");
+        console.error('Print popup was blocked');
+        
+        // Reset status after a delay
+        setTimeout(() => {
+          setPrintStatus(null);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Print failed:', error);
+      setPrintStatus("error");
+      
+      // Reset status after a delay
+      setTimeout(() => {
+        setPrintStatus(null);
+      }, 2000);
+    }
+  }, [url]);
+
   return (
-    <ToolBar>
+    <ToolBar data-auto="tool-bar" className={showNativePDFViewer ? "native-pdf-viewer" : ""}>
       {!showNativePDFViewer && (
         <ToolGroup>
           <ToolButton
@@ -111,7 +142,6 @@ function PDFViewerTopBar({
       <ToolGroup>
         {!showNativePDFViewer && (
           <>
-            {" "}
             <ToolButton
               onClick={handleRotate}
               disabled={isLoading}
@@ -150,6 +180,25 @@ function PDFViewerTopBar({
                   : downloadStatus === "error"
                     ? "pi-times"
                     : "pi-download"
+            }`}
+          />
+        </ToolButton>
+
+        <ToolButton
+          onClick={handlePrint}
+          disabled={isLoading || printStatus === "printing"}
+          title="Print PDF"
+          className={printStatus ? `status-${printStatus}` : ""}
+        >
+          <i
+            className={`pi ${
+              printStatus === "printing"
+                ? "pi-spin pi-spinner"
+                : printStatus === "success"
+                  ? "pi-check"
+                  : printStatus === "error"
+                    ? "pi-times"
+                    : "pi-print"
             }`}
           />
         </ToolButton>
@@ -219,7 +268,6 @@ const ToolBar = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem;
-  background: var(--surface-0);
   border-bottom: 1px solid var(--surface-200);
   gap: 0.75rem;
   position: relative;
@@ -227,6 +275,10 @@ const ToolBar = styled.div`
   @media (max-width: 768px) {
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  &.native-pdf-viewer {
+    margin: 0 auto;
   }
 `;
 
