@@ -23,15 +23,26 @@ export const filterConfig = [
     labelField: "name",
   },
   {
-    type: "dropdown",
+    type: "multiSelect",
     label: "גורם",
     field: "type",
-    options: origins,
+    options: origins.map((o) => ({ label: o, value: o })),
   },
   {
     type: "text",
     label: "חיפוש",
     field: "text",
-    searchFields: ["title", "content", "caseNumber", "subtitle"],
+    searchFields: [
+      "title", 
+      "content", 
+      "caseNumber", 
+      "subtitle", 
+      "date",
+      "selectedCase.description",
+      "selectedCase.relation", 
+      "selectedCase.type",
+      "selectedCase.id",
+      "groups[].label"
+    ],
   },
 ];

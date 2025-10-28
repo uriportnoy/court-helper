@@ -4,13 +4,13 @@ import { Paginator } from "primereact/paginator";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.min";
 import { auth } from "../../firebase";
-import LoadingAnimation from "./LoadingAnimation";
 import ErrorDisplay from "./ErrorDisplay";
 import usePinchZoom from "./utils/usePinchZoom";
 import PDFViewerTopBar from "./PDFViewerTopBar.tsx";
 import { ItemMenuProps } from "../ItemMenu.tsx";
 import { getInitialScale } from "./utils";
 
+const LoadingAnimation = () => <div/>
 interface PDFViewerProps {
   url: string;
   item: ItemMenuProps;

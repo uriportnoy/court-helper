@@ -1,11 +1,25 @@
+export interface CaseFile {
+  id: string;
+  name: string;
+  fileUrl: string;
+  type?: string;
+  uploadDate: string;
+  size?: number;
+}
+
 export interface Case {
+  id?: string;
   type: string;
   caseNumber: string;
   court: string;
   description: string;
+  relation: string;
   appealAccepted: boolean;
   isMyCase: boolean;
   isOpen: boolean;
+  files?: CaseFile[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Group {

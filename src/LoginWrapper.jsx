@@ -1,9 +1,10 @@
 import Center from "./Center";
 import LoginForm from "./LoginForm";
 import { Toast } from "primereact/toast";
-import { cloneElement, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
+import AppLoader from "./common/AppLoader";
 import {
   onAuthStateChanged,
   signInWithPopup,
@@ -83,7 +84,11 @@ function AppWithLogin({ children }) {
   };
 
   if (!isLoaded) {
-    return <LoadingScreen>Loading...</LoadingScreen>;
+    return (
+      <LoadingScreen>
+        <AppLoader text="מאתחל את האפליקציה..." size={120} />
+      </LoadingScreen>
+    );
   }
 
   return (

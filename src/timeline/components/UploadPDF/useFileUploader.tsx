@@ -36,8 +36,19 @@ export function useFileUploader({
         const finalFileName = fileName
           ? `${fileName}_${label || "untitled"}_${Date.now()}` // Add timestamp for uniqueness
           : `${name || "name"}_${label || "untitled"}_${Date.now()}`;
-        const folderName = ext === "pdf" ? "pdfs" : ext;
-        const storageRef = ref(storage, `${folderName}/${finalFileName}`);
+        
+        // Determine folder structure based on fileName prefix for cases
+        let folderPath: string;
+        if (fileName && fileName.startsWith("case_")) {
+          // Case-specific file: important/[caseNumber]/
+          const caseNumber = fileName.replace("case_", "").split("_")[0];
+          folderPath = `important/${caseNumber}`;
+        } else {
+          // General file: pdfs/ or other extension folder
+          folderPath = ext === "pdf" ? "pdfs" : ext;
+        }
+        
+        const storageRef = ref(storage, `${folderPath}/${finalFileName}`);
         const uploadTask = uploadBytesResumable(storageRef, files[0]);
 
         uploadTask.on(

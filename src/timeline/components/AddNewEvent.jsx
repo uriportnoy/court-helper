@@ -35,7 +35,7 @@ export default function AddNewEvent({ btnClassName, caseNumber }) {
 const defaultState = {
   selectedCase: null,
   type: null,
-  date: null,
+  date: new Date().toLocaleDateString("en-CA"),
   title: "",
   subtitle: "",
   content: "",
@@ -47,23 +47,21 @@ const defaultState = {
 };
 export const FormDialog = ({ eventData = {}, close }) => {
   const [isLoading, setIsLoading] = useState(false);
+
   const [state, setState] = useImmer({
     ...defaultState,
     ...eventData,
   });
   const { loadEvents, cases: options, groups } = useAppContext();
 
-  console.log("state", state);
   const addNewEvent = async () => {
     setIsLoading(true);
     const createdData = {
       ...state,
       fileURL: state.fileURL.filter((file) => !!file.url),
     };
-    console.log("addNewEvent:", state);
     addEvent(createdData)
       .then((createdId) => {
-        console.log(createdId);
         setState((draft) => {
           draft.id = createdId;
         });
@@ -80,7 +78,6 @@ export const FormDialog = ({ eventData = {}, close }) => {
       ...state,
       fileURL: state.fileURL.filter((file) => !!file.url),
     };
-    console.log("updateEventData:", updatedData);
 
     setIsLoading(true);
     updateEvent(updatedData)
@@ -92,7 +89,6 @@ export const FormDialog = ({ eventData = {}, close }) => {
         setIsLoading(false);
       });
   };
-  const isEditMode = !!state?.id;
 
   return (
     <div className={styles.formWrapper}>
@@ -103,7 +99,6 @@ export const FormDialog = ({ eventData = {}, close }) => {
           }
           onChange={(selectedCase) => {
             setState((draft) => {
-              console.log(selectedCase);
               draft.selectedCase = selectedCase;
               draft.caseNumber = selectedCase.caseNumber;
             });
@@ -142,11 +137,12 @@ export const FormDialog = ({ eventData = {}, close }) => {
             });
           }}
           value={state.relatedEvent}
+          itemData={state}
         />
       </LabelWrapper>
       <LabelWrapper title={"תאריך"}>
         <Calendar
-          value={state.date ? new Date(state.date) : new Date()}
+          value={new Date(state.date)}
           onChange={(e) => {
             setState((draft) => {
               const pickedDate = e.value;
@@ -236,14 +232,21 @@ export const FormDialog = ({ eventData = {}, close }) => {
       </LabelWrapper>
       <BottomBar>
         <Button
-          label={isEditMode ? "עדכן" : "הוסף"}
-          onClick={isEditMode ? updateEventData : addNewEvent}
+          label={state?.id ? "עדכן" : "הוסף"}
+          onClick={() => {
+            // Determine action based on current state at the moment of click
+            if (state?.id) {
+              updateEventData();
+            } else {
+              addNewEvent();
+            }
+          }}
           disabled={
             !state.selectedCase || !state.type || !state.date || !state.title
           }
           loading={isLoading}
         />
-        {isEditMode && (
+        {state?.id && (
           <Button
             label={"שכפל"}
             outlined
@@ -251,7 +254,9 @@ export const FormDialog = ({ eventData = {}, close }) => {
               setState((draft) => {
                 delete draft.id;
                 draft.fileURL = [];
-                draft.content = "";
+                if (!draft.title.includes("- עותק")) {
+                  draft.title = `${draft.title} - עותק`;
+                }
               });
             }}
           />

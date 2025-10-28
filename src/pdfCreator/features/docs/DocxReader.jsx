@@ -14,7 +14,6 @@ const DocxReader = ({ onLoad }) => {
       try {
         const content = e.target.result;
         const fileResult = await readFile(content);
-        console.log(fileResult);
         const resultObj = fileResult.reduce((acc, item) => {
           const id = Math.random().toString(16).slice(2);
           acc[id] = { ...item, id };
@@ -58,7 +57,6 @@ const DocxReader = ({ onLoad }) => {
         });
       }
     }
-    console.log(Array.from(matches.values()));
     return Array.from(matches.values());
   }
 

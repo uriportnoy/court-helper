@@ -72,9 +72,15 @@ const VerticalTimelineElement = ({
           <ContentCard type={type} data-auto="content-card">
             <ItemMenu ref={menu} {...item} />
             <ItemCourt>
-              {selectedCase.court === "שלום" && "*"}
-              {selectedCase.court === "מחוזי" && "**"}
-              {selectedCase.court === "העליון" && "***"}
+              {selectedCase.court === "שלום" && (
+                <CourtBadge level="peace">שלום</CourtBadge>
+              )}
+              {selectedCase.court === "מחוזי" && (
+                <CourtBadge level="district">מחוזי</CourtBadge>
+              )}
+              {selectedCase.court === "העליון" && (
+                <CourtBadge level="supreme">עליון</CourtBadge>
+              )}
             </ItemCourt>
             <ContentHeader data-auto="content-header">{children}</ContentHeader>
             {fileURL && fileURL.length > 0 ? (
@@ -164,10 +170,33 @@ const TimelineElementWrapper = styled(motion.div)`
   }
 `;
 const ItemCourt = styled.div`
-font-size: 2rem;
-    position: absolute;
-    left: 10px;
-}
+  position: absolute;
+  left: 10px;
+  top: 10px;
+`;
+
+const CourtBadge = styled.span<{ level: 'peace' | 'district' | 'supreme' }>`
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  color: white;
+  background-color: ${props => {
+    switch (props.level) {
+      case 'peace':
+        return 'var(--green-600)';
+      case 'district':
+        return 'var(--blue-600)';
+      case 'supreme':
+        return 'var(--purple-600)';
+      default:
+        return 'var(--gray-600)';
+    }
+  }};
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
 `;
 const TimelineIcon = styled(motion.div)`
   width: 40px;

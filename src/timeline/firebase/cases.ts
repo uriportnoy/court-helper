@@ -5,14 +5,17 @@ const COLLECTION_NAME = "cases";
 
 export async function getAllCases(): Promise<Array<Case>> {
   const dbCases = await getAll(COLLECTION_NAME);
-  return dbCases.sort((a, b) => {
+  if (!dbCases) return [];
+  
+  return (dbCases as Case[]).sort((a, b) => {
     const dateA = parseDate(a.caseNumber);
     const dateB = parseDate(b.caseNumber);
-    return dateA - dateB;
+    if (!dateA || !dateB) return 0;
+    return dateA.getTime() - dateB.getTime();
   });
 }
 
-const parseDate = (str) => {
+const parseDate = (str: string): Date | null => {
   let match;
   if ((match = str.match(/^(\d+)-(\d+)-(\d+)$/))) {
     const [, , month, year] = match;
@@ -24,13 +27,28 @@ const parseDate = (str) => {
   return null;
 };
 
-export async function updateCase(updatedData) {
+export async function updateCase(updatedData: Case) {
   if (!updatedData.id) {
     throw new Error("Case ID is required for updating a case.");
   }
-  return await update(COLLECTION_NAME, updatedData.id, updatedData);
+  
+  // Ensure files array exists and is properly structured
+  const caseData = {
+    ...updatedData,
+    files: updatedData.files || [],
+    updatedAt: new Date().toISOString(),
+  };
+  
+  return await update(COLLECTION_NAME, updatedData.id, caseData);
 }
 
-export async function addCase(newCase) {
-  return await add(COLLECTION_NAME, newCase);
+export async function addCase(newCase: Omit<Case, 'id'>) {
+  const caseData = {
+    ...newCase,
+    files: newCase.files || [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  
+  return await add(COLLECTION_NAME, caseData);
 }
