@@ -9,21 +9,22 @@ import usePinchZoom from "./utils/usePinchZoom";
 import PDFViewerTopBar from "./PDFViewerTopBar.tsx";
 import { ItemMenuProps } from "../ItemMenu.tsx";
 import { getInitialScale } from "./utils";
+import AppLoader from "common/AppLoader.tsx";
 
-const LoadingAnimation = () => <div/>
 interface PDFViewerProps {
   url: string;
   item: ItemMenuProps;
   type: string;
   label: string;
 }
+
 const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
-  const [pdfDoc, setPdfDoc] = useState(null);
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [pageNum, setPageNum] = useState(1);
-  const [numPages, setNumPages] = useState(null);
-  const [error, setError] = useState(null);
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const renderingRef = useRef(false);
   const [pdfDimensions, setPdfDimensions] = useState({ width: 0, height: 0 });
@@ -48,9 +49,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
     isZoomedIn,
   } = pinchProps;
 
-  const [showNativePDFViewer, setShowNativePDFViewer] = useState(
-    url.includes("docx"),
-  );
+  const [showNativePDFViewer, setShowNativePDFViewer] = useState(true);
 
   const renderPage = useCallback(
     async (num) => {
@@ -217,7 +216,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
           $allowOverflow={isZoomedIn}
           data-auto={"viewer-content"}
         >
-          {isLoading && <LoadingAnimation />}
+          {isLoading && <AppLoader text="Loading PDF..." overlay size={100} />}
           <CanvasWrapper data-auto="canvas-wrapper">
             <canvas
               ref={canvasRef}
@@ -307,6 +306,7 @@ const IFrameWrapper = styled.div`
   height: 100%;
   border: none;
   margin: 0 auto;
+  position: relative;
 `;
 
 export default PDFViewer;
