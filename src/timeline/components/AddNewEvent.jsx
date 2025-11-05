@@ -14,9 +14,11 @@ import { Dropdown } from "primereact/dropdown";
 import { Editor } from "primereact/editor";
 import { InputText } from "primereact/inputtext";
 import { cloneElement, useState } from "react";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useImmer } from "use-immer";
 import AITextButton from "./AITextButton";
+import { Tag } from "primereact/tag";
 
 export default function AddNewEvent({ btnClassName, caseNumber }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,6 +38,7 @@ const defaultState = {
   selectedCase: null,
   type: null,
   date: new Date().toLocaleDateString("en-CA"),
+  important: false,
   title: "",
   subtitle: "",
   content: "",
@@ -92,6 +95,25 @@ export const FormDialog = ({ eventData = {}, close }) => {
 
   return (
     <div className={styles.formWrapper}>
+      <FormHeaderBar>
+        <div className="flex items-center gap-2">
+          <i className="pi pi-plus" />
+          <span>פרטי אירוע</span>
+        </div>
+        <ImportantToggle
+          $active={!!state.important}
+          onClick={() =>
+            setState((draft) => {
+              draft.important = !draft.important;
+            })
+          }
+          title={state.important ? "חשוב" : "סמן כחשוב"}
+        >
+          <i className={`pi ${state.important ? "pi-star-fill" : "pi-star"}`} />
+        </ImportantToggle>
+      </FormHeaderBar>
+
+      <FieldsGrid>
       <LabelWrapper title="תיק">
         <CasesDropdown
           selectedCaseNumber={
@@ -198,6 +220,12 @@ export const FormDialog = ({ eventData = {}, close }) => {
           placeholder={"כותרת משנה"}
         />
       </LabelWrapper>
+      </FieldsGrid>
+
+      <SectionTitle>
+        <span>תוכן האירוע</span>
+        {state.important && <Tag severity="warning" value="חשוב" />}
+      </SectionTitle>
       <AITextButton
         originalText={state.content}
         onRewrite={(text) => {
@@ -274,6 +302,65 @@ function LabelWrapper({ children, title }) {
     </div>
   );
 }
+
+AddNewEvent.propTypes = {
+  btnClassName: PropTypes.string,
+  caseNumber: PropTypes.string,
+};
+
+FormDialog.propTypes = {
+  eventData: PropTypes.object,
+  close: PropTypes.func.isRequired,
+};
+
+LabelWrapper.propTypes = {
+  children: PropTypes.element.isRequired,
+  title: PropTypes.string.isRequired,
+};
+
+const FormHeaderBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface-50);
+  border: 1px solid var(--surface-200);
+  border-radius: var(--border-radius);
+  margin-bottom: 12px;
+`;
+
+const ImportantToggle = styled.button`
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--surface-300);
+  border-radius: 50%;
+  background: ${(p) => (p.$active ? "var(--yellow-100)" : "var(--surface-0)")};
+  color: ${(p) => (p.$active ? "var(--yellow-600)" : "var(--surface-700)")};
+`;
+
+const FieldsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const SectionTitle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 12px 0 6px 0;
+  padding: 0 4px;
+  color: var(--text-color);
+  font-weight: 600;
+`;
 
 const TextEditor = styled(Editor)`
   flex: 1;

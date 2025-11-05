@@ -132,6 +132,7 @@ export default function useTimelineApp() {
 
   const loadCases = useCallback(async () => {
     const loadedCases = await getAllCases();
+    debugger;
     setCases(loadedCases);
     return loadedCases;
   }, []);

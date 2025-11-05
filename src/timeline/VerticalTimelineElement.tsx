@@ -71,6 +71,11 @@ const VerticalTimelineElement = ({
           </TimelineIcon>
           <ContentCard type={type} data-auto="content-card">
             <ItemMenu ref={menu} {...item} />
+            {item?.important && (
+              <ImportantStar title="חשוב">
+                <i className="pi pi-star-fill" />
+              </ImportantStar>
+            )}
             <ItemCourt>
               {selectedCase.court === "שלום" && (
                 <CourtBadge level="peace">שלום</CourtBadge>
@@ -173,6 +178,23 @@ const ItemCourt = styled.div`
   position: absolute;
   left: 10px;
   top: 10px;
+`;
+
+const ImportantStar = styled.div`
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--yellow-100);
+  color: var(--yellow-700);
+  border: 1px solid var(--yellow-300);
+
+  i { font-size: 0.9rem; }
 `;
 
 const CourtBadge = styled.span<{ level: 'peace' | 'district' | 'supreme' }>`
