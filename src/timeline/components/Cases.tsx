@@ -370,6 +370,29 @@ const Cases: React.FC = () => {
     }
   };
 
+  // --- Cases status summary (similar to printCases) ---
+  const courtTypes = ["שלום", "מחוזי", "עליון"] as const;
+  type CourtType = typeof courtTypes[number];
+
+  const casesSummary = courtTypes.map((court: CourtType) => {
+    const courtCases = cases.filter((c) => c.court === court);
+    const herCases = courtCases.filter((p) => !p.isMyCase);
+    const myCases = courtCases.filter((p) => p.isMyCase);
+
+    const herAccepted = herCases.filter((it) => it.appealAccepted).length;
+    const herDeclined = herCases.filter((it) => !it.appealAccepted).length;
+
+    const mineAccepted = myCases.filter((it) => it.appealAccepted).length;
+    const mineDeclined = myCases.filter((it) => !it.appealAccepted).length;
+
+    return {
+      court,
+      total: courtCases.length,
+      her: { total: herCases.length, accepted: herAccepted, declined: herDeclined },
+      mine: { total: myCases.length, accepted: mineAccepted, declined: mineDeclined },
+    };
+  });
+
   const getCaseStatus = (caseItem: Case) => {
     if (caseItem.isOpen) return { label: "פתוח", severity: "success" as const };
     if (caseItem.appealAccepted) return { label: "זכה", severity: "success" as const };
@@ -402,10 +425,36 @@ const Cases: React.FC = () => {
         </HeaderActions>
       </Header>
 
+      {/* Status Summary */}
+      <StatsSection>
+        <h3>סטטוס תיקים לפי ערכאה</h3>
+        <StatsGrid>
+          {casesSummary.map((s) => (
+            <StatCard key={s.court}>
+              <StatTitle>{s.court}</StatTitle>
+              <StatTotal>סה"כ: {s.total}</StatTotal>
+              <StatRow>
+                <span>היא הגישה</span>
+                <span>
+                  {s.her.total} (התקבלו {s.her.accepted} | נדחו {s.her.declined})
+                </span>
+              </StatRow>
+              <StatRow>
+                <span>אני הגשתי</span>
+                <span>
+                  {s.mine.total} (התקבלו {s.mine.accepted} | נדחו {s.mine.declined})
+                </span>
+              </StatRow>
+            </StatCard>
+          ))}
+        </StatsGrid>
+      </StatsSection>
+
       <CasesGrid>
         <AnimatePresence>
           {filteredCases.map((caseItem) => (
             <CaseCard
+              $missing={!caseItem.court}
               key={caseItem.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -640,11 +689,55 @@ const CasesGrid = styled.div`
   }
 `;
 
-const CaseCard = styled(motion.div)`
+const StatsSection = styled.div`
+  margin-bottom: 2rem;
+  background: var(--surface-0);
+  border: 1px solid var(--surface-200);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  h3 {
+    margin: 0 0 1rem 0;
+  }
+`;
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+`;
+
+const StatCard = styled.div`
+  background: var(--surface-50);
+  border: 1px solid var(--surface-200);
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+`;
+
+const StatTitle = styled.div`
+  font-weight: 600;
+  color: var(--text-color);
+`;
+
+const StatTotal = styled.div`
+  margin: 0.25rem 0 0.5rem 0;
+  color: var(--text-color-secondary);
+`;
+
+const StatRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-color);
+  padding: 0.25rem 0;
+`;
+
+const CaseCard = styled(motion.div)<{ $missing?: boolean }>`
   .p-card {
     height: 100%;
     box-shadow: var(--shadow-2);
     transition: all 0.3s ease;
+    border: 2px solid
+      ${(props) => (props.$missing ? "var(--red-300)" : "transparent")};
+    background: ${(props) => (props.$missing ? "var(--red-50)" : "inherit")};
     
     &:hover {
       box-shadow: var(--shadow-4);

@@ -50,6 +50,10 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
   } = pinchProps;
 
   const [showNativePDFViewer, setShowNativePDFViewer] = useState(true);
+  const [nativeLoading, setNativeLoading] = useState(false);
+  const [nativeError, setNativeError] = useState<string | null>(null);
+  const [iframeKey, setIframeKey] = useState(0);
+  const retryRef = useRef(0);
 
   const renderPage = useCallback(
     async (num) => {
@@ -161,7 +165,21 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
     let mounted = true;
 
     const initPDF = async () => {
-      if (!mounted || showNativePDFViewer) return;
+      if (!mounted) return;
+      if (showNativePDFViewer) {
+        // Kick off native loading state and a retry watchdog
+        setNativeLoading(true);
+        setNativeError(null);
+        retryRef.current = 0;
+        // If iframe didn't call onLoad within 4s, force a reload once
+        const timer = setTimeout(() => {
+          if (retryRef.current < 1) {
+            retryRef.current += 1;
+            setIframeKey((k) => k + 1);
+          }
+        }, 4000);
+        return () => clearTimeout(timer);
+      }
       await loadPDF();
     };
 
@@ -203,10 +221,35 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
       />
       {showNativePDFViewer && (
         <IFrameWrapper className="max-w-7xl h-[95vh] p-0 flex flex-col overflow-hidden bg-white border-0 shadow-2xl">
-          <iframe
-            src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
-            className="w-full h-full border-none"
-          />
+          {nativeLoading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+              <AppLoader text="Loading PDF..." size={80} />
+            </div>
+          )}
+          {nativeError ? (
+            <ErrorDisplay
+              message={nativeError}
+              onRetry={() => {
+                setNativeError(null);
+                setNativeLoading(true);
+                retryRef.current = 0;
+                setIframeKey((k) => k + 1);
+              }}
+            />
+          ) : (
+            <iframe
+              key={iframeKey}
+              src={`https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(url)}&t=${Date.now()}`}
+              className="w-full h-full border-none"
+              onLoad={() => {
+                setNativeLoading(false);
+              }}
+              onError={() => {
+                setNativeLoading(false);
+                setNativeError("Failed to load PDF. Try again.");
+              }}
+            />
+          )}
         </IFrameWrapper>
       )}
       {isCustomViewer && (
