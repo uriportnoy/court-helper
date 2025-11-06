@@ -247,13 +247,15 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
               //       )}&t=${Date.now()}`
               //     : url
               // }
-              src={
-                /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-                  ? `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(
-                      url
-                    )}`
-                  : url
-              }
+              // src={
+              //   /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+              //     ? `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(
+              //         url
+              //       )}`
+              //     : url
+              // }
+              src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
+
               className="w-full h-full border-none"
               onLoad={() => {
                 setNativeLoading(false);
