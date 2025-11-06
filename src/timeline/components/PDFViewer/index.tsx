@@ -104,7 +104,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
         setIsLoading(false);
       }
     },
-    [pdfDoc, scale, rotation, isZoomedIn, setScale],
+    [pdfDoc, scale, rotation, isZoomedIn, setScale]
   );
 
   const loadPDF = useCallback(async () => {
@@ -239,7 +239,21 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
           ) : (
             <iframe
               key={iframeKey}
-              src={`https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(url)}&t=${Date.now()}`}
+              // src={url}
+              // src={
+              //   /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+              //     ? `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(
+              //         url
+              //       )}&t=${Date.now()}`
+              //     : url
+              // }
+              src={
+                /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+                  ? `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(
+                      url
+                    )}`
+                  : url
+              }
               className="w-full h-full border-none"
               onLoad={() => {
                 setNativeLoading(false);
@@ -248,6 +262,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
                 setNativeLoading(false);
                 setNativeError("Failed to load PDF. Try again.");
               }}
+              allow="fullscreen"
             />
           )}
         </IFrameWrapper>
