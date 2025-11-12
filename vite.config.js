@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 import viteCompression from "vite-plugin-compression";
+import path from "path";
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -43,6 +44,7 @@ export default defineConfig(({ mode }) => ({
       timeline: "/src/timeline",
       common: "/src/common",
       pdfCreator: "/src/pdfCreator",
+      "@": path.resolve(__dirname, "src")
     },
   },
 }));

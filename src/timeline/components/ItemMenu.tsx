@@ -49,13 +49,13 @@ const ItemMenu = React.forwardRef((props: ItemMenuProps, ref) => {
                 icon: "pi pi-pencil",
                 command: openEditDialog,
               },
-              {
-                label: "Remove",
-                icon: "pi pi-times",
-                command: () => {
-                  deleteEvent(props).then(loadEvents);
-                },
-              },
+              // {
+              //   label: "Remove",
+              //   icon: "pi pi-times",
+              //   command: () => {
+              //     deleteEvent(props).then(loadEvents);
+              //   },
+              // },
             ],
           },
         ]}

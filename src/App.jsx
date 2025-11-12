@@ -1,6 +1,7 @@
 import LoginWrapper from "./LoginWrapper";
-import { default as TimelineApp } from "./timeline/App";
+import { default as TimelineAppOld } from "./timeline/App";
 import { default as PDFCreator } from "./pdfCreator/App";
+import { default as TimelineApp } from "./theTimeline";
 import Cases from "./timeline/components/Cases";
 import { Menubar } from "primereact/menubar";
 import { useState } from "react";
@@ -10,6 +11,7 @@ import PropTypes from "prop-types";
 const PDF = "PDF";
 const TIMELINE = "Timeline";
 const CASES = "Cases";
+const TIMELINE_OLD = "TimelineOld";
 
 function MainApp({ logout }) {
   const [selection, setSelection] = useState(TIMELINE);
@@ -19,6 +21,12 @@ function MainApp({ logout }) {
       icon: "pi pi-calendar",
       disabled: selection === TIMELINE,
       command: () => setSelection(TIMELINE),
+    },
+    {
+      label: "ציר זמן ישן",
+      icon: "pi pi-calendar",
+      disabled: selection === TIMELINE_OLD,
+      command: () => setSelection(TIMELINE_OLD),
     },
     {
       label: "תיקים",
@@ -49,6 +57,7 @@ function MainApp({ logout }) {
       />
       <MainContent>
         {selection === TIMELINE && <TimelineApp />}
+        {selection === TIMELINE_OLD && <TimelineAppOld />}
         {selection === CASES && <Cases />}
         {selection === PDF && <PDFCreator />}
       </MainContent>

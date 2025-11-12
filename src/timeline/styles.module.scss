@@ -1,5 +1,15 @@
 @use "sass:color";
 
+*{
+  direction: rtl;
+  text-align: right;
+}
+input[type="date"]{
+  justify-content: end;
+}
+button[role="switch"]{
+  direction: ltr;
+}
 .app {
   text-align: right;
 

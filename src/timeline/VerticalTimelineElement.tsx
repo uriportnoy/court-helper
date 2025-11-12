@@ -36,7 +36,7 @@ const VerticalTimelineElement = ({
     relatedEvent,
     relatedDates,
     groups,
-    selectedCase,
+    selectedCase = {},
     caseNumber,
   } = item;
 

@@ -4,6 +4,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   orderBy,
@@ -100,6 +101,17 @@ export const uploadFile = async (event) => {
     return downloadUrl; // Save the URL to your database as needed
   } catch (error) {
     console.error("Error uploading file:", error);
+    return null;
+  }
+};
+
+export const getEventById = async (eventId: string) => {
+  try {
+    const eventRef = doc(db, "events", eventId);
+    const event = await getDoc(eventRef);
+    return event.data();
+  } catch (error) {
+    console.error("Error getting event by ID:", error);
     return null;
   }
 };

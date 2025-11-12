@@ -1,5 +1,6 @@
 import CasesDropdown from "../CasesDropdown.tsx";
-import { origins } from "timeline/common";
+import { origins } from "../../common";
+import { courts } from "../../../theTimeline/common";
 
 export const filterConfig = [
   {
@@ -12,7 +13,7 @@ export const filterConfig = [
     type: "dropdown",
     label: "ערכאה",
     field: "selectedCase.court",
-    options: ["שלום", "מחוזי", "העליון"],
+    options: courts,
   },
   {
     type: "multiSelect",

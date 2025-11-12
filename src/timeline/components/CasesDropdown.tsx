@@ -1,4 +1,4 @@
-import { useAppContext } from "timeline/Context";
+import { useAppContext } from "../Context";
 import { addCase } from "../firebase/cases.ts";
 import { useMemo, useState } from "react";
 import Select from "react-select";
