@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { X, Download, Maximize2, Minimize2, ExternalLink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { summarizeDocument } from "@/timeline/firebase";
 
 interface FileViewerProps {
   file: {
@@ -18,6 +19,8 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
   const [loading, setLoading] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [summary, setSummary] = useState<string>("");
+  const [summarizing, setSummarizing] = useState(false);
   
   const fileExtension = file.url?.split('.').pop()?.split('?')[0]?.toLowerCase();
   const isPDF = fileExtension === 'pdf' || file.url?.includes('.pdf') || file.url?.includes('pdfs%2F');
@@ -56,6 +59,19 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
     document.body.removeChild(link);
   };
 
+  const onSummarize = async () => {
+    try {
+      setSummarizing(true);
+      // setSummary("");
+      const s = await summarizeDocument(file.url);
+      setSummary(s);
+    } catch (e: any) {
+      setSummary(`שגיאה בסיכום: ${e?.message || e}`);
+    } finally {
+      setSummarizing(false);
+    }
+  };
+
   const handleIframeLoad = (event: React.SyntheticEvent<HTMLIFrameElement>) => {
     const iframe = event.currentTarget;
 
@@ -92,6 +108,16 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-semibold">{file.label}</DialogTitle>
             <div className="flex items-center gap-2">
+              {(isPDF || isDOCX) && (
+                <Button
+                  variant="secondary"
+                  onClick={onSummarize}
+                  disabled={summarizing}
+                  title="סכם מסמך"
+                >
+                  {summarizing ? "מסכם..." : "סכם מסמך"}
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -159,13 +185,25 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
               </div>
             </div>
           ) : (isPDF || isDOCX) ? (
-            <iframe
-              src={getViewerUrl()}
-              className="w-full h-full border-0"
-              onLoad={handleIframeLoad}
-              onError={handleIframeError}
-              title={file.label}
-            />
+            <div className="w-full h-full flex">
+              <div className="flex-1 h-full">
+                <iframe
+                  src={getViewerUrl()}
+                  className="w-full h-full border-0"
+                  onLoad={handleIframeLoad}
+                  onError={handleIframeError}
+                  title={file.label}
+                />
+              </div>
+              {summary && (
+                <div className="w-[420px] h-full overflow-auto border-l bg-white p-4 hidden md:block">
+                  <h3 className="font-semibold mb-2">סיכום</h3>
+                  <div className="text-sm whitespace-pre-wrap leading-6" dir="rtl">
+                    {summary}
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center space-y-4 p-8">
