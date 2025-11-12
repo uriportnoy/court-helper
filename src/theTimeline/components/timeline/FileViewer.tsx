@@ -4,7 +4,17 @@ import { Button } from "@/components/ui/button";
 import { X, Download, Maximize2, Minimize2, ExternalLink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function FileViewer({ file, open, onClose }) {
+interface FileViewerProps {
+  file: {
+    url: string;
+    label: string;
+    type?: string;
+  };
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function FileViewer({ file, open, onClose }: FileViewerProps) {
   const [loading, setLoading] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [loadError, setLoadError] = useState(false);
@@ -17,6 +27,13 @@ export default function FileViewer({ file, open, onClose }) {
     if (open) {
       setLoading(true);
       setLoadError(false);
+
+      // Auto-hide loading after 3 seconds as fallback
+      const timeout = setTimeout(() => {
+        setLoading(false);
+      }, 3000);
+
+      return () => clearTimeout(timeout);
     }
   }, [open, file.url]);
 
@@ -37,6 +54,27 @@ export default function FileViewer({ file, open, onClose }) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleIframeLoad = (event: React.SyntheticEvent<HTMLIFrameElement>) => {
+    const iframe = event.currentTarget;
+
+    // Try to detect if content loaded successfully
+    try {
+      // Check if iframe content is accessible (basic check)
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (iframeDoc && iframeDoc.readyState === 'complete') {
+        setLoading(false);
+        return;
+      }
+    } catch (error) {
+      // Cross-origin restrictions, fallback to timeout
+    }
+
+    // Give Google Docs Viewer a moment to load the actual content
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   };
 
   const handleIframeError = () => {
@@ -124,7 +162,7 @@ export default function FileViewer({ file, open, onClose }) {
             <iframe
               src={getViewerUrl()}
               className="w-full h-full border-0"
-              onLoad={() => setLoading(false)}
+              onLoad={handleIframeLoad}
               onError={handleIframeError}
               title={file.label}
             />

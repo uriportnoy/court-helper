@@ -75,7 +75,6 @@ const AppWrapper = styled.div`
 `;
 
 const MainContent = styled.main`
-  padding: var(--spacing-md);
   max-width: 1400px;
   margin: 0 auto;
 `;
