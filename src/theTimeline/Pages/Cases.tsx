@@ -291,7 +291,9 @@ export default function CasesPage() {
             {filteredCases.map((caseItem) => (
               <Card
                 key={caseItem.id}
-                className="shadow-lg hover:shadow-xl transition-shadow border-slate-200/50"
+                className={`shadow-lg hover:shadow-xl transition-shadow border-slate-200/50 ${
+                  caseItem.isOpen ? "opacity-100" : "opacity-50"
+                }`}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">

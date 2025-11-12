@@ -1,11 +1,28 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { X, FileText, Link as LinkIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export default function FileURLInput({ file, index, onChange, onRemove }) {
+interface FileURLInputProps {
+  file: any;
+  index: number;
+  onChange: (field: string, value: string) => void;
+  onRemove: () => void;
+}
+export default function FileURLInput({
+  file,
+  index,
+  onChange,
+  onRemove,
+}: FileURLInputProps) {
   return (
     <div className="border border-slate-200 rounded-xl p-4 bg-white space-y-3">
       <div className="flex items-start justify-between gap-3">
@@ -17,7 +34,7 @@ export default function FileURLInput({ file, index, onChange, onRemove }) {
             <Input
               placeholder="תווית מסמך (לדוגמה, 'החלטת בית משפט')"
               value={file.label}
-              onChange={(e) => onChange('label', e.target.value)}
+              onChange={(e) => onChange("label", e.target.value)}
               className="font-medium"
             />
             <div className="flex gap-2">
@@ -26,13 +43,13 @@ export default function FileURLInput({ file, index, onChange, onRemove }) {
                 <Input
                   placeholder="כתובת URL של הקובץ"
                   value={file.url}
-                  onChange={(e) => onChange('url', e.target.value)}
+                  onChange={(e) => onChange("url", e.target.value)}
                   className="pr-10"
                 />
               </div>
               <Select
                 value={file.type}
-                onValueChange={(value) => onChange('type', value)}
+                onValueChange={(value) => onChange("type", value)}
               >
                 <SelectTrigger className="w-36">
                   <SelectValue />
@@ -57,7 +74,7 @@ export default function FileURLInput({ file, index, onChange, onRemove }) {
           <X className="w-5 h-5" />
         </Button>
       </div>
-      
+
       {file.url && (
         <div className="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 p-2 rounded-lg">
           <Badge variant="secondary" className="bg-green-100 text-green-700">

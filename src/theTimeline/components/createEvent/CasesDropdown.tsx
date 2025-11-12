@@ -24,9 +24,9 @@ export default function CasesDropdown({
       setSelectedCase(_case);
     }
   };
-
+  const caseValue = selectedCase?.caseNumber || selectedCase;
   return (
-    <Select value={selectedCase} onValueChange={onChange}>
+    <Select value={caseValue} onValueChange={onChange}>
       <SelectTrigger className="h-11 border-slate-300">
         <SelectValue placeholder="בחר תיק" />
       </SelectTrigger>

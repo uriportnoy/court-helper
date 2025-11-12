@@ -26,16 +26,18 @@ import {
   Star,
   Building2,
   Tag,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import FileUploader from "../createEvent/FileUploader";
-import FileURLInput from "../createEvent/FileURLInput";
 import { updateEvent } from "@/timeline/firebase/events";
+import { cleanHtmlContent } from "@/timeline/firebase";
 import CasesDropdown from "../createEvent/CasesDropdown";
 import { Case } from "@/timeline/types";
 import HtmlBox from "./HtmlBox";
+import FileList from "../common/FileList";
 
 interface EditEventDialogProps {
   event: any;
@@ -51,6 +53,8 @@ export default function EditEventDialog({
   onClose,
 }: EditEventDialogProps) {
   const queryClient = useQueryClient();
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [isCleaningContent, setIsCleaningContent] = useState(false);
   console.log(event);
   const [formData, setFormData] = useState({
     title: event.title || "",
@@ -107,6 +111,25 @@ export default function EditEventDialog({
       ...prev,
       { label: label || "", url: fileUrl, type: "mine" },
     ]);
+  };
+
+  const handleCleanContent = async () => {
+    if (!formData.content || formData.content.trim() === "") {
+      toast.error("אין תוכן לניקוי");
+      return;
+    }
+
+    setIsCleaningContent(true);
+    try {
+      const cleanedContent = await cleanHtmlContent(formData.content);
+      setFormData({ ...formData, content: cleanedContent });
+      toast.success("התוכן נוקה בהצלחה!");
+    } catch (error) {
+      console.error("Error cleaning content:", error);
+      toast.error("שגיאה בניקוי התוכן");
+    } finally {
+      setIsCleaningContent(false);
+    }
   };
 
   return (
@@ -261,10 +284,27 @@ export default function EditEventDialog({
           {/* Content Section */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="bg-gradient-to-r from-slate-50 to-slate-100 px-6 py-4 border-b border-slate-200">
-              <h3 className="font-semibold text-lg text-slate-900 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-slate-600" />
-                תוכן האירוע
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-lg text-slate-900 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-slate-600" />
+                  תוכן האירוע
+                </h3>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCleanContent}
+                  disabled={isCleaningContent || !formData.content}
+                  className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
+                >
+                  {isCleaningContent ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4" />
+                  )}
+                  {isCleaningContent ? "מנקה..." : "נקה תוכן"}
+                </Button>
+              </div>
             </div>
             <HtmlBox
               html={formData.content}
@@ -281,37 +321,20 @@ export default function EditEventDialog({
               </h3>
             </div>
             <div className="p-6 space-y-4">
-              <FileUploader onFileUploaded={handleFileUploaded} />
-
-              <div className="space-y-3">
-                {fileURLInputs.map((file, index) => (
-                  <FileURLInput
-                    key={index + "-" + file.url}
-                    file={file}
-                    index={index}
-                    onChange={(field, value) => {
-                      const newInputs = [...fileURLInputs];
-                      newInputs[index][field] = value;
-                      setFileURLInputs(newInputs);
-                    }}
-                    onRemove={() =>
-                      setFileURLInputs(
-                        fileURLInputs.filter((_, i) => i !== index)
-                      )
-                    }
-                  />
-                ))}
-              </div>
-              {/* <PDFUploader
-          currentFiles={state?.fileURL}
-          fileName={state.title.replace(" ", "_") + "_" + state.date}
-          updateFiles={(updatedFiles) => {
-            setState((draft) => {
-              draft.fileURL = updatedFiles;
-            });
-          }}
-          defaultType={state.type}
-        /> */}
+              <FileUploader
+                onFileUploaded={handleFileUploaded}
+                setIsUploadingFile={setIsUploadingFile}
+              />
+              <FileList
+                fileURLInputs={fileURLInputs}
+                setFileURLInputs={(files) => {
+                  // updateEventMutation.mutate({
+                  //   id: event.id,
+                  //   fileURLs: files,
+                  // });
+                  setFileURLInputs(files);
+                }}
+              />
             </div>
           </div>
 
@@ -376,7 +399,7 @@ export default function EditEventDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={updateEventMutation.isPending}
+            disabled={updateEventMutation.isPending || isUploadingFile || isCleaningContent}
             className="h-11 px-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg"
           >
             <Save className="w-5 h-5 ml-2" />

@@ -7,6 +7,7 @@ import { Menubar } from "primereact/menubar";
 import { useState } from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
+import { Toaster } from "sonner";
 
 const PDF = "PDF";
 const TIMELINE = "Timeline";
@@ -50,6 +51,7 @@ function MainApp({ logout }) {
 
   return (
     <AppWrapper>
+      <Toaster />
       <StyledMenubar
         model={items}
         className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm  shadow-sm"

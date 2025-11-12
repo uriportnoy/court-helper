@@ -8,6 +8,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { getFunctions } from "firebase/functions";
 import "./migration";
 
 const firebaseConfig = {
@@ -23,6 +24,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const storage = getStorage(app);
+const functions = getFunctions(app);
 
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
@@ -38,8 +40,40 @@ export const onAuthStateChanged = (callback) =>
 export {
   app,
   storage,
+  functions,
   auth,
   provider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+};
+
+// Text cleaning function
+export const cleanHtmlContent = async (htmlText) => {
+  try {
+    // api is different on dev
+    const apiUrl =
+      import.meta.env.MODE === "development"
+        ? "http://127.0.0.1:5001/timeline-38aac/us-central1"
+        : "https://us-central1-timeline-38aac.cloudfunctions.net";
+
+    const response = await fetch(`${apiUrl}/cleanHtmlText`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ htmlText }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Server error:', errorText);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data.cleanedHtml;
+  } catch (error) {
+    console.error('Error cleaning HTML:', error);
+    throw error;
+  }
 };

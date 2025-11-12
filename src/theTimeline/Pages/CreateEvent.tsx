@@ -23,16 +23,16 @@ import { toast } from "sonner";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import FileUploader from "../components/createEvent/FileUploader";
-import FileURLInput from "../components/createEvent/FileURLInput";
 import { getAllCases } from "../../timeline/firebase/cases.ts";
 import { addEvent } from "../../timeline/firebase/events.ts";
 import { Case } from "@/timeline/types.ts";
 import CasesDropdown from "../components/createEvent/CasesDropdown.tsx";
+import FileList from "../components/common/FileList";
 
 export default function CreateEventPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",
@@ -45,9 +45,7 @@ export default function CreateEventPage() {
     groups: [],
   });
 
-  const [fileURLInputs, setFileURLInputs] = useState([
-    { label: "", url: "", type: "mine" },
-  ]);
+  const [fileURLInputs, setFileURLInputs] = useState([]);
   const [groupInputs, setGroupInputs] = useState([{ label: "", value: "" }]);
 
   const { data: cases } = useQuery({
@@ -94,7 +92,7 @@ export default function CreateEventPage() {
     });
   };
 
-  const handleFileUploaded = (fileUrl, label) => {
+  const handleFileUploaded = (fileUrl: string, label: string) => {
     setFileURLInputs((prev) => [
       ...prev,
       { label, url: fileUrl, type: "mine" },
@@ -255,42 +253,8 @@ export default function CreateEventPage() {
               <CardTitle>מסמכים וקבצים</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <FileUploader onFileUploaded={handleFileUploaded} />
-
-              <div className="space-y-3">
-                {fileURLInputs.map((file, index) => (
-                  <FileURLInput
-                    key={index}
-                    file={file}
-                    index={index}
-                    onChange={(field, value) => {
-                      const newInputs = [...fileURLInputs];
-                      newInputs[index][field] = value;
-                      setFileURLInputs(newInputs);
-                    }}
-                    onRemove={() =>
-                      setFileURLInputs(
-                        fileURLInputs.filter((_, i) => i !== index)
-                      )
-                    }
-                  />
-                ))}
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  setFileURLInputs([
-                    ...fileURLInputs,
-                    { label: "", url: "", type: "mine" },
-                  ])
-                }
-                className="w-full"
-              >
-                <Plus className="w-4 h-4 ml-2" />
-                הוסף קובץ ידני
-              </Button>
+              <FileUploader onFileUploaded={handleFileUploaded} setIsUploadingFile={setIsUploadingFile} />
+              <FileList fileURLInputs={fileURLInputs} setFileURLInputs={setFileURLInputs} />
             </CardContent>
           </Card>
 
