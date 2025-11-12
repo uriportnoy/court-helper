@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import  {  useState } from "react";
 import "../../timeline/firebase";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -27,7 +27,7 @@ import { getAllCases } from "../../timeline/firebase/cases.ts";
 import { addEvent } from "../../timeline/firebase/events.ts";
 import { Case } from "@/timeline/types.ts";
 import CasesDropdown from "../components/createEvent/CasesDropdown.tsx";
-import FileList from "../components/common/FileList";
+import FileList from "../components/common/FileList.tsx";
 
 export default function CreateEventPage() {
   const navigate = useNavigate();
