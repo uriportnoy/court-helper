@@ -55,7 +55,7 @@ export const cleanHtmlContent = async (htmlText) => {
 
     const response = await fetch(`${apiUrl}/cleanHtmlText`, {
       method: "POST",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ htmlText }),
@@ -63,14 +63,14 @@ export const cleanHtmlContent = async (htmlText) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Server error:', errorText);
+      console.error("Server error:", errorText);
       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
     return data.cleanedHtml;
   } catch (error) {
-    console.error('Error cleaning HTML:', error);
+    console.error("Error cleaning HTML:", error);
     throw error;
   }
 };
@@ -104,6 +104,7 @@ export const summarizeDocument = async (fileUrl) => {
 };
 
 function getURL() {
+  // return "https://us-central1-timeline-38aac.cloudfunctions.net";
   return import.meta.env.MODE === "development"
     ? "http://127.0.0.1:5001/timeline-38aac/us-central1"
     : "https://us-central1-timeline-38aac.cloudfunctions.net";

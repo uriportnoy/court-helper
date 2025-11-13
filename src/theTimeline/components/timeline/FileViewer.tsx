@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Download, Maximize2, Minimize2, ExternalLink } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { X, Download, Maximize2, Minimize2, ExternalLink, RotateCw } from "lucide-react";
 import { summarizeDocument } from "@/timeline/firebase";
 
 interface FileViewerProps {
@@ -57,6 +56,16 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const reloadFile = () => {
+    setLoading(true);
+    setLoadError(false);
+    // Force iframe reload by changing its key/src
+    const iframe = document.querySelector('iframe');
+    if (iframe) {
+      iframe.src = iframe.src;
+    }
   };
 
   const onSummarize = async () => {
@@ -118,6 +127,14 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
                   {summarizing ? "מסכם..." : "סכם מסמך"}
                 </Button>
               )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={reloadFile}
+                title="טען מחדש"
+              >
+                <RotateCw className="w-5 h-5" />
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
