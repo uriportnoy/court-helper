@@ -51,10 +51,7 @@ export {
 export const cleanHtmlContent = async (htmlText) => {
   try {
     // api is different on dev
-    const apiUrl =
-      import.meta.env.MODE === "development"
-        ? "http://127.0.0.1:5001/timeline-38aac/us-central1"
-        : "https://us-central1-timeline-38aac.cloudfunctions.net";
+    const apiUrl = getURL();
 
     const response = await fetch(`${apiUrl}/cleanHtmlText`, {
       method: "POST",
@@ -91,10 +88,7 @@ function stripMarkdownCodeFencesClient(text) {
 }
 
 export const summarizeDocument = async (fileUrl) => {
-  const apiUrl =
-    import.meta.env.MODE === "development"
-      ? "http://127.0.0.1:5001/timeline-38aac/us-central1"
-      : "https://us-central1-timeline-38aac.cloudfunctions.net";
+  const apiUrl = getURL();
 
   const res = await fetch(`${apiUrl}/summarizeDocument`, {
     method: "POST",
@@ -108,3 +102,9 @@ export const summarizeDocument = async (fileUrl) => {
   const data = await res.json();
   return stripMarkdownCodeFencesClient(data.summary || "");
 };
+
+function getURL() {
+  return import.meta.env.MODE === "development"
+    ? "http://127.0.0.1:5001/timeline-38aac/us-central1"
+    : "https://us-central1-timeline-38aac.cloudfunctions.net";
+}
