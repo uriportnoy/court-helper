@@ -2,6 +2,7 @@ import { askGPT } from "./utils";
 import * as prompts from "./prompts";
 import { summarizeFromUrl } from "./summarizeFromUrl";
 import { cleanHtmlText } from "./cleanHtmlText";
+import { parsePdfToLegalEvent } from "./readPDFObject";
 
 const functions = require("firebase-functions");
 
@@ -78,6 +79,25 @@ exports.summarizeDocument = onRequest(async (req, res) => {
     res.status(200).json({ summary });
   } catch (err: any) {
     console.error("Summarize error:", err);
+    res
+      .status(500)
+      .json({ error: "Something went wrong", details: err?.message || err });
+  }
+});
+
+exports.readPDFObject = onRequest(async (req, res) => {
+  const { fileUrl } = req.body;
+  if (!fileUrl) {
+    console.warn("Missing fileUrl in request");
+    res.status(400).json({ error: "Missing 'fileUrl' in request body" });
+    return;
+  }
+
+  try {
+    const pdfObject = await parsePdfToLegalEvent(fileUrl);
+    res.status(200).json({ pdfObject });
+  } catch (err: any) {
+    console.error("Read PDF object error:", err);
     res
       .status(500)
       .json({ error: "Something went wrong", details: err?.message || err });

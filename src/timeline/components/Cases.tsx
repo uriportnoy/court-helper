@@ -643,7 +643,6 @@ const Cases: React.FC = () => {
 // Styled Components
 const CasesContainer = styled.div`
   padding: 2rem;
-  max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
   background: var(--surface-50);

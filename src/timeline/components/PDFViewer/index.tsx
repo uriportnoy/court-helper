@@ -157,7 +157,7 @@ const PDFViewer = ({ url, item, type, label }: PDFViewerProps) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [pdfDoc, pageNum, renderPage, isZoomedIn, setScale]);
-
+console.log(url);
   useEffect(() => {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://mozilla.github.io/pdf.js/build/pdf.worker.mjs";

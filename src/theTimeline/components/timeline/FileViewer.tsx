@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Download, Maximize2, Minimize2, ExternalLink, RotateCw } from "lucide-react";
-import { summarizeDocument } from "@/timeline/firebase";
+import { summarizeDocument } from "@/timeline/firebase/functions";
 
 interface FileViewerProps {
   file: {

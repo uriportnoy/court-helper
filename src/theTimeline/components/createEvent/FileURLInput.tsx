@@ -1,4 +1,3 @@
-import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,17 +8,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { X, FileText, Link as LinkIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 interface FileURLInputProps {
   file: any;
-  index: number;
   onChange: (field: string, value: string) => void;
   onRemove: () => void;
 }
 export default function FileURLInput({
   file,
-  index,
   onChange,
   onRemove,
 }: FileURLInputProps) {
@@ -74,16 +70,6 @@ export default function FileURLInput({
           <X className="w-5 h-5" />
         </Button>
       </div>
-
-      {file.url && (
-        <div className="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 p-2 rounded-lg">
-          <Badge variant="secondary" className="bg-green-100 text-green-700">
-            <FileText className="w-3 h-3 ml-1" />
-            קובץ נוסף
-          </Badge>
-          <span className="truncate">{file.url}</span>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui";
 import {
@@ -28,18 +28,17 @@ import {
   Input,
   Badge,
 } from "@/components/ui";
-import {
-  getAllCases,
-  addCase,
-  updateCase,
-} from "../../timeline/firebase/cases.ts";
-import { HASHALOM, MAHZOVY, ALONY, OTHER, courts, caseTypes } from "../common";
+import { addCase, updateCase } from "../../timeline/firebase/cases.ts";
+import type { Case } from "../../timeline/types.ts";
+import { HASHALOM, MAHZOVY, ALONY, courts, caseTypes } from "../common";
+import { useTimelineContext } from "../context";
 
 export default function CasesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { cases, isCasesLoading } = useTimelineContext();
 
   const [newCase, setNewCase] = useState({
     caseNumber: "",
@@ -56,14 +55,8 @@ export default function CasesPage() {
 
   const [editingCase, setEditingCase] = useState<any | null>(null);
 
-  const { data: cases, isLoading } = useQuery({
-    queryKey: ["cases"],
-    queryFn: () => getAllCases(),
-    initialData: [],
-  });
-
   const createCaseMutation = useMutation({
-    mutationFn: (caseData) => addCase(caseData),
+    mutationFn: (caseData: Omit<Case, "id">) => addCase(caseData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cases"] });
       toast.success("התיק נוצר בהצלחה!");
@@ -84,7 +77,7 @@ export default function CasesPage() {
   });
 
   const updateCaseMutation = useMutation({
-    mutationFn: (caseData: any) => updateCase(caseData),
+    mutationFn: (caseData: Case) => updateCase(caseData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cases"] });
       toast.success("התיק עודכן בהצלחה!");
@@ -99,6 +92,37 @@ export default function CasesPage() {
       c.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const casesSummary = courts.map((court) => {
+    const courtCases = cases.filter((c) => c.court === court);
+    const herCases = courtCases.filter((p) => !p.isMyCase);
+    const myCases = courtCases.filter((p) => p.isMyCase);
+
+    const openCount = courtCases.filter((it) => it.isOpen).length;
+    const closedCount = courtCases.length - openCount;
+
+    const herAccepted = herCases.filter((it) => it.appealAccepted).length;
+    const herDeclined = herCases.filter((it) => !it.appealAccepted).length;
+
+    const mineAccepted = myCases.filter((it) => it.appealAccepted).length;
+    const mineDeclined = myCases.filter((it) => !it.appealAccepted).length;
+
+    return {
+      court,
+      total: courtCases.length,
+      open: openCount,
+      closed: closedCount,
+      her: {
+        total: herCases.length,
+        accepted: herAccepted,
+        declined: herDeclined,
+      },
+      mine: {
+        total: myCases.length,
+        accepted: mineAccepted,
+        declined: mineDeclined,
+      },
+    };
+  });
   return (
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -109,163 +133,200 @@ export default function CasesPage() {
             </h1>
             <p className="text-slate-600">נהל את כל התיקים המשפטיים שלך</p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/25">
-                <Plus className="w-5 h-5 ml-2" />
-                תיק חדש
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>יצירת תיק חדש</DialogTitle>
-              </DialogHeader>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  createCaseMutation.mutate(newCase);
-                }}
-                className="space-y-4"
-              >
-                <div className="grid grid-cols-2 gap-4">
+          <div className="w-full md:w-auto flex flex-col items-stretch md:items-end gap-3">
+            <div className="overflow-hidden rounded-xl border bg-white">
+              <table className="min-w-[340px] text-right text-sm">
+                <thead className="bg-slate-50 text-slate-600">
+                  <tr>
+                    <th className="px-3 py-2 font-medium">בית משפט</th>
+                    <th className="px-3 py-2 font-medium">סה"כ</th>
+                    <th className="px-3 py-2 font-medium">פתוחים/סגורים</th>
+                    <th className="px-3 py-2 font-medium">היא</th>
+                    <th className="px-3 py-2 font-medium">אני</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {casesSummary.map((s) => (
+                    <tr key={s.court} className="border-t">
+                      <td className="px-3 py-2">{s.court}</td>
+                      <td className="px-3 py-2">{s.total}</td>
+                      <td className="px-3 py-2">
+                        {s.open}/{s.closed}
+                      </td>
+                      <td className="px-3 py-2">
+                        {s.her.total} (התקבלו {s.her.accepted} | נדחו{" "}
+                        {s.her.declined})
+                      </td>
+                      <td className="px-3 py-2">
+                        {s.mine.total} (התקבלו {s.mine.accepted} | נדחו{" "}
+                        {s.mine.declined})
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/25">
+                  <Plus className="w-5 h-5 ml-2" />
+                  תיק חדש
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>יצירת תיק חדש</DialogTitle>
+                </DialogHeader>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    createCaseMutation.mutate(newCase);
+                  }}
+                  className="space-y-4"
+                >
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>מספר תיק *</Label>
+                      <Input
+                        value={newCase.caseNumber}
+                        onChange={(e) =>
+                          setNewCase({ ...newCase, caseNumber: e.target.value })
+                        }
+                        required
+                        placeholder="לדוגמה: 12345-06-23"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>בית משפט</Label>
+                      <Select
+                        value={newCase.court}
+                        onValueChange={(value) =>
+                          setNewCase({ ...newCase, court: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {courts.map((c) => (
+                            <SelectItem key={c} value={c}>
+                              {c}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label>מספר תיק *</Label>
+                    <Label>תיאור</Label>
                     <Input
-                      value={newCase.caseNumber}
+                      value={newCase.description}
                       onChange={(e) =>
-                        setNewCase({ ...newCase, caseNumber: e.target.value })
+                        setNewCase({ ...newCase, description: e.target.value })
                       }
-                      required
-                      placeholder="לדוגמה: 12345-06-23"
+                      placeholder="תיאור התיק"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>בית משפט</Label>
-                    <Select
-                      value={newCase.court}
-                      onValueChange={(value) =>
-                        setNewCase({ ...newCase, court: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {courts.map((c) => (
-                          <SelectItem key={c} value={c}>
-                            {c}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label>תיאור</Label>
-                  <Input
-                    value={newCase.description}
-                    onChange={(e) =>
-                      setNewCase({ ...newCase, description: e.target.value })
-                    }
-                    placeholder="תיאור התיק"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>סוג</Label>
-                    <Select
-                      value={newCase.type}
-                      onValueChange={(value) =>
-                        setNewCase({ ...newCase, type: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {caseTypes.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {t}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>סוג</Label>
+                      <Select
+                        value={newCase.type}
+                        onValueChange={(value) =>
+                          setNewCase({ ...newCase, type: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {caseTypes.map((t) => (
+                            <SelectItem key={t} value={t}>
+                              {t}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>תאריך פתיחה</Label>
+                      <Input
+                        type="date"
+                        value={newCase.openDate}
+                        onChange={(e) =>
+                          setNewCase({ ...newCase, openDate: e.target.value })
+                        }
+                      />
+                    </div>
                   </div>
+
                   <div className="space-y-2">
-                    <Label>תאריך פתיחה</Label>
+                    <Label>צדדים</Label>
                     <Input
-                      type="date"
-                      value={newCase.openDate}
+                      value={newCase.relation}
                       onChange={(e) =>
-                        setNewCase({ ...newCase, openDate: e.target.value })
+                        setNewCase({ ...newCase, relation: e.target.value })
                       }
+                      placeholder="לדוגמה: פלוני נ׳ אלמוני"
                     />
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label>צדדים</Label>
-                  <Input
-                    value={newCase.relation}
-                    onChange={(e) =>
-                      setNewCase({ ...newCase, relation: e.target.value })
-                    }
-                    placeholder="לדוגמה: פלוני נ׳ אלמוני"
-                  />
-                </div>
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                    <Label>סטטוס התיק</Label>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`text-sm font-medium ${
+                          newCase.status === "פתוח"
+                            ? "text-green-600"
+                            : "text-slate-600"
+                        }`}
+                      >
+                        {newCase.status === "פתוח" ? "פתוח" : "סגור"}
+                      </span>
+                      <Switch
+                        checked={newCase.status === "פתוח"}
+                        onCheckedChange={(checked) => {
+                          setNewCase({
+                            ...newCase,
+                            status: checked ? "פתוח" : "סגור",
+                            isOpen: checked,
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
 
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                  <Label>סטטוס התיק</Label>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`text-sm font-medium ${
-                        newCase.status === "פתוח"
-                          ? "text-green-600"
-                          : "text-slate-600"
-                      }`}
-                    >
-                      {newCase.status === "פתוח" ? "פתוח" : "סגור"}
-                    </span>
+                  <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
                     <Switch
-                      checked={newCase.status === "פתוח"}
-                      onCheckedChange={(checked) => {
-                        setNewCase({
-                          ...newCase,
-                          status: checked ? "פתוח" : "סגור",
-                          isOpen: checked,
-                        });
-                      }}
+                      checked={newCase.isMyCase}
+                      onCheckedChange={(checked) =>
+                        setNewCase({ ...newCase, isMyCase: checked })
+                      }
                     />
+                    <Label>התיק שלי</Label>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
-                  <Switch
-                    checked={newCase.isMyCase}
-                    onCheckedChange={(checked) =>
-                      setNewCase({ ...newCase, isMyCase: checked })
-                    }
-                  />
-                  <Label>התיק שלי</Label>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setDialogOpen(false)}
-                  >
-                    ביטול
-                  </Button>
-                  <Button type="submit" disabled={createCaseMutation.isPending}>
-                    {createCaseMutation.isPending ? "יוצר..." : "צור תיק"}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  <div className="flex justify-end gap-3 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setDialogOpen(false)}
+                    >
+                      ביטול
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={createCaseMutation.isPending}
+                    >
+                      {createCaseMutation.isPending ? "יוצר..." : "צור תיק"}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <div className="mb-6">
@@ -280,7 +341,7 @@ export default function CasesPage() {
           </div>
         </div>
 
-        {isLoading ? (
+        {isCasesLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="h-48 rounded-2xl" />
@@ -311,6 +372,23 @@ export default function CasesPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {(caseItem.court === MAHZOVY ||
+                        caseItem.court === ALONY) && (
+                        <div
+                          className="flex items-center gap-2"
+                          title="ערעור התקבל"
+                        >
+                          <Switch
+                            checked={!!caseItem.appealAccepted}
+                            onCheckedChange={(checked) =>
+                              updateCaseMutation.mutate({
+                                ...(caseItem as Case),
+                                appealAccepted: checked,
+                              })
+                            }
+                          />
+                        </div>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -325,7 +403,7 @@ export default function CasesPage() {
                       >
                         <Pencil className="w-4 h-4" />
                       </Button>
-                      {caseItem.isOpen || caseItem.status === "פתוח" ? (
+                      {caseItem.isOpen ? (
                         <CheckCircle2 className="w-5 h-5 text-green-600" />
                       ) : (
                         <XCircle className="w-5 h-5 text-slate-400" />
@@ -352,6 +430,21 @@ export default function CasesPage() {
                           {caseItem.type}
                         </Badge>
                       )}
+                      {(caseItem.court === MAHZOVY ||
+                        caseItem.court === ALONY) && (
+                        <Badge
+                          variant="outline"
+                          className={`${
+                            caseItem.appealAccepted
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-rose-50 text-rose-700"
+                          }`}
+                        >
+                          {caseItem.appealAccepted
+                            ? "ערעור התקבל"
+                            : "ערעור נדחה"}
+                        </Badge>
+                      )}
                       {caseItem.isMyCase && (
                         <Badge
                           variant="outline"
@@ -367,12 +460,10 @@ export default function CasesPage() {
                         {caseItem.relation}
                       </p>
                     )}
-                    {caseItem.status && (
-                      <p className="text-sm text-slate-600">
-                        <span className="font-medium">סטטוס:</span>{" "}
-                        {caseItem.status}
-                      </p>
-                    )}
+                    <p className="text-sm text-slate-600">
+                      <span className="font-medium">סטטוס:</span>{" "}
+                      {caseItem.isOpen ? "פתוח" : "סגור"}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -380,7 +471,7 @@ export default function CasesPage() {
           </div>
         )}
 
-        {filteredCases.length === 0 && !isLoading && (
+        {filteredCases.length === 0 && !isCasesLoading && (
           <div className="text-center py-16">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
               <Building2 className="w-10 h-10 text-slate-400" />

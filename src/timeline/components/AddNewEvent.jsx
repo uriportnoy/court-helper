@@ -17,7 +17,6 @@ import { cloneElement, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useImmer } from "use-immer";
-import AITextButton from "./AITextButton";
 import { Tag } from "primereact/tag";
 
 export default function AddNewEvent({ btnClassName, caseNumber }) {
@@ -226,14 +225,6 @@ export const FormDialog = ({ eventData = {}, close }) => {
         <span>תוכן האירוע</span>
         {state.important && <Tag severity="warning" value="חשוב" />}
       </SectionTitle>
-      <AITextButton
-        originalText={state.content}
-        onRewrite={(text) => {
-          setState((draft) => {
-            draft.content = text;
-          });
-        }}
-      />
       <LabelWrapper title={"בארוכה"}>
         <TextEditor
           value={state.content}

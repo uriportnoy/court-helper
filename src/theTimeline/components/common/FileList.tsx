@@ -26,7 +26,6 @@ const FileList = ({
           <FileURLInput
             key={index + "-" + file.url}
             file={file}
-            index={index}
             onChange={(field, value) => {
               onFileChange(index, field, value);
             }}

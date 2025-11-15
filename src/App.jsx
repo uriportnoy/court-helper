@@ -77,7 +77,6 @@ const AppWrapper = styled.div`
 `;
 
 const MainContent = styled.main`
-  max-width: 1400px;
   margin: 0 auto;
 `;
 

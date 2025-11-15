@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import TimelinePage from "./Pages/Timeline";
 import CreateEventPage from "./Pages/CreateEvent";
 import CasesPage from "./Pages/Cases";
-import EditEventPage from "./Pages/EditEvent";
+import { ContextWrapper } from "./context";
 
 const navigationItems = [
   {
@@ -28,7 +28,6 @@ const navigationItems = [
 
 export default function Layout({ children }: { children?: React.ReactNode }) {
   const location = useLocation();
-
   return (
     <div
       className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50"
@@ -71,8 +70,9 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
           </div>
         </div>
       </header>
-
-      <main className="flex-1">{children ?? <AppRoutes />}</main>
+      <ContextWrapper>
+        <main className="flex-1">{children ?? <AppRoutes />}</main>
+      </ContextWrapper>
     </div>
   );
 }
@@ -93,7 +93,6 @@ function AppRoutes() {
         path={createPageUrl("CreateEvent")}
         element={<CreateEventPage />}
       />
-      <Route path={createPageUrl("EditEvent")} element={<EditEventPage />} />
     </Routes>
   );
 }

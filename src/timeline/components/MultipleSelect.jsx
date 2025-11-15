@@ -42,6 +42,7 @@ const MultipleSelect = ({
         styles={colourStyles}
         placeholder={"בחר תיקים קשורים"}
         menuPosition="fixed"
+        // menuPlacement="top"
         {...rest}
       />
     </Wrapper>
