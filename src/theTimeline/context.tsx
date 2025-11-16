@@ -60,10 +60,7 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     queryKey: ["events"],
     queryFn: async () => {
       const evts = await getEvents();
-      return (evts || []).map((e: any) => ({
-        ...e,
-        fileURLs: e.fileURLs ?? e.fileURL ?? [],
-      }));
+      return evts || [];
     },
     initialData: [],
   });

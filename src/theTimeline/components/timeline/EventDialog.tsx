@@ -71,7 +71,7 @@ export default function EventDialog({
   }));
 
   const [fileURLInputs, setFileURLInputs] = useState(
-    event?.fileURLs?.length > 0 ? event.fileURLs : []
+    event?.fileURL?.length > 0 ? event.fileURL : []
   );
 
   const [groupInputs, setGroupInputs] = useState(
@@ -92,7 +92,7 @@ export default function EventDialog({
       caseNumber: event?.caseNumber || "",
     });
 
-    setFileURLInputs(event?.fileURLs?.length > 0 ? event.fileURLs : []);
+    setFileURLInputs(event?.fileURL?.length > 0 ? event.fileURL : []);
     setGroupInputs(event?.groups?.length > 0 ? event.groups : []);
   }, [event, open]);
 
@@ -102,12 +102,6 @@ export default function EventDialog({
         // update existing event
         return updateEvent(payload);
       } else {
-        // create new event
-        // keep backward compatibility: also store fileURL as alias to fileURLs
-        const createPayload = {
-          ...payload,
-          fileURL: payload.fileURLs,
-        };
         return addEvent(createPayload);
       }
     },
@@ -129,7 +123,7 @@ export default function EventDialog({
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    const fileURLs = fileURLInputs
+    const fileURL = fileURLInputs
       .filter((f: any) => f.url && f.label)
       .map(({ label, url, type }: any) => ({ label, url, type }));
 
@@ -139,7 +133,7 @@ export default function EventDialog({
 
     const payload: any = {
       ...formData,
-      fileURLs,
+      fileURL,
       groups,
     };
 

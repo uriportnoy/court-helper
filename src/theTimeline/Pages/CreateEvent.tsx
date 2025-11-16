@@ -24,7 +24,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import FileUploader from "../components/createEvent/FileUploader";
 import { addEvent } from "../../timeline/firebase/events.ts";
-import { Case } from "@/timeline/types.ts";
+import { Case, FileURL } from "@/timeline/types.ts";
 import CasesDropdown from "../components/createEvent/CasesDropdown.tsx";
 import FileList from "../components/common/FileList.tsx";
 import { useTimelineContext } from "@/theTimeline/context";
@@ -43,7 +43,7 @@ export default function CreateEventPage() {
     important: false,
     type: Origin.MINE,
     caseNumber: "",
-    fileURLs: [],
+    fileURL: [],
     groups: [],
   });
 
@@ -53,11 +53,6 @@ export default function CreateEventPage() {
   const { cases } = useTimelineContext();
   const createEventMutation = useMutation({
     mutationFn: async (eventData) => {
-      // Persist both fileURLs and fileURL for compatibility with older views
-      const payload = {
-        ...eventData,
-        fileURL: eventData.fileURLs,
-      };
       await addEvent(payload);
     },
     onSuccess: () => {
@@ -74,7 +69,7 @@ export default function CreateEventPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const fileURLs = fileURLInputs
+    const fileURL = fileURLInputs
       .filter((f) => f.url && f.label)
       .map(({ label, url, type }) => ({ label, url, type }));
 
@@ -84,7 +79,7 @@ export default function CreateEventPage() {
 
     createEventMutation.mutate({
       ...formData,
-      fileURLs,
+      fileURL,
       groups,
     });
   };
@@ -97,7 +92,7 @@ export default function CreateEventPage() {
   };
 
   const handleObjectGenerated = (
-    object: any,
+    object: FileURL,
     file: { fileUrl: string; label: string }
   ) => {
     const receivedData = {

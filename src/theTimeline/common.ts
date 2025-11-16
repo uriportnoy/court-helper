@@ -79,4 +79,10 @@ const typeColors = {
     ASC = "asc",
     DESC = "desc",
   }
+
+  export type FileURL = {
+    url: string;
+    label: string;
+    type: Origin;
+  }
 export { typeColors, typeLabels, courtColors, monthNames };

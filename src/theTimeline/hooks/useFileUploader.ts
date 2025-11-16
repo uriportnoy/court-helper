@@ -68,7 +68,7 @@ export function useFileUploader({
             const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
             console.log("File available at", downloadUrl);
             onFileUploaded(downloadUrl, fileLabel);
-            setIsUploadingFile?.(false);  
+            setIsUploadingFile?.(false);
             setPendingFile(null);
             setIsUploading(false);
           }
@@ -110,7 +110,10 @@ export function useFileUploader({
 
   const handleUploadClick = useCallback(() => {
     if (pendingFile) {
-      handleUpload(pendingFile, fileLabel || pendingFile.name || "קובץ");
+      handleUpload(
+        pendingFile,
+        fileLabel || pendingFile.name.split(".")[0] || "קובץ"
+      );
     }
   }, [pendingFile]);
 
