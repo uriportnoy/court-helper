@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Download, ExternalLink, File as FileIcon, Share } from "lucide-react";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
+import useFileShare from "./pdf/useFileShare";
 
 interface PDFButtonProps {
   setViewingFile: Dispatch<SetStateAction<FileURL>>;
@@ -19,7 +20,7 @@ export default function PDFButton({ setViewingFile, file }: PDFButtonProps) {
   const longPressTimerRef = useRef<number | null>(null);
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
   const longPressActivatedRef = useRef(false);
-
+  const { directDownload, viaWhatsApp } = useFileShare({ file });
   const clearLongPress = () => {
     if (longPressTimerRef.current !== null) {
       window.clearTimeout(longPressTimerRef.current);
@@ -34,80 +35,6 @@ export default function PDFButton({ setViewingFile, file }: PDFButtonProps) {
     setMenuOpen(false);
   };
 
-  const directDownload = async () => {
-    try {
-      const fileExtension =
-        file.url?.split(".").pop()?.split("?")[0]?.toLowerCase() || "pdf";
-      const filename = `${file.label || "document"}.${fileExtension}`;
-      const res = await fetch(file.url, { mode: "cors" });
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(blobUrl);
-    } catch {
-      // Fallback
-      const a = document.createElement("a");
-      a.href = file.url;
-      a.download = file.label || "document";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } finally {
-      setMenuOpen(false);
-    }
-  };
-
-  const shareViaWhatsApp = async () => {
-    try {
-      const res = await fetch(file.url, { mode: "cors" });
-      const blob = await res.blob();
-      const ext =
-        file.url?.split(".").pop()?.split("?")[0]?.toLowerCase() || "pdf";
-      const typeFromHeader = res.headers.get("content-type") || "";
-      const mimeGuess =
-        typeFromHeader ||
-        (ext === "pdf"
-          ? "application/pdf"
-          : ext === "png"
-          ? "image/png"
-          : ext === "jpg" || ext === "jpeg"
-          ? "image/jpeg"
-          : ext === "webp"
-          ? "image/webp"
-          : "application/octet-stream");
-      const filename = `${file.label || "document"}.${ext}`;
-      const FileCtor = (window as any).File as
-        | (new (fileBits: BlobPart[], fileName: string, options?: FilePropertyBag) => File)
-        | undefined;
-      const nav: any = navigator;
-      if (FileCtor) {
-        const fileToShare = new FileCtor([blob], filename, { type: mimeGuess });
-        if (nav.canShare && nav.canShare({ files: [fileToShare] })) {
-          await nav.share({
-            files: [fileToShare],
-            title: file.label || "מסמך",
-            text: "",
-          });
-        } else {
-          // Fallback to link share if file share is not supported
-          window.open(`https://wa.me/?text=${encodeURIComponent(file.url)}`, "_blank");
-        }
-      } else {
-        // Fallback to link share if file share is not supported
-        window.open(`https://wa.me/?text=${encodeURIComponent(file.url)}`, "_blank");
-      }
-    } catch {
-      // Fallback to link share on any error
-      window.open(`https://wa.me/?text=${encodeURIComponent(file.url)}`, "_blank");
-    } finally {
-      setMenuOpen(false);
-    }
-  };
 
   return (
     <>
@@ -203,7 +130,7 @@ export default function PDFButton({ setViewingFile, file }: PDFButtonProps) {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={shareViaWhatsApp}
+            onClick={viaWhatsApp}
             className="flex items-center gap-2"
           >
             <Share className="w-4 h-4" />

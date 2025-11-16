@@ -13,18 +13,13 @@ import {
   Minimize2,
   ExternalLink,
   RotateCw,
-  Share,
 } from "lucide-react";
 import { summarizeDocument } from "@/timeline/firebase/functions";
-import ShareMenu from "@/timeline/components/PDFViewer/ShareMenu";
-import { AnimatePresence } from "framer-motion";
+import PDFShare from "./PDFShare";
+import { FileURL } from "@/theTimeline/common";
 
 interface FileViewerProps {
-  file: {
-    url: string;
-    label: string;
-    type?: string;
-  };
+  file: FileURL;
   open: boolean;
   onClose: () => void;
 }
@@ -75,40 +70,6 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
 
   const openInNewTab = () => {
     window.open(file.url, "_blank");
-  };
-
-  const downloadFile = async () => {
-    try {
-      const ext =
-        (isPDF && "pdf") ||
-        (isDOCX && (fileExtension || "docx")) ||
-        fileExtension ||
-        "bin";
-      const filename = `${file.label || "document"}.${ext}`;
-      const response = await fetch(file.url, { mode: "cors" });
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(blobUrl);
-    } catch {
-      // Fallback: try native download attribute without fetching
-      const a = document.createElement("a");
-      const ext =
-        (isPDF && "pdf") ||
-        (isDOCX && (fileExtension || "docx")) ||
-        fileExtension ||
-        "bin";
-      a.href = file.url;
-      a.download = `${file.label || "document"}.${ext}`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
   };
 
   const reloadFile = () => {
@@ -175,7 +136,16 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-semibold">
               {file.label}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={reloadFile}
+                title="טען מחדש"
+              >
+                <RotateCw className="w-5 h-5" />
+              </Button>
             </DialogTitle>
+
             <div className="flex items-center gap-2">
               {(isPDF || isDOCX) && (
                 <Button
@@ -187,30 +157,7 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
                   {summarizing ? "מסכם..." : "סכם מסמך"}
                 </Button>
               )}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowShareMenu(true)}
-                title="שתף"
-              >
-                <Share className="w-5 h-5" />
-              </Button>
-              <AnimatePresence>
-                {showShareMenu && (
-                  <ShareMenu
-                    url={file.url}
-                    onClose={() => setShowShareMenu(false)}
-                  />
-                )}
-              </AnimatePresence>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={reloadFile}
-                title="טען מחדש"
-              >
-                <RotateCw className="w-5 h-5" />
-              </Button>
+              <PDFShare file={file} />
               <Button
                 variant="ghost"
                 size="icon"
@@ -218,14 +165,6 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
                 title="פתח בחלון חדש"
               >
                 <ExternalLink className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={downloadFile}
-                title="הורד"
-              >
-                <Download className="w-5 h-5" />
               </Button>
               <Button
                 variant="ghost"
