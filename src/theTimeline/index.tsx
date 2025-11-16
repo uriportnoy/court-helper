@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import TimelinePage from "./Pages/Timeline";
 import CreateEventPage from "./Pages/CreateEvent";
 import CasesPage from "./Pages/Cases";
-import { ContextWrapper } from "./context";
+import { ContextWrapper } from "@/theTimeline/context";
 
 const navigationItems = [
   {

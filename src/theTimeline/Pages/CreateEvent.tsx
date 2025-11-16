@@ -27,7 +27,7 @@ import { addEvent } from "../../timeline/firebase/events.ts";
 import { Case } from "@/timeline/types.ts";
 import CasesDropdown from "../components/createEvent/CasesDropdown.tsx";
 import FileList from "../components/common/FileList.tsx";
-import { useTimelineContext } from "../context.tsx";
+import { useTimelineContext } from "@/theTimeline/context";
 
 export default function CreateEventPage() {
   const navigate = useNavigate();

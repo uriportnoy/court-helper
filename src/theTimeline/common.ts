@@ -2,8 +2,28 @@ export const HASHALOM = "שלום";
 export const MAHZOVY = "מחוזי";
 export const ALONY = "עליון";
 export const OTHER = "אחר";
-export const courts = [HASHALOM, MAHZOVY, ALONY, OTHER];
-export const caseTypes = ["תלה״מ", "עמ״ש", "ש״ש", "רמ״ש", "י״ס", "ע״ל", "תמ״ש", "בע״מ", "אחר"];
+export enum CourtType {
+  HASHALOM = "שלום",
+  MAHZOVY = "מחוזי",
+  ALONY = "עליון",
+  OTHER = "אחר",
+} 
+export enum CaseType {
+  TELAHIM = "תלה״מ",
+  EAMSH = "עמ״ש",
+  SHISH = "ש״ש",
+  RAMSH = "רמ״ש",
+  YIZSH = "י״ס",
+  OAL = "ע״ל",
+  TAMSH = "תמ״ש",
+  BEAM = "בע״מ",
+  OTHER = "אחר",
+}
+export enum AllValue {
+  ALL = "all",
+}
+export const courts = Object.values(CourtType);
+export const caseTypes = Object.values(CaseType);
 
 const typeColors = {
     mine: "bg-blue-100 text-blue-700 border-blue-200",
@@ -41,4 +61,9 @@ const typeColors = {
     "נובמבר",
     "דצמבר",
   ];
+
+  export enum SortDirection {
+    ASC = "asc",
+    DESC = "desc",
+  }
 export { typeColors, typeLabels, courtColors, monthNames };
