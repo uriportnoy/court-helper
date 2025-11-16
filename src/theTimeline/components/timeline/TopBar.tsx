@@ -18,6 +18,7 @@ import {
   typeLabels,
 } from "../../common";
 import { useTimelineContext } from "@/theTimeline/context";
+import GroupsDropdown from "../createEvent/GroupsDropdown";
 
 export default function TopBar() {
   const {
@@ -39,6 +40,8 @@ export default function TopBar() {
     availableMonths,
     clearFilters,
     hasActiveFilters,
+    filterGroups,
+    setFilterGroups,
   } = useTimelineContext();
 
   return (
@@ -153,7 +156,11 @@ export default function TopBar() {
           </Button>
         ))}
       </ButtonGroup>
-
+      <GroupsDropdown
+                selected={filterGroups}
+                onChange={(groups) => setFilterGroups(groups)}
+                placeholder="חפש בקבוצות..."
+              />
       {hasActiveFilters && (
         <Button
           variant="outline"

@@ -34,6 +34,8 @@ interface TimelineContextType {
   groupedEvents: Record<string, any[]>;
   editingEvent: any;
   setEditingEvent: (event: any | null | undefined) => void;
+  filterGroups: Array<{ label: string; value: string }>;
+  setFilterGroups: (groups: Array<{ label: string; value: string }>) => void;
 }
 
 const TimelineContext = createContext<TimelineContextType>(
@@ -43,9 +45,7 @@ const TimelineContext = createContext<TimelineContextType>(
 export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterImportant, setFilterImportant] = useState(false);
-  const [filterType, setFilterType] = useState<Origin | AllValue>(
-    AllValue.ALL
-  );
+  const [filterType, setFilterType] = useState<Origin | AllValue>(AllValue.ALL);
   const [filterYear, setFilterYear] = useState<AllValue | string>(AllValue.ALL);
   const [filterMonth, setFilterMonth] = useState<AllValue | string>(
     AllValue.ALL
@@ -55,6 +55,7 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
   );
   const [sortDirection, setSortDirection] = useState(SortDirection.DESC); // "asc" or "desc"
   const [editingEvent, setEditingEvent] = useState(null);
+  const [filterGroups, setFilterGroups] = useState<Array<{ label: string; value: string }>>([]);
 
   const { data: events, isLoading: isEventsLoading } = useQuery({
     queryKey: ["events"],
@@ -102,6 +103,7 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     setFilterMonth(AllValue.ALL);
     setFilterCourt(AllValue.ALL);
     setSortDirection(SortDirection.DESC);
+    setFilterGroups([]);
   };
 
   const hasActiveFilters =
@@ -111,7 +113,8 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     filterYear !== AllValue.ALL ||
     filterMonth !== AllValue.ALL ||
     filterCourt !== AllValue.ALL ||
-    sortDirection !== SortDirection.DESC;
+    sortDirection !== SortDirection.DESC ||
+    filterGroups.length > 0;
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
@@ -139,13 +142,20 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
       filterCourt === AllValue.ALL ||
       (relatedCase && relatedCase.court === filterCourt);
 
+    const matchesGroups =
+      filterGroups.length === 0 ||
+      filterGroups.every((selected) =>
+        event.groups?.some((group) => selected.value === group.value)
+      );
+  
     return (
       matchesSearch &&
       matchesImportant &&
       matchesType &&
       matchesYear &&
       matchesMonth &&
-      matchesCourt
+      matchesCourt &&
+      matchesGroups
     );
   });
 
@@ -212,6 +222,8 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     setEditingEvent,
     isCasesLoading,
     isEventsLoading,
+    filterGroups,
+    setFilterGroups,
   };
   return (
     <TimelineContext.Provider value={context}>

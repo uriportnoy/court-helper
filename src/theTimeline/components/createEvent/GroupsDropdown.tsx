@@ -9,12 +9,14 @@ interface GroupsDropdownProps {
   selected: GroupOption[];
   onChange: (groups: GroupOption[]) => void;
   placeholder?: string;
+  isCreatable?: boolean;
 }
 
 export default function GroupsDropdown({
   selected,
   onChange,
   placeholder = "בחר קבוצות...",
+  isCreatable = false,
 }: GroupsDropdownProps) {
   const [groups, setGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +70,7 @@ export default function GroupsDropdown({
         onChange={handleChange}
         valKey="id"
         labelKey="name"
-        isCreatable
+        isCreatable={isCreatable}
         isDisabled={isLoading}
         placeholder={placeholder}
         menuPosition="absolute"

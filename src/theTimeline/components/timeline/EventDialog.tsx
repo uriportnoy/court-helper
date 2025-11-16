@@ -394,6 +394,7 @@ export default function EventDialog({
                 selected={groupInputs}
                 onChange={(groups) => setGroupInputs(groups)}
                 placeholder="בחר או צור קבוצות..."
+                isCreatable
               />
             </div>
           </div>

@@ -27,7 +27,7 @@ import {
   typeLabels,
 } from "@/theTimeline/common";
 import { useTimelineContext } from "@/theTimeline/context";
-import { Origin } from "@/theTimeline/common";
+import GroupsDropdown from "../createEvent/GroupsDropdown";
 
 export default function FloatingFilters() {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,6 +51,8 @@ export default function FloatingFilters() {
     hasActiveFilters,
     sortDirection,
     setSortDirection,
+    filterGroups,
+    setFilterGroups,
   } = useTimelineContext();
 
   useEffect(() => {
@@ -282,6 +284,11 @@ export default function FloatingFilters() {
                     <ArrowDown className="w-4 h-4" />
                   )}
                 </Button>
+                <GroupsDropdown
+                  selected={filterGroups}
+                  onChange={(groups) => setFilterGroups(groups)}
+                  placeholder="חפש בקבוצות..."
+                />
                 {/* Clear Filters */}
                 {hasActiveFilters && (
                   <div className="pt-4 border-t border-slate-200">
