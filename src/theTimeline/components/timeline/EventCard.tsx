@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -94,11 +94,7 @@ export default function EventCard({ event, cases, onEdit }: EventCardProps) {
                 {relatedCase?.court && (
                   <Badge
                     variant="outline"
-                    className={`${(courtColors as any)[
-                      relatedCase.court
-                    ]?.replace("bg-", "bg-opacity-10 border-")} ${(
-                      courtColors as any
-                    )[relatedCase.court]?.replace("bg-", "text-")}`}
+                    className={`text-white ${(courtColors as any)[relatedCase.court] || (courtColors as any)[OTHER]}`}
                   >
                     <Scale className="w-3 h-3 ml-1" />
                     {relatedCase.court}
