@@ -13,7 +13,7 @@ import { getFileNameAndExtension } from "@/timeline/components/UploadPDF/utils";
 interface FileUploaderProps {
   onFileUploaded: (file: string, label: string) => void;
   fileName?: string;
-  setIsUploadingFile: (isUploading: boolean) => void;
+  setIsUploadingFile?: (isUploading: boolean) => void;
 }
 
 export function useFileUploader({
@@ -27,13 +27,13 @@ export function useFileUploader({
 
   const [dragActive, setDragActive] = useState(false);
   const [fileLabel, setFileLabel] = useState("");
-  const [pendingFile, setPendingFile] = useState(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
   const handleUpload = useCallback(
     async (pendingFile: File, fileLabel: string) => {
       setIsUploading(true);
       setError(null);
-      setIsUploadingFile(true);
+      setIsUploadingFile?.(true);
       try {
         const { name, ext } = getFileNameAndExtension(pendingFile.name) || {};
         const storage = getStorage();
@@ -45,7 +45,7 @@ export function useFileUploader({
           folderPath = `important/${caseNumber}`;
         } else {
           // General file: pdfs/ or other extension folder
-          folderPath = ext === "pdf" ? "pdfs" : ext;
+          folderPath = ext === "pdf" ? "pdfs" : ext || "other";
         }
 
         const storageRef = ref(storage, `${folderPath}/${fileLabel || name}`);
@@ -68,7 +68,7 @@ export function useFileUploader({
             const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
             console.log("File available at", downloadUrl);
             onFileUploaded(downloadUrl, fileLabel);
-            setIsUploadingFile(false);
+            setIsUploadingFile?.(false);  
             setPendingFile(null);
             setIsUploading(false);
           }
@@ -82,7 +82,7 @@ export function useFileUploader({
     []
   );
 
-  const handleDrag = useCallback((e) => {
+  const handleDrag = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") {
@@ -92,7 +92,7 @@ export function useFileUploader({
     }
   }, []);
 
-  const handleDrop = useCallback((e) => {
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -102,22 +102,22 @@ export function useFileUploader({
     }
   }, []);
 
-  const handleFileInput = (e) => {
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setPendingFile(e.target.files[0]);
     }
   };
 
-  const handleUploadClick = () => {
+  const handleUploadClick = useCallback(() => {
     if (pendingFile) {
-      handleUpload(pendingFile, fileLabel);
+      handleUpload(pendingFile, fileLabel || pendingFile.name || "קובץ");
     }
-  };
+  }, [pendingFile]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setPendingFile(null);
     setFileLabel("");
-  };
+  }, []);
 
   return {
     isUploading,

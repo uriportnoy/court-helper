@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import PropTypes from "prop-types";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import styled from "styled-components";
 import {
   shareViaEmail,

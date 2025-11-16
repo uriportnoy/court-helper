@@ -29,6 +29,7 @@ import CasesDropdown from "../components/createEvent/CasesDropdown.tsx";
 import FileList from "../components/common/FileList.tsx";
 import { useTimelineContext } from "@/theTimeline/context";
 import { Origin } from "@/timeline/common";
+import AIFileToObject from "../components/createEvent/AIFileToObject.tsx";
 
 export default function CreateEventPage() {
   const navigate = useNavigate();
@@ -95,6 +96,18 @@ export default function CreateEventPage() {
     ]);
   };
 
+  const handleObjectGenerated = (
+    object: any,
+    file: { fileUrl: string; label: string }
+  ) => {
+    const receivedData = {
+      ...object,
+      caseNumber: object.caseNumber?.match(/\d{5}-\d{2}-\d{2}/)?.[0] || null,
+    };
+    handleFileUploaded(file.fileUrl, file.label);
+    console.log("AI PDF Object received", receivedData);
+    setFormData(receivedData);
+  };
   return (
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
@@ -115,6 +128,7 @@ export default function CreateEventPage() {
               הוסף אירוע חדש לציר הזמן המשפטי שלך
             </p>
           </div>
+          <AIFileToObject onObjectGenerated={handleObjectGenerated} />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -300,7 +314,7 @@ export default function CreateEventPage() {
                 <Plus className="w-4 h-4 ml-2" />
                 הוסף קטגוריה
               </Button>
-            </CardContent>            
+            </CardContent>
           </Card>
 
           {/* Submit */}

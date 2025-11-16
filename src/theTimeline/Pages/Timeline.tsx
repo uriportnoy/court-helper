@@ -183,20 +183,15 @@ export default function TimelinePage() {
                         <div className="flex-1 h-px bg-gradient-to-l from-slate-300 to-transparent" />
                       </div>
 
-                      <div className="relative pr-8 border-r-2 border-slate-200">
+                      <div className="relative space-y-4">
                         {(monthEvents as any[]).map(
                           (event: any, idx: number) => (
-                            <div
+                            <EventCard
                               key={`event-${event.id}-${idx}`}
-                              className="relative mb-8 last:mb-0"
-                            >
-                              <div className="absolute -right-[33px] w-4 h-4 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 border-4 border-white shadow-lg" />
-                              <EventCard
-                                event={event}
-                                cases={cases}
-                                onEdit={() => setEditingEvent(event)}
-                              />
-                            </div>
+                              event={event}
+                              cases={cases}
+                              onEdit={() => setEditingEvent(event)}
+                            />
                           )
                         )}
                       </div>

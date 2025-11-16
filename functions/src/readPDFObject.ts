@@ -101,6 +101,13 @@ const prompt = `
     - "קבלת בקשת האב להרחבת זמני השהות באופן חלקי"
   - אם אין צורך – אפשר להחזיר null.
 
+- "type":
+  - סוג המסמך ("mine", "notMine", "court", "thirdParty").
+    - my name is אורי פורטנוי
+    - other side name is עדי סרגוסי
+    - try to guess if the document is mine, not mine, court document or third party document
+  - אם אין צורך להחזיר סוג מסמך – החזר null.
+
 חשוב מאוד:
 - החזר אך ורק JSON תקין אחד, ללא טקסט מסביב, ללא הערות, ללא Markdown.
 - ודא שכל השדות קיימים בדיוק בשם שניתן (גם אם הערך null).
