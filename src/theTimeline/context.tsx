@@ -5,7 +5,7 @@ import { createContext, useContext, useMemo, useState } from "react";
 import { getEvents } from "@/timeline/firebase/events";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
-import { AllValue, CaseType, CourtType, SortDirection } from "./common";
+import { AllValue, CaseType, CourtType, Origin, SortDirection } from "./common";
 
 interface TimelineContextType {
   events: any[];
@@ -24,8 +24,8 @@ interface TimelineContextType {
   setSortDirection: (value: SortDirection) => void;
   filterImportant: boolean;
   setFilterImportant: (value: boolean) => void;
-  filterType: AllValue | CaseType;
-  setFilterType: (value: AllValue | CaseType) => void;
+  filterType: AllValue | Origin;
+  setFilterType: (value: AllValue | Origin) => void;
   availableYears: number[];
   availableMonths: number[];
   clearFilters: () => void;
@@ -43,7 +43,7 @@ const TimelineContext = createContext<TimelineContextType>(
 export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterImportant, setFilterImportant] = useState(false);
-  const [filterType, setFilterType] = useState<CaseType | AllValue>(
+  const [filterType, setFilterType] = useState<Origin | AllValue>(
     AllValue.ALL
   );
   const [filterYear, setFilterYear] = useState<AllValue | string>(AllValue.ALL);

@@ -28,6 +28,7 @@ import { Case } from "@/timeline/types.ts";
 import CasesDropdown from "../components/createEvent/CasesDropdown.tsx";
 import FileList from "../components/common/FileList.tsx";
 import { useTimelineContext } from "@/theTimeline/context";
+import { Origin } from "@/timeline/common";
 
 export default function CreateEventPage() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function CreateEventPage() {
     content: "",
     date: new Date().toISOString().split("T")[0],
     important: false,
-    type: "mine",
+    type: Origin.MINE,
     caseNumber: "",
     fileURLs: [],
     groups: [],
@@ -90,7 +91,7 @@ export default function CreateEventPage() {
   const handleFileUploaded = (fileUrl: string, label: string) => {
     setFileURLInputs((prev) => [
       ...prev,
-      { label, url: fileUrl, type: "mine" },
+      { label, url: fileUrl, type: Origin.MINE },
     ]);
   };
 
@@ -190,10 +191,10 @@ export default function CreateEventPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="mine">המסמך שלי</SelectItem>
-                      <SelectItem value="notMine">צד שני</SelectItem>
-                      <SelectItem value="court">בית משפט</SelectItem>
-                      <SelectItem value="thirdParty">צד שלישי</SelectItem>
+                      <SelectItem value={Origin.MINE}>המסמך שלי</SelectItem>
+                      <SelectItem value={Origin.NOT_MINE}>צד שני</SelectItem>
+                      <SelectItem value={Origin.COURT}>בית משפט</SelectItem>
+                      <SelectItem value={Origin.TRD_PARTY}>צד שלישי</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

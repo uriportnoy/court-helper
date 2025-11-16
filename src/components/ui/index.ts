@@ -10,6 +10,7 @@ export { Separator } from "./separator";
 export { Sidebar } from "./sidebar";
 export { Skeleton } from "./skeleton";
 export { Tooltip } from "./tooltip";
+export { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "./button-group";
 
 export {
   DialogContent,

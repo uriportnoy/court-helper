@@ -1,4 +1,3 @@
-// EventDialog.tsx (you can keep the name EditEventDialog if you want)
 import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -41,6 +40,7 @@ import { addEvent, updateEvent } from "@/timeline/firebase/events";
 import { cleanHtmlContent } from "@/timeline/firebase/functions";
 import HtmlBox from "./HtmlBox";
 import { useTimelineContext } from "@/theTimeline/context";
+import { Origin } from "@/timeline/common";
 
 interface EventDialogProps {
   event?: any | null;
@@ -66,7 +66,7 @@ export default function EventDialog({
     content: event?.content || "",
     date: event?.date || new Date().toISOString().split("T")[0],
     important: event?.important || false,
-    type: event?.type || "mine",
+    type: event?.type || Origin.MINE,
     caseNumber: event?.caseNumber || "",
   }));
 
@@ -88,7 +88,7 @@ export default function EventDialog({
       content: event?.content || "",
       date: event?.date || new Date().toISOString().split("T")[0],
       important: event?.important || false,
-      type: event?.type || "mine",
+      type: event?.type || Origin.MINE,
       caseNumber: event?.caseNumber || "",
     });
 

@@ -2,6 +2,7 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { Origin } from "./index";
 
 interface DialogBtnProps {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ interface DialogBtnProps {
   isOpen?: boolean;
   onClick?: () => { preventShow: boolean };
   onClose?: () => void;
-  type: "mine" | "notMine" | "court" | "trd-party";
+  type: Origin;
 }
 export default function DialogBtn({
   children,

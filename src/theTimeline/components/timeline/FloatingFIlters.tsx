@@ -7,10 +7,10 @@ import {
   SelectValue,
   Button,
   Input,
+  ButtonGroup,
 } from "@/components/ui";
 import {
   Search,
-  Filter,
   Star,
   X,
   SlidersHorizontal,
@@ -18,8 +18,16 @@ import {
   ArrowUp,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { courts, monthNames } from "@/theTimeline/common";
+import {
+  AllValue,
+  courts,
+  monthNames,
+  origins,
+  SortDirection,
+  typeLabels,
+} from "@/theTimeline/common";
 import { useTimelineContext } from "@/theTimeline/context";
+import { Origin } from "@/theTimeline/common";
 
 export default function FloatingFilters() {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +52,7 @@ export default function FloatingFilters() {
     sortDirection,
     setSortDirection,
   } = useTimelineContext();
-  
+
   useEffect(() => {
     const handleScroll = () => {
       setIsVisible(window.scrollY > 300);
@@ -231,38 +239,44 @@ export default function FloatingFilters() {
                       <div className="w-2 h-2 rounded-full bg-white" />
                     )}
                   </Button>
-
-                  <Button
-                    variant={filterType === "mine" ? "default" : "outline"}
-                    onClick={() =>
-                      setFilterType(filterType === "mine" ? "all" : "mine")
-                    }
-                    className={`w-full h-12 justify-start ${
-                      filterType === "mine"
-                        ? "bg-blue-600 hover:bg-blue-700"
-                        : ""
-                    }`}
-                  >
-                    <Filter className="w-5 h-5 ml-3" />
-                    <span className="flex-1 text-right">המסמכים שלי</span>
-                    {filterType === "mine" && (
-                      <div className="w-2 h-2 rounded-full bg-white" />
-                    )}
-                  </Button>
+                  <ButtonGroup>
+                    {origins.map((origin) => (
+                      <Button
+                        variant={filterType === origin ? "default" : "outline"}
+                        onClick={() => setFilterType(origin)}
+                        className={`w-full h-12 justify-start ${
+                          filterType === origin
+                            ? "bg-blue-600 hover:bg-blue-700"
+                            : ""
+                        }`}
+                      >
+                        <span className="flex-1 text-right">
+                          {typeLabels[origin]}
+                        </span>
+                        {filterType === origin && (
+                          <div className="w-2 h-2 rounded-full bg-white" />
+                        )}
+                      </Button>
+                    ))}
+                  </ButtonGroup>
                 </div>
                 <Button
                   variant="outline"
                   onClick={() =>
-                    setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+                    setSortDirection(
+                      sortDirection === SortDirection.ASC
+                        ? SortDirection.DESC
+                        : SortDirection.ASC
+                    )
                   }
                   className="w-10 h-10 p-0"
                   title={
-                    sortDirection === "asc"
+                    sortDirection === SortDirection.ASC
                       ? "מיין לפי תאריך עולה"
                       : "מיין לפי תאריך יורד"
                   }
                 >
-                  {sortDirection === "asc" ? (
+                  {sortDirection === SortDirection.ASC ? (
                     <ArrowUp className="w-4 h-4" />
                   ) : (
                     <ArrowDown className="w-4 h-4" />

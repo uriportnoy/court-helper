@@ -7,8 +7,16 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  ButtonGroup,
 } from "@/components/ui";
-import { courts, monthNames } from "../../common";
+import {
+  AllValue,
+  courts,
+  monthNames,
+  origins,
+  SortDirection,
+  typeLabels,
+} from "../../common";
 import { useTimelineContext } from "@/theTimeline/context";
 
 export default function TopBar() {
@@ -68,13 +76,13 @@ export default function TopBar() {
       <Select
         value={filterMonth}
         onValueChange={setFilterMonth}
-        disabled={filterYear === "all"}
+        disabled={filterYear === AllValue.ALL}
       >
         <SelectTrigger className="w-36 md:w-40 h-10 rounded-xl">
           <SelectValue placeholder="חודש" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">כל החודשים</SelectItem>
+          <SelectItem value={AllValue.ALL}>כל החודשים</SelectItem>
           {availableMonths.map((month) => (
             <SelectItem key={`month-${month}`} value={month.toString()}>
               {monthNames[month]}
@@ -88,7 +96,7 @@ export default function TopBar() {
           <SelectValue placeholder="בית משפט" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">כל בתי המשפט</SelectItem>
+          <SelectItem value={AllValue.ALL}>כל בתי המשפט</SelectItem>
           {courts.map((c) => (
             <SelectItem key={`court-${c}`} value={c}>
               {c}
@@ -109,31 +117,42 @@ export default function TopBar() {
       <Button
         variant="outline"
         onClick={() =>
-          setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+          setSortDirection(
+            sortDirection === SortDirection.ASC
+              ? SortDirection.DESC
+              : SortDirection.ASC
+          )
         }
         size="icon"
         title={
-          sortDirection === "asc"
+          sortDirection === SortDirection.ASC
             ? "מיין לפי תאריך עולה"
             : "מיין לפי תאריך יורד"
         }
       >
-        {sortDirection === "asc" ? (
+        {sortDirection === SortDirection.ASC ? (
           <ArrowUp className="w-4 h-4" />
         ) : (
           <ArrowDown className="w-4 h-4" />
         )}
       </Button>
 
-      <Button
-        variant={filterType === "mine" ? "default" : "outline"}
-        size="lg"
-        onClick={() => setFilterType(filterType === "mine" ? "all" : "mine")}
-        className={filterType === "mine" ? "bg-blue-600 hover:bg-blue-700" : ""}
-      >
-        <Filter className="w-4 h-4 ml-2" />
-        המסמכים שלי
-      </Button>
+      <ButtonGroup>
+        {origins.map((origin) => (
+          <Button
+            variant={filterType === origin ? "default" : "outline"}
+            onClick={() => setFilterType(origin)}
+            className={`w-full h-12 justify-start ${
+              filterType === origin ? "bg-blue-600 hover:bg-blue-700" : ""
+            }`}
+          >
+            <span className="flex-1 text-right">{typeLabels[origin]}</span>
+            {filterType === origin && (
+              <div className="w-2 h-2 rounded-full bg-white" />
+            )}
+          </Button>
+        ))}
+      </ButtonGroup>
 
       {hasActiveFilters && (
         <Button
