@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { createPageUrl } from "../utils";
 import { Plus, Calendar, Download, Upload } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import EventCard from "../components/timeline/EventCard";
@@ -143,7 +142,7 @@ export default function TimelinePage() {
                   className="hidden"
                 />
               </div>
-              <Link to={createPageUrl("CreateEvent")}>
+              <Link to={"/CreateEvent"}>
                 <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/25">
                   <Plus className="w-5 h-5 ml-2" />
                   אירוע חדש
@@ -218,7 +217,7 @@ export default function TimelinePage() {
                       ? "נסה לשנות את הפילטרים"
                       : "התחל ביצירת האירוע המשפטי הראשון שלך"}
                   </p>
-                  <Link to={createPageUrl("CreateEvent")}>
+                  <Link to={"/CreateEvent"}>
                     <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                       <Plus className="w-5 h-5 ml-2" />
                       צור אירוע

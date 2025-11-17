@@ -2,7 +2,6 @@ import { useState } from "react";
 // import "@/firebase/index.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { createPageUrl } from "../utils";
 import {
   Button,
   Input,
@@ -57,7 +56,7 @@ export default function CreateEventPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
       toast.success("האירוע נוצר בהצלחה!");
-      navigate(createPageUrl("Timeline"));
+      navigate("/Timeline");
     },
     onError: (error) => {
       toast.error("שגיאה ביצירת האירוע");
@@ -109,7 +108,7 @@ export default function CreateEventPage() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => navigate(createPageUrl("Timeline"))}
+            onClick={() => navigate("/Timeline")}
             className="rounded-full"
           >
             <ArrowRight className="w-5 h-5" />
@@ -311,7 +310,7 @@ export default function CreateEventPage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate(createPageUrl("Timeline"))}
+              onClick={() => navigate("/Timeline")}
             >
               ביטול
             </Button>

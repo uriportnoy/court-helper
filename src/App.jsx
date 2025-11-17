@@ -1,119 +1,109 @@
 import LoginWrapper from "./LoginWrapper";
-import { default as PDFCreator } from "./pdfCreator/App";
-import { default as TimelineApp } from "./theTimeline";
-import { Menubar } from "primereact/menubar";
-import { useState } from "react";
+import { Link, Navigate, Routes, useLocation, Route } from "react-router-dom";
+import { Scale, Calendar, Plus, FolderOpen, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import CreateEventPage from "@/theTimeline/Pages/CreateEvent";
+import CasesPage from "@/theTimeline/Pages/Cases";
+import { ContextWrapper } from "@/theTimeline/context";
 import styled from "styled-components";
-import PropTypes from "prop-types";
-import { Toaster } from "sonner";
+import TimelinePage from "@/theTimeline/Pages/Timeline";
+import { default as PDFCreator } from "@/pdfCreator/App";
 
-const PDF = "PDF";
-const TIMELINE = "Timeline";
-
-function MainApp({ logout }) {
-  const [selection, setSelection] = useState(TIMELINE);
-  const items = [
-    {
-      label: "ציר זמן",
-      icon: "pi pi-calendar",
-      disabled: selection === TIMELINE,
-      command: () => setSelection(TIMELINE),
-    },
-    {
-      label: "PDF",
-      icon: "pi pi-file-pdf",
-      disabled: selection === PDF,
-      command: () => setSelection(PDF),
-    },
-    {
-      label: "התנתק",
-      icon: "pi pi-sign-out",
-      command: logout,
-      className: "sign-out-button",
-    },
-  ];
-
-  return (
-    <AppWrapper>
-      <Toaster />
-      <StyledMenubar
-        model={items}
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm  shadow-sm"
-        id="topbar-body-anchor"
-      />
-      <MainContent>
-        {selection === TIMELINE && <TimelineApp />}
-        {selection === PDF && <PDFCreator />}
-      </MainContent>
-    </AppWrapper>
-  );
-}
-
-MainApp.propTypes = {
-  logout: PropTypes.func.isRequired,
-};
+const navigationItems = [
+  {
+    title: "ציר זמן",
+    url: "/Timeline",
+    icon: Calendar,
+  },
+  {
+    title: "תיקים",
+    url: "/Cases",
+    icon: FolderOpen,
+  },
+  {
+    title: "יצירת מסמכים",
+    url: "/PDFCreator",
+    icon: FileText,
+  },
+  {
+    title: "אירוע חדש",
+    url: "/CreateEvent",
+    icon: Plus,
+  },
+];
 
 const AppWrapper = styled.div`
   min-height: 100vh;
   background-color: var(--surface-50);
 `;
 
-const MainContent = styled.main`
-  margin: 0 auto;
-`;
+const App = () => {
+  const location = useLocation();
 
-const StyledMenubar = styled(Menubar)`
-  background: var(--surface-0);
-  border: none;
-  box-shadow: var(--shadow-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  .p-menuitem-link {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--border-radius-md);
-    transition: all var(--transition-fast);
+  return (
+    <LoginWrapper>
+      {({ logout }) => (
+        <AppWrapper>
+          <div
+            className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50"
+            dir="rtl"
+          >
+            <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50 shadow-sm">
+              <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                      <Scale className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="font-bold text-slate-900 text-lg">
+                        ניהול אירועים
+                      </h2>
+                    </div>
+                  </div>
 
-    &:hover {
-      background-color: var(--surface-100);
-    }
-
-    &:active {
-      background-color: var(--surface-200);
-    }
-  }
-
-  .p-menuitem-icon {
-    color: var(--primary-600);
-  }
-
-  .p-menuitem-text {
-    color: var(--surface-700);
-    font-weight: 500;
-  }
-
-  .sign-out-button {
-    .p-menuitem-link {
-      color: var(--surface-700);
-
-      &:hover {
-        color: var(--primary-600);
-        background-color: var(--surface-100);
-      }
-    }
-  }
-
-  @media (max-width: 768px) {
-    padding: var(--spacing-sm);
-
-    .p-menuitem-link {
-      padding: var(--spacing-sm);
-    }
-  }
-`;
-
-const App = () => (
-  <LoginWrapper>{({ logout }) => <MainApp logout={logout} />}</LoginWrapper>
-);
+                  <nav className="flex items-center gap-2">
+                    {navigationItems.map((item) => {
+                      const isActive = location.pathname === item.url;
+                      return (
+                        <Link key={item.title} to={item.url}>
+                          <Button
+                            variant={isActive ? "default" : "ghost"}
+                            className={`flex items-center gap-2 ${
+                              isActive
+                                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md"
+                                : "hover:bg-slate-100"
+                            }`}
+                          >
+                            <item.icon className="w-4 h-4" />
+                            <span className="hidden md:inline">
+                              {item.title}
+                            </span>
+                          </Button>
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </div>
+              </div>
+            </header>
+            <ContextWrapper>
+              <Routes>
+                <Route
+                  path="/"
+                  element={<Navigate to={"/Timeline"} replace />}
+                />
+                <Route path={"/Timeline"} element={<TimelinePage />} />
+                <Route path={"/Cases"} element={<CasesPage />} />
+                <Route path={"/CreateEvent"} element={<CreateEventPage />} />
+                <Route path={"/PDFCreator"} element={<PDFCreator />} />
+              </Routes>
+            </ContextWrapper>
+          </div>
+        </AppWrapper>
+      )}
+    </LoginWrapper>
+  );
+};
 
 export default App;
