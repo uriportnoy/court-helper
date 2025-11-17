@@ -1,5 +1,5 @@
-import { add, getAll, update } from "./crud";
-import { Case } from "../types.ts";
+import { add, getAll, update, remove } from "./crud";
+import { Case } from "@/theTimeline/types";
 
 const COLLECTION_NAME = "cases";
 
@@ -51,4 +51,11 @@ export async function addCase(newCase: Omit<Case, 'id'>) {
   };
   
   return await add(COLLECTION_NAME, caseData);
+}
+
+export async function deleteCase(caseId: string) {
+  if (!caseId) {
+    throw new Error("Case ID is required for deleting a case.");
+  }
+  return await remove(COLLECTION_NAME, caseId);
 }

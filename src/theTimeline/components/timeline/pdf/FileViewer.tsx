@@ -14,7 +14,7 @@ import {
   ExternalLink,
   RotateCw,
 } from "lucide-react";
-import { summarizeDocument } from "@/timeline/firebase/functions";
+import { summarizeDocument } from "@/firebase/functions";
 import PDFShare from "./PDFShare";
 import { FileURL } from "@/theTimeline/common";
 

@@ -8,7 +8,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { getFileNameAndExtension } from "@/timeline/components/UploadPDF/utils";
+import { getFileNameAndExtension } from "@/theTimeline/components/timeline/pdf/utils";
 
 interface FileUploaderProps {
   onFileUploaded: (file: string, label: string) => void;

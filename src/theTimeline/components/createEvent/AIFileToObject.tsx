@@ -2,7 +2,7 @@ import { Loader2, Rocket } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import FileUploader from "./FileUploader";
-import { readPDFObject } from "@/timeline/firebase/functions";
+import { readPDFObject } from "@/firebase/functions";
 import { Button } from "@/components/ui/button";
 
 interface AIFileToObjectProps {

@@ -1,17 +1,19 @@
+import { CaseType, CourtType, Origin } from "./common";
+
 export interface CaseFile {
   id: string;
   name: string;
   fileUrl: string;
-  type?: string;
+  type?: CaseType;
   uploadDate: string;
   size?: number;
 }
 
 export interface Case {
   id?: string;
-  type: string;
+  type: CaseType;
   caseNumber: string;
-  court: string;
+  court: CourtType;
   description: string;
   relation: string;
   appealAccepted: boolean;
@@ -30,10 +32,10 @@ export interface Group {
 export interface FileURL {
   url: string;
   label?: string;
-  type?: string;
+  type?: Origin;
   date: string;
 }
-export interface TimelineData {
+export interface TimelineEventData {
   id: string;
   type: string;
   title: string;
@@ -47,4 +49,5 @@ export interface TimelineData {
   selectedCase: Case;
   caseNumber: string;
   fileURL: FileURL[];
+  important?: boolean;
 }

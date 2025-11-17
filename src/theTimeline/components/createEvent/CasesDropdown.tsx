@@ -5,28 +5,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
-import { Case } from "@/timeline/types";
+import { useTimelineContext } from "@/theTimeline/context";
+import { Case } from "@/theTimeline/types";
 
 interface CasesDropdownProps {
-  cases: Case[];
-  selectedCase: string | null;
+  selectedCase: Case;
   setSelectedCase: (_case: Case) => void;
 }
 
 export default function CasesDropdown({
-  cases,
   selectedCase,
   setSelectedCase,
 }: CasesDropdownProps) {
+  const { cases } = useTimelineContext();
+
   const onChange = (caseNumber: string) => {
     const _case = cases.find((c: any) => c.caseNumber === caseNumber) as Case;
     if (_case) {
       setSelectedCase(_case);
     }
   };
-  const caseValue = selectedCase?.caseNumber || selectedCase;
+console.log(cases)
   return (
-    <Select value={caseValue} onValueChange={onChange}>
+    <Select value={selectedCase?.caseNumber} onValueChange={onChange}>
       <SelectTrigger className="h-11 border-slate-300">
         <SelectValue placeholder="בחר תיק" />
       </SelectTrigger>

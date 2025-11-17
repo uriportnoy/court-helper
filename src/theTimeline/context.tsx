@@ -1,14 +1,14 @@
-import { getAllCases } from "@/timeline/firebase/cases";
-import { Case } from "@/timeline/types";
+import { getAllCases } from "@/firebase/cases";
+import { Case, TimelineEventData } from "@/theTimeline/types";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useMemo, useState } from "react";
-import { getEvents } from "@/timeline/firebase/events";
+import { getEvents } from "@/firebase/events";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { AllValue, CaseType, CourtType, Origin, SortDirection } from "./common";
 
 interface TimelineContextType {
-  events: any[];
+  events: TimelineEventData[];
   cases: Case[];
   isEventsLoading: boolean;
   isCasesLoading: boolean;
@@ -55,8 +55,10 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
   );
   const [sortDirection, setSortDirection] = useState(SortDirection.DESC); // "asc" or "desc"
   const [editingEvent, setEditingEvent] = useState(null);
-  const [filterGroups, setFilterGroups] = useState<Array<{ label: string; value: string }>>([]);
-
+  const [filterGroups, setFilterGroups] = useState<
+    Array<{ label: string; value: string }>
+  >([]);
+  console.log("filterGroups", filterGroups);
   const { data: events, isLoading: isEventsLoading } = useQuery({
     queryKey: ["events"],
     queryFn: async () => {
@@ -117,37 +119,57 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     filterGroups.length > 0;
 
   const filteredEvents = events.filter((event) => {
+    const lowerSearch = searchQuery.toLowerCase();
+
     const matchesSearch =
-      event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.subtitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.caseNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.groups?.some((group) =>
-        group.label?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      !searchQuery ||
+      event.title?.toLowerCase().includes(lowerSearch) ||
+      event.subtitle?.toLowerCase().includes(lowerSearch) ||
+      event.caseNumber?.toLowerCase().includes(lowerSearch) ||
+      event.content?.toLowerCase().includes(lowerSearch) ||
+      event.groups?.some((group: any) => {
+        // support both { name } and { label }
+        const groupName = (group.name ?? group.label ?? "").toLowerCase();
+        return groupName.includes(lowerSearch);
+      });
+
     const matchesImportant = !filterImportant || event.important;
+
     const matchesType =
       filterType === AllValue.ALL || event.type === filterType;
 
     const eventDate = event.date ? new Date(event.date) : null;
+
     const matchesYear =
       filterYear === AllValue.ALL ||
-      (eventDate && eventDate.getFullYear() === parseInt(filterYear));
+      (eventDate && eventDate.getFullYear() === parseInt(filterYear, 10));
+
     const matchesMonth =
       filterMonth === AllValue.ALL ||
-      (eventDate && eventDate.getMonth() === parseInt(filterMonth));
+      (eventDate && eventDate.getMonth() === parseInt(filterMonth, 10));
 
     const relatedCase = cases?.find((c) => c.caseNumber === event.caseNumber);
+
     const matchesCourt =
       filterCourt === AllValue.ALL ||
       (relatedCase && relatedCase.court === filterCourt);
 
+    // ----- FIXED GROUP FILTER -----
     const matchesGroups =
+      !filterGroups ||
       filterGroups.length === 0 ||
-      filterGroups.every((selected) =>
-        event.groups?.some((group) => selected.value === group.value)
-      );
-  
+      (event.groups &&
+        event.groups.length > 0 &&
+        event.groups.some((group: any) => {
+          // event groups can be { id } or { value }
+          const groupId = String(group.id ?? group.value);
+          return filterGroups.some((selected: any) => {
+            // filterGroups entries are { label, value }
+            const selectedId = String(selected.id ?? selected.value);
+            return selectedId === groupId;
+          });
+        }));
+
     return (
       matchesSearch &&
       matchesImportant &&

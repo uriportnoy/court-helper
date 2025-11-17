@@ -8,9 +8,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { X, FileText, Link as LinkIcon } from "lucide-react";
+import { FileURL } from "@/theTimeline/types";
 
 interface FileURLInputProps {
-  file: any;
+  file: FileURL;
   onChange: (field: string, value: string) => void;
   onRemove: () => void;
 }

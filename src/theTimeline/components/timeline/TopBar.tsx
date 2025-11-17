@@ -69,7 +69,7 @@ export default function TopBar() {
         <SelectContent>
           <SelectItem value="all">כל השנים</SelectItem>
           {availableYears.map((year) => (
-            <SelectItem key={year} value={year.toString()}>
+            <SelectItem key={`availableYears-${year}`} value={year.toString()}>
               {year}
             </SelectItem>
           ))}
@@ -87,7 +87,7 @@ export default function TopBar() {
         <SelectContent>
           <SelectItem value={AllValue.ALL}>כל החודשים</SelectItem>
           {availableMonths.map((month) => (
-            <SelectItem key={`month-${month}`} value={month.toString()}>
+            <SelectItem key={`availableMonths-${month}`} value={month.toString()}>
               {monthNames[month]}
             </SelectItem>
           ))}
@@ -101,7 +101,7 @@ export default function TopBar() {
         <SelectContent>
           <SelectItem value={AllValue.ALL}>כל בתי המשפט</SelectItem>
           {courts.map((c) => (
-            <SelectItem key={`court-${c}`} value={c}>
+            <SelectItem key={`court-select-${c}`} value={c}>
               {c}
             </SelectItem>
           ))}
@@ -143,6 +143,7 @@ export default function TopBar() {
       <ButtonGroup>
         {origins.map((origin) => (
           <Button
+            key={`origin-button-${origin}`}
             variant={filterType === origin ? "default" : "outline"}
             onClick={() => setFilterType(origin)}
             className={`w-full h-12 justify-start ${

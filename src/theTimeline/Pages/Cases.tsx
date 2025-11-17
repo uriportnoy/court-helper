@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   XCircle,
   Pencil,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -28,23 +29,35 @@ import {
   Input,
   Badge,
 } from "@/components/ui";
-import { addCase, updateCase } from "../../timeline/firebase/cases.ts";
-import type { Case } from "../../timeline/types.ts";
-import { HASHALOM, MAHZOVY, ALONY, courts, caseTypes } from "../common";
+import { addCase, updateCase, deleteCase } from "@/firebase/cases.ts";
+import type { Case } from "../types.ts";
+import { HASHALOM, MAHZOVY, ALONY, courts, caseTypes, CourtType, CaseType, AllValue } from "../common";
 import { useTimelineContext } from "../context";
+
+const DEFAULT_CASE = {
+  caseNumber: "",
+  description: "",
+  type: CaseType.TELAHIM,
+  court: HASHALOM as CourtType,
+  status: "פתוח",
+  openDate: new Date().toISOString().split("T")[0],
+  relation: "",
+};
 
 export default function CasesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingCase, setDeletingCase] = useState<Case | null>(null);
   const queryClient = useQueryClient();
   const { cases, isCasesLoading } = useTimelineContext();
 
   const [newCase, setNewCase] = useState({
     caseNumber: "",
     description: "",
-    type: "בית המשפט",
-    court: HASHALOM,
+    type: CaseType.TELAHIM,
+    court: HASHALOM as CourtType,
     status: "פתוח",
     openDate: new Date().toISOString().split("T")[0],
     relation: "",
@@ -54,6 +67,11 @@ export default function CasesPage() {
   });
 
   const [editingCase, setEditingCase] = useState<any | null>(null);
+  // Filters
+  const [filterCourt, setFilterCourt] = useState<AllValue | CourtType>(AllValue.ALL);
+  const [filterType, setFilterType] = useState<AllValue | CaseType>(AllValue.ALL);
+  const [filterStatus, setFilterStatus] = useState<AllValue | "open" | "closed">(AllValue.ALL);
+  const [filterOwner, setFilterOwner] = useState<AllValue | "mine" | "hers">(AllValue.ALL);
 
   const createCaseMutation = useMutation({
     mutationFn: (caseData: Omit<Case, "id">) => addCase(caseData),
@@ -64,8 +82,8 @@ export default function CasesPage() {
       setNewCase({
         caseNumber: "",
         description: "",
-        type: "בית המשפט",
-        court: HASHALOM,
+        type: CaseType.TELAHIM,
+        court: HASHALOM as CourtType,
         status: "פתוח",
         openDate: new Date().toISOString().split("T")[0],
         relation: "",
@@ -86,11 +104,36 @@ export default function CasesPage() {
     },
   });
 
-  const filteredCases = cases.filter(
-    (c) =>
+  const deleteCaseMutation = useMutation({
+    mutationFn: (caseId: string) => deleteCase(caseId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cases"] });
+      toast.success("התיק נמחק בהצלחה!");
+      setDeleteDialogOpen(false);
+      setDeletingCase(null);
+    },
+    onError: () => {
+      toast.error("מחיקת התיק נכשלה. נסה שוב.");
+    },
+  });
+
+  const filteredCases = cases.filter((c) => {
+    const matchesSearch =
       c.caseNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      c.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCourt =
+      filterCourt === AllValue.ALL || c.court === filterCourt;
+    const matchesType = filterType === AllValue.ALL || c.type === filterType;
+    const matchesStatus =
+      filterStatus === AllValue.ALL ||
+      (filterStatus === "open" ? c.isOpen : !c.isOpen);
+    const matchesOwner =
+      filterOwner === AllValue.ALL ||
+      (filterOwner === "mine" ? c.isMyCase : !c.isMyCase);
+    return (
+      matchesSearch && matchesCourt && matchesType && matchesStatus && matchesOwner
+    );
+  });
 
   const casesSummary = courts.map((court) => {
     const courtCases = cases.filter((c) => c.court === court);
@@ -148,18 +191,16 @@ export default function CasesPage() {
                 <tbody>
                   {casesSummary.map((s) => (
                     <tr key={s.court} className="border-t">
-                      <td className="px-3 py-2">{s.court}</td>
-                      <td className="px-3 py-2">{s.total}</td>
-                      <td className="px-3 py-2">
-                        {s.open}/{s.closed}
+                      <td className="px-3 py-2 text-center">{s.court}</td>
+                      <td className="px-3 py-2 text-center">{s.total}</td>
+                      <td className="px-3 py-2 text-center">
+                        <span className="text-green-600 font-bold">{s.open}</span> / <span className="text-red-600 font-bold">{s.closed}</span>
                       </td>
-                      <td className="px-3 py-2">
-                        {s.her.total} (התקבלו {s.her.accepted} | נדחו{" "}
-                        {s.her.declined})
+                      <td className="px-3 py-2 text-center">
+                        <span className="text-green-600 font-bold">{s.her.accepted}</span> / <span className="text-red-600 font-bold">{s.her.declined}</span>
                       </td>
-                      <td className="px-3 py-2">
-                        {s.mine.total} (התקבלו {s.mine.accepted} | נדחו{" "}
-                        {s.mine.declined})
+                      <td className="px-3 py-2 text-center">
+                        <span className="text-green-600 font-bold">{s.mine.accepted}</span> / <span className="text-red-600 font-bold">{s.mine.declined}</span>
                       </td>
                     </tr>
                   ))}
@@ -201,7 +242,7 @@ export default function CasesPage() {
                       <Select
                         value={newCase.court}
                         onValueChange={(value) =>
-                          setNewCase({ ...newCase, court: value })
+                          setNewCase({ ...newCase, court: value as CourtType })
                         }
                       >
                         <SelectTrigger>
@@ -235,7 +276,7 @@ export default function CasesPage() {
                       <Select
                         value={newCase.type}
                         onValueChange={(value) =>
-                          setNewCase({ ...newCase, type: value })
+                          setNewCase({ ...newCase, type: value as CaseType })
                         }
                       >
                         <SelectTrigger>
@@ -339,6 +380,88 @@ export default function CasesPage() {
               className="pr-10 bg-white shadow-sm"
             />
           </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Select
+              value={filterCourt}
+              onValueChange={(value) => setFilterCourt(value as CourtType | AllValue)}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="בית משפט" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={AllValue.ALL}>כל בתי המשפט</SelectItem>
+                {courts.map((c) => (
+                  <SelectItem key={`court-${c}`} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={filterType}
+              onValueChange={(value) => setFilterType(value as CaseType | AllValue)}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="סוג תיק" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={AllValue.ALL}>כל הסוגים</SelectItem>
+                {caseTypes.map((t) => (
+                  <SelectItem key={`type-${t}`} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={filterStatus}
+              onValueChange={(value) =>
+                setFilterStatus(value as "open" | "closed" | AllValue)
+              }
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="סטטוס" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={AllValue.ALL}>פתוחים וסגורים</SelectItem>
+                <SelectItem value="open">פתוחים</SelectItem>
+                <SelectItem value="closed">סגורים</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={filterOwner}
+              onValueChange={(value) =>
+                setFilterOwner(value as "mine" | "hers" | AllValue)
+              }
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="בעלות" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={AllValue.ALL}>שלי ושלה</SelectItem>
+                <SelectItem value="mine">שלי</SelectItem>
+                <SelectItem value="hers">שלה</SelectItem>
+              </SelectContent>
+            </Select>
+            {(filterCourt !== AllValue.ALL ||
+              filterType !== AllValue.ALL ||
+              filterStatus !== AllValue.ALL ||
+              filterOwner !== AllValue.ALL) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setFilterCourt(AllValue.ALL);
+                  setFilterType(AllValue.ALL);
+                  setFilterStatus(AllValue.ALL);
+                  setFilterOwner(AllValue.ALL);
+                }}
+                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+              >
+                נקה פילטרים
+              </Button>
+            )}
+          </div>
         </div>
 
         {isCasesLoading ? (
@@ -402,6 +525,17 @@ export default function CasesPage() {
                         title="ערוך תיק"
                       >
                         <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setDeletingCase(caseItem as Case);
+                          setDeleteDialogOpen(true);
+                        }}
+                        title="מחק תיק"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
                       {caseItem.isOpen ? (
                         <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -626,6 +760,47 @@ export default function CasesPage() {
                 </div>
               </form>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Case Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>אישור מחיקת תיק</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <p className="text-slate-700">
+                האם אתה בטוח שברצונך למחוק את התיק{" "}
+                <span className="font-semibold">
+                  {deletingCase?.caseNumber || ""}
+                </span>
+                ? פעולה זו בלתי הפיכה.
+              </p>
+            </div>
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setDeleteDialogOpen(false);
+                  setDeletingCase(null);
+                }}
+              >
+                ביטול
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700"
+                onClick={() => {
+                  if (deletingCase?.id) {
+                    deleteCaseMutation.mutate(deletingCase.id);
+                  }
+                }}
+                disabled={deleteCaseMutation.isPending}
+              >
+                {deleteCaseMutation.isPending ? "מוחק..." : "מחק"}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

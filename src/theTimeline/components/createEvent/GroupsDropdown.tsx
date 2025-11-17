@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import MultipleSelect from "@/timeline/components/MultipleSelect.jsx";
-import { getAll, add } from "@/timeline/firebase/crud";
-import type { Group } from "@/timeline/types";
+import MultipleSelect from "@/components/MultipleSelect.jsx";
+import { getAll, add } from "@/firebase/crud";
+import type { Group } from "@/theTimeline/types";
 
 type GroupOption = { label: string; value: string };
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../../timeline/firebase";
+// import "@/firebase/index.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
@@ -23,12 +23,12 @@ import { toast } from "sonner";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import FileUploader from "../components/createEvent/FileUploader";
-import { addEvent } from "../../timeline/firebase/events.ts";
-import { Case, FileURL } from "@/timeline/types.ts";
+import { addEvent } from "@/firebase/events.ts";
+import { Case, FileURL } from "@/theTimeline/types.ts";
 import CasesDropdown from "../components/createEvent/CasesDropdown.tsx";
 import FileList from "../components/common/FileList.tsx";
 import { useTimelineContext } from "@/theTimeline/context";
-import { Origin } from "@/timeline/common";
+import { Origin } from "@/theTimeline/common";
 import AIFileToObject from "../components/createEvent/AIFileToObject.tsx";
 
 export default function CreateEventPage() {
@@ -50,10 +50,9 @@ export default function CreateEventPage() {
   const [fileURLInputs, setFileURLInputs] = useState([]);
   const [groupInputs, setGroupInputs] = useState([{ label: "", value: "" }]);
 
-  const { cases } = useTimelineContext();
   const createEventMutation = useMutation({
     mutationFn: async (eventData) => {
-      await addEvent(payload);
+      await addEvent(eventData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -176,12 +175,7 @@ export default function CreateEventPage() {
                 <div className="space-y-2">
                   <Label htmlFor="case">תיק קשור</Label>
                   <CasesDropdown
-                    cases={cases}
-                    selectedCase={
-                      cases.find(
-                        (c: Case) => c.caseNumber === formData.caseNumber
-                      ) || null
-                    }
+                    selectedCase={formData.caseNumber}
                     setSelectedCase={(_case: Case) =>
                       setFormData({ ...formData, caseNumber: _case.caseNumber })
                     }

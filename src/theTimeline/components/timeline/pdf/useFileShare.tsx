@@ -1,5 +1,5 @@
 import { FileURL } from "@/theTimeline/common";
-import { shareViaWhatsApp } from "@/timeline/components/PDFViewer/utils/share";
+import { shareViaWhatsApp } from "@/theTimeline/components/timeline/pdf/share";
 
 interface ShareProps {
     file: FileURL;
@@ -8,10 +8,25 @@ export default function useFileShare({ file }: ShareProps) {
 
   const directDownload = async () => {
     try {
-      const fileExtension =
-        file.url?.split(".").pop()?.split("?")[0]?.toLowerCase() || "pdf";
-      const filename = `${file.label || "document"}.${fileExtension}`;
+      const urlExtRaw = file.url?.split("?")[0]?.split(".").pop() || "";
+      const urlExt = urlExtRaw.toLowerCase();
       const res = await fetch(file.url, { mode: "cors" });
+      const contentType = res.headers.get("content-type") || "";
+      // Prefer MIME-derived extension when available
+      const mimeExt =
+        contentType.includes("pdf")
+          ? "pdf"
+          : contentType.includes("png")
+          ? "png"
+          : contentType.includes("jpeg")
+          ? "jpg"
+          : contentType.includes("webp")
+          ? "webp"
+          : urlExt || "pdf";
+      const baseName = file.label || "document";
+      const filename = baseName.toLowerCase().endsWith(`.${mimeExt}`)
+        ? baseName
+        : `${baseName}.${mimeExt}`;
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -25,7 +40,13 @@ export default function useFileShare({ file }: ShareProps) {
       // Fallback
       const a = document.createElement("a");
       a.href = file.url;
-      a.download = file.label || "document";
+      const urlExtRaw = file.url?.split("?")[0]?.split(".").pop() || "";
+      const extGuess = (urlExtRaw || "pdf").toLowerCase();
+      const baseName = file.label || "document";
+      a.download = baseName.toLowerCase().endsWith(`.${extGuess}`)
+        ? baseName
+        : `${baseName}.${extGuess}`;
+      a.target = "_blank";
       document.body.appendChild(a);
       a.click();
       a.remove();

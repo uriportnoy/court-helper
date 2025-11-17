@@ -35,15 +35,15 @@ import FileList from "../common/FileList";
 import CasesDropdown from "../createEvent/CasesDropdown";
 import GroupsDropdown from "../createEvent/GroupsDropdown";
 
-import { Case } from "@/timeline/types";
-import { addEvent, updateEvent } from "@/timeline/firebase/events";
-import { cleanHtmlContent } from "@/timeline/firebase/functions";
+import { Case, TimelineEventData } from "@/theTimeline/types";
+import { addEvent, updateEvent } from "@/firebase/events";
+import { cleanHtmlContent } from "@/firebase/functions";
 import HtmlBox from "./HtmlBox";
 import { useTimelineContext } from "@/theTimeline/context";
-import { Origin } from "@/timeline/common";
+import { Origin } from "@/theTimeline/common";
 
 interface EventDialogProps {
-  event?: any | null;
+  event?: TimelineEventData | null;
   open: boolean;
   onClose: () => void;
 }
@@ -71,11 +71,11 @@ export default function EventDialog({
   }));
 
   const [fileURLInputs, setFileURLInputs] = useState(
-    event?.fileURL?.length > 0 ? event.fileURL : []
+    event?.fileURL?.length && event.fileURL.length> 0 ? event.fileURL : []
   );
 
   const [groupInputs, setGroupInputs] = useState(
-    event?.groups?.length > 0 ? event.groups : []
+    event?.groups?.length && event.groups.length > 0 ? event.groups : []
   );
 
   // When event changes (e.g., you open dialog for another event), sync state
@@ -92,8 +92,8 @@ export default function EventDialog({
       caseNumber: event?.caseNumber || "",
     });
 
-    setFileURLInputs(event?.fileURL?.length > 0 ? event.fileURL : []);
-    setGroupInputs(event?.groups?.length > 0 ? event.groups : []);
+    setFileURLInputs(event?.fileURL?.length && event.fileURL.length > 0 ? event.fileURL : []);
+    setGroupInputs(event?.groups?.length && event.groups.length > 0 ? event.groups : []);
   }, [event, open]);
 
   const eventMutation = useMutation({

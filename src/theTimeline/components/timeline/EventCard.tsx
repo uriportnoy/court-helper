@@ -24,10 +24,11 @@ import {
   typeLabels,
 } from "../../common";
 import PDFButton from "./PDFButton";
+import { Case, TimelineEventData } from "@/theTimeline/types";
 
 interface EventCardProps {
-  event: any;
-  cases: any[];
+  event: TimelineEventData;
+  cases: Case[];
   onEdit: () => void;
 }
 
@@ -35,7 +36,7 @@ export default function EventCard({ event, cases, onEdit }: EventCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [viewingFile, setViewingFile] = useState(null);
   const relatedCase = cases?.find(
-    (c: any) => c.caseNumber === event.caseNumber
+    (c: Case) => c.caseNumber === event.caseNumber
   );
 
   return (
@@ -162,7 +163,7 @@ export default function EventCard({ event, cases, onEdit }: EventCardProps) {
                     className="overflow-hidden"
                   >
                     <div
-                      className="prose prose-sm max-w-none text-slate-700 mb-3 p-4 bg-slate-50 rounded-xl"
+                      className="prose prose-sm max-w-none text-slate-700 mb-3 p-4 bg-slate-50 rounded-xl max-h-[300px] overflow-y-auto"
                       dangerouslySetInnerHTML={{ __html: event.content }}
                     />
                   </motion.div>

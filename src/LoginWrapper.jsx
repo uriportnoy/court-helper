@@ -10,7 +10,7 @@ import {
   signOut,
   signInWithRedirect,
   getRedirectResult,
-} from "./timeline/firebase";
+} from "@/firebase";
 
 const isMobile = () => {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -20,10 +20,6 @@ function AppWithLogin({ children }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [user, setUser] = useState(null);
   const [hasAccess, setHasAccess] = useState(false);
-
-  const showMessage = (label, severity) => {
-    toast.error(label);
-  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged((currentUser) => {
@@ -42,12 +38,11 @@ function AppWithLogin({ children }) {
           const userHasAccess = currentUser.email === "uriportnoy@gmail.com";
           setHasAccess(userHasAccess);
           if (!userHasAccess) {
-            showMessage("Access denied", "error");
+            toast.error("Access denied", "error");
           }
         }
-        s;
       } catch (error) {
-        showMessage("Error handling redirect result:" + error, "error");
+        toast.error("Error handling redirect result:" + error, "error");
       } finally {
         setIsLoaded(true);
       }
@@ -66,7 +61,7 @@ function AppWithLogin({ children }) {
       setUser(currentUser);
       setHasAccess(["uriportnoy@gmail.com"].includes(currentUser.email));
     } catch (error) {
-      showMessage("Error signing in: " + error.message, "error");
+      toast.error("Error signing in: " + error.message, "error");
     }
   };
 

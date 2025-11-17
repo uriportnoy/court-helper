@@ -5,6 +5,7 @@ import {
   getDocs,
   getFirestore,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -58,7 +59,7 @@ export async function add(collection_name, newItem) {
 export async function remove(collection_name, caseId) {
   const caseDoc = doc(db, collection_name, caseId); // Reference to the specific document
   try {
-    await caseDoc.delete();
+    await deleteDoc(caseDoc);
     console.log(`${collection_name}: id ${caseId} deleted successfully.`);
   } catch (error) {
     console.error(`${collection_name}: Error deleting case ${caseId}:`, error);

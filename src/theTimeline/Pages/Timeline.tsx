@@ -4,13 +4,14 @@ import { Plus, Calendar, Download, Upload } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import EventCard from "../components/timeline/EventCard";
 import { Skeleton, Button } from "@/components/ui";
-import { addEvent } from "../../timeline/firebase/events.ts";
+import { addEvent } from "@/firebase/events.ts";
 import { toast } from "sonner";
 import TopBar from "../components/timeline/TopBar.tsx";
 import Stats from "../components/timeline/Stats.tsx";
 import FloatingFilters from "../components/timeline/FloatingFIlters.tsx";
 import EventDialog from "../components/timeline/EventDialog.tsx";
 import { useTimelineContext } from "../context";
+import { TimelineEventData } from "@/theTimeline/types.ts";
 
 export default function TimelinePage() {
   const {
@@ -184,8 +185,8 @@ export default function TimelinePage() {
                       </div>
 
                       <div className="relative space-y-4">
-                        {(monthEvents as any[]).map(
-                          (event: any, idx: number) => (
+                        {(monthEvents as TimelineEventData[]).map(
+                          (event: TimelineEventData, idx: number) => (
                             <EventCard
                               key={`event-${event.id}-${idx}`}
                               event={event}
