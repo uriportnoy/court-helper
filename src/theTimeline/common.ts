@@ -18,6 +18,7 @@ export enum CaseType {
   OAL = "ע״ל",
   TAMSH = "תמ״ש",
   BEAM = "בע״מ",
+  AFS = "עפ״ס",
   OTHER = "אחר",
 }
 export enum Origin {

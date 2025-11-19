@@ -146,9 +146,22 @@ export default function EventDialog({
   };
 
   const handleFileUploaded = (fileUrl: string, label: string) => {
+    let type = Origin.MINE;
+    let _label = label || "";
+    if (
+      [label, formData.title, formData.subtitle].some((l) =>
+        l.includes("החלטה")
+      )
+    ) {
+      type = Origin.COURT;
+      _label += " - החלטה";
+    } else if (formData.type) {
+      type = formData.type as Origin;
+      _label += " - " + formData.type;
+    }
     setFileURLInputs((prev: any) => [
       ...prev,
-      { label: label || "", url: fileUrl, type: "mine" },
+      { label: _label, url: fileUrl, type },
     ]);
   };
 
@@ -242,7 +255,6 @@ export default function EventDialog({
                   />
                 </div>
               </div>
-
               <div className="space-y-2">
                 <Label
                   htmlFor="subtitle"
