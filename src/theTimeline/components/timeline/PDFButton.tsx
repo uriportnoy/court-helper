@@ -1,4 +1,4 @@
-import { FileURL, typeColors } from "@/theTimeline/common";
+import { typeColors } from "@/theTimeline/common";
 import { Button } from "@/components/ui";
 import {
   DropdownMenu,
@@ -8,19 +8,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Download, ExternalLink, File as FileIcon, Share } from "lucide-react";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import useFileShare from "./pdf/useFileShare";
+import { FileURL } from "@/theTimeline/types";
 
 interface PDFButtonProps {
-  setViewingFile: Dispatch<SetStateAction<FileURL>>;
+  setActiveFile: () => void;
   file: FileURL;
+  fileName?: string;
 }
-export default function PDFButton({ setViewingFile, file }: PDFButtonProps) {
+export default function PDFButton({ setActiveFile, file, fileName }: PDFButtonProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const longPressTimerRef = useRef<number | null>(null);
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
   const longPressActivatedRef = useRef(false);
-  const { directDownload, viaWhatsApp } = useFileShare({ file });
+  const { directDownload, viaWhatsApp } = useFileShare({ file, fileName });
   const clearLongPress = () => {
     if (longPressTimerRef.current !== null) {
       window.clearTimeout(longPressTimerRef.current);
@@ -68,7 +70,7 @@ export default function PDFButton({ setViewingFile, file }: PDFButtonProps) {
                   setMenuOpen(true);
                 } else {
                   // Left / Middle click -> open viewer
-                  setViewingFile(file);
+                  setActiveFile();
                   setMenuOpen(false);
                 }
               } else {
@@ -93,7 +95,7 @@ export default function PDFButton({ setViewingFile, file }: PDFButtonProps) {
               if (e.pointerType === "mouse") return;
               // For touch/pen: if long-press not activated, treat as tap -> open viewer
               if (!longPressActivatedRef.current) {
-                setViewingFile(file);
+                setActiveFile();
                 setMenuOpen(false);
               }
               clearLongPress();

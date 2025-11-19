@@ -8,8 +8,8 @@ import {
 import { Download, ExternalLink, Share2 } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useState } from "react";
-import { FileURL } from "@/theTimeline/common";
 import useFileShare from "./useFileShare";
+import { FileURL } from "@/theTimeline/types";
 
 export default function PDFShare({ file }: { file: FileURL }) {
   const [showShareMenu, setShowShareMenu] = useState(false);

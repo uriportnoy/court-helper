@@ -19,15 +19,15 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  AllValue,
   courts,
   monthNames,
   origins,
-  SortDirection,
   typeLabels,
 } from "@/theTimeline/common";
 import { useTimelineContext } from "@/theTimeline/context";
 import GroupsDropdown from "../createEvent/GroupsDropdown";
+import CasesDropdown from "../createEvent/CasesDropdown";
+import { SortDirection } from "@/theTimeline/types";
 
 export default function FloatingFilters() {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,6 +53,8 @@ export default function FloatingFilters() {
     setSortDirection,
     filterGroups,
     setFilterGroups,
+    caseFilter,
+    setCaseFilter,
   } = useTimelineContext();
 
   useEffect(() => {
@@ -288,6 +290,11 @@ export default function FloatingFilters() {
                   selected={filterGroups}
                   onChange={(groups) => setFilterGroups(groups)}
                   placeholder="חפש בקבוצות..."
+                />
+                <CasesDropdown
+                  selectedCase={caseFilter}
+                  setSelectedCase={setCaseFilter}
+                  placeholder="בחר תיק..."
                 />
                 {/* Clear Filters */}
                 {hasActiveFilters && (

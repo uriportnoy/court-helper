@@ -23,10 +23,9 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import FileUploader from "../components/createEvent/FileUploader";
 import { addEvent } from "@/firebase/events.ts";
-import { Case, FileURL } from "@/theTimeline/types.ts";
+import { Case, FileURL, TimelineEventData } from "@/theTimeline/types.ts";
 import CasesDropdown from "../components/createEvent/CasesDropdown.tsx";
 import FileList from "../components/common/FileList.tsx";
-import { useTimelineContext } from "@/theTimeline/context";
 import { Origin } from "@/theTimeline/common";
 import AIFileToObject from "../components/createEvent/AIFileToObject.tsx";
 
@@ -34,7 +33,7 @@ export default function CreateEventPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isUploadingFile, setIsUploadingFile] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<TimelineEventData>>({
     title: "",
     subtitle: "",
     content: "",
@@ -42,15 +41,15 @@ export default function CreateEventPage() {
     important: false,
     type: Origin.MINE,
     caseNumber: "",
-    fileURL: [],
+    files: [],
     groups: [],
   });
 
-  const [fileURLInputs, setFileURLInputs] = useState([]);
-  const [groupInputs, setGroupInputs] = useState([{ label: "", value: "" }]);
+  const [fileURLInputs, setFileURLInputs] = useState<FileURL[]>([]);
+  const [groupInputs, setGroupInputs] = useState<{ label: string; value: string }[]>([{ label: "", value: "" }]);
 
   const createEventMutation = useMutation({
-    mutationFn: async (eventData) => {
+    mutationFn: async (eventData: Partial<TimelineEventData>) => {
       await addEvent(eventData);
     },
     onSuccess: () => {
@@ -64,7 +63,7 @@ export default function CreateEventPage() {
     },
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const fileURL = fileURLInputs
@@ -77,20 +76,24 @@ export default function CreateEventPage() {
 
     createEventMutation.mutate({
       ...formData,
-      fileURL,
+      files: fileURL,
       groups,
     });
   };
 
   const handleFileUploaded = (fileUrl: string, label: string) => {
-    setFileURLInputs((prev) => [
-      ...prev,
-      { label, url: fileUrl, type: Origin.MINE },
+    setFileURLInputs([
+      ...fileURLInputs,
+      {
+        label,
+        url: fileUrl,
+        type: Origin.MINE,
+      },
     ]);
   };
 
   const handleObjectGenerated = (
-    object: FileURL,
+    object: Partial<TimelineEventData>,
     file: { fileUrl: string; label: string }
   ) => {
     const receivedData = {
@@ -99,8 +102,9 @@ export default function CreateEventPage() {
     };
     handleFileUploaded(file.fileUrl, file.label);
     console.log("AI PDF Object received", receivedData);
-    setFormData(receivedData);
+    setFormData(receivedData as TimelineEventData);
   };
+
   return (
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
@@ -174,7 +178,7 @@ export default function CreateEventPage() {
                 <div className="space-y-2">
                   <Label htmlFor="case">תיק קשור</Label>
                   <CasesDropdown
-                    selectedCase={formData.caseNumber}
+                    selectedCase={formData.caseNumber || null}
                     setSelectedCase={(_case: Case) =>
                       setFormData({ ...formData, caseNumber: _case.caseNumber })
                     }

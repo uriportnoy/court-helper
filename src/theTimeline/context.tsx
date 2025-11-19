@@ -1,11 +1,11 @@
 import { getAllCases } from "@/firebase/cases";
-import { Case, TimelineEventData } from "@/theTimeline/types";
+import { Case, Group, TimelineEventData } from "@/theTimeline/types";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useMemo, useState } from "react";
 import { getEvents } from "@/firebase/events";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
-import { AllValue, CaseType, CourtType, Origin, SortDirection } from "./common";
+import { AllValue, CourtType, Origin, SortDirection } from "./common";
 
 interface TimelineContextType {
   events: TimelineEventData[];
@@ -34,8 +34,10 @@ interface TimelineContextType {
   groupedEvents: Record<string, any[]>;
   editingEvent: any;
   setEditingEvent: (event: any | null | undefined) => void;
-  filterGroups: Array<{ label: string; value: string }>;
-  setFilterGroups: (groups: Array<{ label: string; value: string }>) => void;
+  filterGroups: Array<Group>;
+  setFilterGroups: (groups: Array<Group>) => void;
+  caseFilter: Case | null;
+  setCaseFilter: (caseFilter: Case | null) => void;
 }
 
 const TimelineContext = createContext<TimelineContextType>(
@@ -50,6 +52,7 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
   const [filterMonth, setFilterMonth] = useState<AllValue | string>(
     AllValue.ALL
   );
+  const [caseFilter, setCaseFilter] = useState<Case | null>(null);
   const [filterCourt, setFilterCourt] = useState<CourtType | AllValue>(
     AllValue.ALL
   );
@@ -58,17 +61,19 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
   const [filterGroups, setFilterGroups] = useState<
     Array<{ label: string; value: string }>
   >([]);
-  console.log("filterGroups", filterGroups);
-  const { data: events, isLoading: isEventsLoading } = useQuery({
+
+  const { data: events, isLoading: isEventsLoading } = useQuery<
+    TimelineEventData[]
+  >({
     queryKey: ["events"],
     queryFn: async () => {
       const evts = await getEvents();
-      return evts || [];
+      return (evts || []) as TimelineEventData[];
     },
     initialData: [],
   });
 
-  const { data: cases, isLoading: isCasesLoading } = useQuery({
+  const { data: cases, isLoading: isCasesLoading } = useQuery<Case[]>({
     queryKey: ["cases"],
     queryFn: () => getAllCases(),
     initialData: [],
@@ -106,6 +111,7 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     setFilterCourt(AllValue.ALL);
     setSortDirection(SortDirection.DESC);
     setFilterGroups([]);
+    setCaseFilter(null);
   };
 
   const hasActiveFilters =
@@ -116,9 +122,10 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     filterMonth !== AllValue.ALL ||
     filterCourt !== AllValue.ALL ||
     sortDirection !== SortDirection.DESC ||
-    filterGroups.length > 0;
+    filterGroups.length > 0 ||
+    caseFilter !== null;
 
-  const filteredEvents = events.filter((event) => {
+  const filteredEvents = events.filter((event: TimelineEventData) => {
     const lowerSearch = searchQuery.toLowerCase();
 
     const matchesSearch =
@@ -154,18 +161,21 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
       filterCourt === AllValue.ALL ||
       (relatedCase && relatedCase.court === filterCourt);
 
+    const matchesCaseFilter =
+      !caseFilter || event.caseNumber === caseFilter.caseNumber;
+
     // ----- FIXED GROUP FILTER -----
     const matchesGroups =
       !filterGroups ||
       filterGroups.length === 0 ||
       (event.groups &&
         event.groups.length > 0 &&
-        event.groups.some((group: any) => {
+        event.groups.some((group: Group) => {
           // event groups can be { id } or { value }
-          const groupId = String(group.id ?? group.value);
-          return filterGroups.some((selected: any) => {
+          const groupId = String(group.value);
+          return filterGroups.some((selected: Group) => {
             // filterGroups entries are { label, value }
-            const selectedId = String(selected.id ?? selected.value);
+            const selectedId = String(selected.value);
             return selectedId === groupId;
           });
         }));
@@ -177,29 +187,35 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
       matchesYear &&
       matchesMonth &&
       matchesCourt &&
-      matchesGroups
+      matchesGroups &&
+      matchesCaseFilter
     );
   });
 
   // Sort all filtered events by date first
-  const sortedEvents = [...filteredEvents].sort((a: any, b: any) => {
-    const aDate = a.date ? new Date(a.date).getTime() : 0;
-    const bDate = b.date ? new Date(b.date).getTime() : 0;
-    return sortDirection === SortDirection.ASC ? aDate - bDate : bDate - aDate;
-  });
+  const sortedEvents = [...filteredEvents].sort(
+    (a: TimelineEventData, b: TimelineEventData) => {
+      const aDate = a.date ? new Date(a.date).getTime() : 0;
+      const bDate = b.date ? new Date(b.date).getTime() : 0;
+      return sortDirection === SortDirection.ASC ? aDate - bDate : bDate - aDate;
+    }
+  );
 
   // Then group sorted events by month/year
-  const groupedEvents = sortedEvents.reduce((acc, event) => {
-    const monthYear = event.date
-      ? format(new Date(event.date), "MMMM yyyy", { locale: he })
-      : "ללא תאריך";
-    if (!acc[monthYear]) acc[monthYear] = [];
-    acc[monthYear].push(event);
-    return acc;
-  }, {});
+  const groupedEvents = sortedEvents.reduce<Record<string, TimelineEventData[]>>(
+    (acc, event) => {
+      const monthYear = event.date
+        ? format(new Date(event.date), "MMMM yyyy", { locale: he })
+        : "ללא תאריך";
+      if (!acc[monthYear]) acc[monthYear] = [];
+      acc[monthYear].push(event);
+      return acc;
+    },
+    {}
+  );
 
   // Sort month groups by their chronological order
-  const sortedGroupedEvents: { [key: string]: any[] } = {};
+  const sortedGroupedEvents: { [key: string]: TimelineEventData[] } = {};
   Object.keys(groupedEvents)
     .sort((a, b) => {
       // Extract date from first event in each group for comparison
@@ -246,6 +262,8 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     isEventsLoading,
     filterGroups,
     setFilterGroups,
+    caseFilter,
+    setCaseFilter,
   };
   return (
     <TimelineContext.Provider value={context}>

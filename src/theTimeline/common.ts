@@ -1,3 +1,4 @@
+import {SortDirection } from "@/theTimeline/types";
 export const HASHALOM = "שלום";
 export const MAHZOVY = "מחוזי";
 export const ALONY = "עליון";
@@ -75,14 +76,4 @@ const typeColors = {
     "דצמבר",
   ];
 
-  export enum SortDirection {
-    ASC = "asc",
-    DESC = "desc",
-  }
-
-  export type FileURL = {
-    url: string;
-    label: string;
-    type: Origin;
-  }
-export { typeColors, typeLabels, courtColors, monthNames };
+export { typeColors, typeLabels, courtColors, monthNames, SortDirection };

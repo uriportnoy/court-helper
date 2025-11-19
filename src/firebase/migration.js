@@ -64,6 +64,7 @@ export const updateDocuments = async (
   }
 };
 
+// window.deleteFromDocument("events", "fileUrls");
 async function deleteFromDocument(collectionName, attributeToDelete) {
   if (!collectionName || !attributeToDelete) {
     console.error(

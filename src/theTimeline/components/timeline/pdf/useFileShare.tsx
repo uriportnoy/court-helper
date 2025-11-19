@@ -1,10 +1,11 @@
-import { FileURL } from "@/theTimeline/common";
 import { shareViaWhatsApp } from "@/theTimeline/components/timeline/pdf/share";
+import { FileURL } from "@/theTimeline/types";
 
 interface ShareProps {
     file: FileURL;
+    fileName?: string;
 }
-export default function useFileShare({ file }: ShareProps) {
+export default function useFileShare({ file, fileName }: ShareProps) {
 
   const directDownload = async () => {
     try {
@@ -14,7 +15,11 @@ export default function useFileShare({ file }: ShareProps) {
       const contentType = res.headers.get("content-type") || "";
       // Prefer MIME-derived extension when available
       const mimeExt =
-        contentType.includes("pdf")
+        contentType.includes(
+          "vnd.openxmlformats-officedocument.wordprocessingml.document"
+        ) || file.url.includes("/docx/")
+          ? "docx"
+          : contentType.includes("pdf") || file.url.includes("/pdfs/")
           ? "pdf"
           : contentType.includes("png")
           ? "png"
@@ -23,7 +28,7 @@ export default function useFileShare({ file }: ShareProps) {
           : contentType.includes("webp")
           ? "webp"
           : urlExt || "pdf";
-      const baseName = file.label || "document";
+      const baseName = fileName || file.label || "document";
       const filename = baseName.toLowerCase().endsWith(`.${mimeExt}`)
         ? baseName
         : `${baseName}.${mimeExt}`;

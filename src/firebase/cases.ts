@@ -4,7 +4,7 @@ import { Case } from "@/theTimeline/types";
 const COLLECTION_NAME = "cases";
 
 export async function getAllCases(): Promise<Array<Case>> {
-  const dbCases = await getAll(COLLECTION_NAME);
+  const dbCases = await getAll<Case>(COLLECTION_NAME);
   if (!dbCases) return [];
   
   return (dbCases as Case[]).sort((a, b) => {

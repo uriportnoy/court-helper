@@ -9,15 +9,19 @@ import { useTimelineContext } from "@/theTimeline/context";
 import { Case } from "@/theTimeline/types";
 
 interface CasesDropdownProps {
-  selectedCase: Case;
+  selectedCase: string | Case | null;
   setSelectedCase: (_case: Case) => void;
+  placeholder?: string;
 }
 
 export default function CasesDropdown({
   selectedCase,
   setSelectedCase,
+  placeholder = "בחר תיק",
 }: CasesDropdownProps) {
   const { cases } = useTimelineContext();
+  const selectedCaseNumber =
+    typeof selectedCase === "string" ? selectedCase : selectedCase?.caseNumber;
 
   const onChange = (caseNumber: string) => {
     const _case = cases.find((c: any) => c.caseNumber === caseNumber) as Case;
@@ -25,11 +29,11 @@ export default function CasesDropdown({
       setSelectedCase(_case);
     }
   };
-console.log(cases)
+  console.log(cases);
   return (
-    <Select value={selectedCase?.caseNumber} onValueChange={onChange}>
+    <Select value={selectedCaseNumber} onValueChange={onChange}>
       <SelectTrigger className="h-11 border-slate-300">
-        <SelectValue placeholder="בחר תיק" />
+        <SelectValue placeholder={placeholder || "בחר תיק"} />
       </SelectTrigger>
       <SelectContent>
         {cases.map((c: any, idx: number) => (

@@ -17,14 +17,13 @@ import { he } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
 import FileViewer from "./pdf/FileViewer";
 import {
-  FileURL,
   OTHER,
   courtColors,
   typeColors,
   typeLabels,
 } from "../../common";
 import PDFButton from "./PDFButton";
-import { Case, TimelineEventData } from "@/theTimeline/types";
+import { Case, FileURL, TimelineEventData } from "@/theTimeline/types";
 
 interface EventCardProps {
   event: TimelineEventData;
@@ -34,11 +33,11 @@ interface EventCardProps {
 
 export default function EventCard({ event, cases, onEdit }: EventCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const [viewingFile, setViewingFile] = useState(null);
+  const [viewingFile, setViewingFile] = useState<FileURL | null>(null);
   const relatedCase = cases?.find(
     (c: Case) => c.caseNumber === event.caseNumber
   );
-
+  const eventFiles: FileURL[] = event.files || [];
   return (
     <>
       <Card className="overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border-slate-200/50 bg-white/95 backdrop-blur-sm relative">
@@ -95,7 +94,10 @@ export default function EventCard({ event, cases, onEdit }: EventCardProps) {
                 {relatedCase?.court && (
                   <Badge
                     variant="outline"
-                    className={`text-white ${(courtColors as any)[relatedCase.court] || (courtColors as any)[OTHER]}`}
+                    className={`text-white ${
+                      (courtColors as any)[relatedCase.court] ||
+                      (courtColors as any)[OTHER]
+                    }`}
                   >
                     <Scale className="w-3 h-3 ml-1" />
                     {relatedCase.court}
@@ -191,18 +193,19 @@ export default function EventCard({ event, cases, onEdit }: EventCardProps) {
           )}
 
           {/* Files - Show as clickable buttons */}
-          {event.fileURL && event.fileURL.length > 0 && (
+          {eventFiles.length > 0 && (
             <div className="space-y-3">
               <p className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                 <FileText className="w-4 h-4" />
-                מסמכים ({event.fileURL.length})
+                מסמכים ({event.files.length})
               </p>
               <div className="flex flex-wrap gap-2">
-                {event.fileURL.map((file: FileURL) => (
+                {eventFiles.map((_file) => (
                   <PDFButton
-                    key={file.url}
-                    setViewingFile={setViewingFile}
-                    file={file}
+                    key={_file.url}
+                    setActiveFile={() => setViewingFile(_file)}
+                    file={_file}
+                    fileName={_file.label + "_" + event.caseNumber}
                   />
                 ))}
               </div>

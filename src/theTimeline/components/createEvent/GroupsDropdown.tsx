@@ -24,10 +24,11 @@ export default function GroupsDropdown({
   useEffect(() => {
     let mounted = true;
     setIsLoading(true);
-    getAll("groups")
-      .then((res) => {
+    getAll<{id: string; name: string}>("groups")
+      .then((res: {id: string; name: string}[]) => {
+        console.log("res", res);
         if (mounted && Array.isArray(res)) {
-          setGroups(res as Group[]);
+          setGroups(res.map((r) => ({ label: r.name, value: r.id })));
         }
       })
       .finally(() => setIsLoading(false));
@@ -46,7 +47,7 @@ export default function GroupsDropdown({
       try {
         const newId = await add("groups", { name: n.label });
         if (newId) {
-          const newGroup = { id: newId as string, name: n.label } as Group;
+          const newGroup = { value: newId as string, label: n.label } as Group;
           setGroups((prev) => [...prev, newGroup]);
           created.push({ label: n.label, value: newId as string });
         }
@@ -63,21 +64,17 @@ export default function GroupsDropdown({
   };
 
   return (
-    // <div className="w-full">
-      <MultipleSelect
-        options={options}
-        selectedOptions={selected}
-        onChange={handleChange}
-        valKey="id"
-        labelKey="name"
-        isCreatable={isCreatable}
-        isDisabled={isLoading}
-        placeholder={placeholder}
-        menuPosition="absolute"
-        menuPlacement="top"
-      />
-    // </div>
+    <MultipleSelect
+      options={options}
+      selectedOptions={selected}
+      onChange={handleChange}
+      valKey="value"
+      labelKey="label"
+      isCreatable={isCreatable}
+      isDisabled={isLoading}
+      placeholder={placeholder}
+      menuPosition="absolute"
+      menuPlacement="top"
+    />
   );
 }
-
-

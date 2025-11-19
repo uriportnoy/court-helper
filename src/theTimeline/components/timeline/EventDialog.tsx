@@ -54,7 +54,6 @@ export default function EventDialog({
   onClose,
 }: EventDialogProps) {
   const queryClient = useQueryClient();
-  const { cases } = useTimelineContext();
   const isEditMode = !!event?.id;
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [isCleaningContent, setIsCleaningContent] = useState(false);
@@ -71,7 +70,7 @@ export default function EventDialog({
   }));
 
   const [fileURLInputs, setFileURLInputs] = useState(
-    event?.fileURL?.length && event.fileURL.length> 0 ? event.fileURL : []
+    event?.files?.length && event.files.length > 0 ? event.files : []
   );
 
   const [groupInputs, setGroupInputs] = useState(
@@ -92,8 +91,12 @@ export default function EventDialog({
       caseNumber: event?.caseNumber || "",
     });
 
-    setFileURLInputs(event?.fileURL?.length && event.fileURL.length > 0 ? event.fileURL : []);
-    setGroupInputs(event?.groups?.length && event.groups.length > 0 ? event.groups : []);
+    setFileURLInputs(
+      event?.files?.length && event.files.length > 0 ? event.files : []
+    );
+    setGroupInputs(
+      event?.groups?.length && event.groups.length > 0 ? event.groups : []
+    );
   }, [event, open]);
 
   const eventMutation = useMutation({
@@ -113,9 +116,7 @@ export default function EventDialog({
       onClose();
     },
     onError: (error) => {
-      toast.error(
-        isEditMode ? "שגיאה בעדכון האירוע" : "שגיאה ביצירת האירוע"
-      );
+      toast.error(isEditMode ? "שגיאה בעדכון האירוע" : "שגיאה ביצירת האירוע");
       console.error(error);
     },
   });
@@ -270,12 +271,7 @@ export default function EventDialog({
                     תיק קשור
                   </Label>
                   <CasesDropdown
-                    cases={cases}
-                    selectedCase={
-                      cases.find(
-                        (c: Case) => c.caseNumber === formData.caseNumber
-                      ) || null
-                    }
+                    selectedCase={formData.caseNumber}
                     setSelectedCase={(_case: Case) =>
                       setFormData({
                         ...formData,

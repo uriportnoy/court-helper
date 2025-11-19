@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { summarizeDocument } from "@/firebase/functions";
 import PDFShare from "./PDFShare";
-import { FileURL } from "@/theTimeline/common";
+import { FileURL } from "@/theTimeline/types";
 
 interface FileViewerProps {
   file: FileURL;

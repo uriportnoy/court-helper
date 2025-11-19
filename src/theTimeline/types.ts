@@ -25,15 +25,14 @@ export interface Case {
 }
 
 export interface Group {
-  id: string;
-  name: string;
+  label: string;
+  value: string;
 }
 
 export interface FileURL {
   url: string;
-  label?: string;
-  type?: Origin;
-  date: string;
+  label: string;
+  type: Origin;
 }
 export interface TimelineEventData {
   id: string;
@@ -48,6 +47,11 @@ export interface TimelineEventData {
   groups: Group[];
   selectedCase: Case;
   caseNumber: string;
-  fileURL: FileURL[];
+  files: FileURL[];
   important?: boolean;
+}
+
+export enum SortDirection {
+  ASC = "asc",
+  DESC = "desc",
 }

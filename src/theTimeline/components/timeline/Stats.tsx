@@ -51,7 +51,7 @@ export default function Stats() {
           <div>
             <p className="text-sm text-slate-600">מסמכים</p>
             <p className="text-2xl font-bold text-slate-900">
-              {events.reduce((sum, e) => sum + (e.fileURL?.length || 0), 0)}
+              {events.reduce((sum, e) => sum + (e.files?.length || 0), 0)}
             </p>
           </div>
         </div>
