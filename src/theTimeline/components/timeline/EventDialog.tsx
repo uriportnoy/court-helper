@@ -124,7 +124,7 @@ export default function EventDialog({
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    const fileURL = fileURLInputs
+    const files = fileURLInputs
       .filter((f: any) => f.url && f.label)
       .map(({ label, url, type }: any) => ({ label, url, type }));
 
@@ -134,7 +134,7 @@ export default function EventDialog({
 
     const payload: any = {
       ...formData,
-      fileURL,
+      files,
       groups,
     };
 

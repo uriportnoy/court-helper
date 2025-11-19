@@ -14,6 +14,7 @@ const FileList = ({
         setFileURLInputs(filteredFiles);
       });
     };
+
     const onFileChange = (index: number, field: string, value: string) => {
       const newInputs = [...fileURLInputs];
       newInputs[index][field] = value;
