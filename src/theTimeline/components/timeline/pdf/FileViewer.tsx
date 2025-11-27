@@ -17,6 +17,8 @@ import {
 import { summarizeDocument } from "@/firebase/functions";
 import PDFShare from "./PDFShare";
 import { FileURL } from "@/theTimeline/types";
+import { downloadPDF } from "./share";
+import { identifyFileExtension, getViewerUrl } from "./utils";
 
 interface FileViewerProps {
   file: FileURL;
@@ -32,21 +34,6 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
   const [summarizing, setSummarizing] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
 
-  const fileExtension = file.url
-    ?.split(".")
-    .pop()
-    ?.split("?")[0]
-    ?.toLowerCase();
-  const isPDF =
-    fileExtension === "pdf" ||
-    file.url?.includes(".pdf") ||
-    file.url?.includes("pdfs%2F");
-  const isDOCX =
-    fileExtension === "docx" ||
-    fileExtension === "doc" ||
-    file.url?.includes(".docx") ||
-    file.url?.includes(".doc");
-
   useEffect(() => {
     if (open) {
       setLoading(true);
@@ -60,13 +47,6 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
       return () => clearTimeout(timeout);
     }
   }, [open, file.url]);
-
-  const getViewerUrl = () => {
-    // Use Google Docs Viewer for both PDF and DOCX for better compatibility
-    return `https://docs.google.com/viewer?url=${encodeURIComponent(
-      file.url
-    )}&embedded=true`;
-  };
 
   const openInNewTab = () => {
     window.open(file.url, "_blank");
@@ -122,6 +102,12 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
     setLoadError(true);
   };
 
+  const downloadFile = () => {
+    downloadPDF(file.url);
+  };
+
+  const { isPDF, isDOCX } = identifyFileExtension(file.url);
+  console.log(file.url);
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
@@ -136,14 +122,6 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-semibold">
               {file.label}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={reloadFile}
-                title="טען מחדש"
-              >
-                <RotateCw className="w-5 h-5" />
-              </Button>
             </DialogTitle>
 
             <div className="flex items-center gap-2">
@@ -177,6 +155,14 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
                 ) : (
                   <Maximize2 className="w-5 h-5" />
                 )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={reloadFile}
+                title="טען מחדש"
+              >
+                <RotateCw className="w-5 h-5" />
               </Button>
               <Button variant="ghost" size="icon" onClick={onClose}>
                 <X className="w-5 h-5" />
@@ -227,7 +213,7 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
             <div className="w-full h-full flex">
               <div className="flex-1 h-full">
                 <iframe
-                  src={getViewerUrl()}
+                  src={getViewerUrl(file.url)}
                   className="w-full h-full border-0"
                   onLoad={handleIframeLoad}
                   onError={handleIframeError}
