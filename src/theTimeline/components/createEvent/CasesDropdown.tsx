@@ -34,19 +34,26 @@ export default function CasesDropdown({
     options.find((opt) => opt.value === selectedCaseNumber) || null;
 
   return (
-    <Select
-      value={selectedOption}
-      onChange={(opt: any) => {
-        if (opt?.value) {
-          onChange(opt.value as string);
+    <div className="w-full">
+      <Select
+        value={selectedOption}
+        onChange={(opt: any) => {
+          if (opt?.value) {
+            onChange(opt.value as string);
+          }
+        }}
+        options={options}
+        isClearable={false}
+        isSearchable
+        styles={colourStyles}
+        placeholder={placeholder || "בחר תיק"}
+        menuPlacement="auto"
+        menuPosition="fixed"
+        // Render menu in portal to avoid clipping by parent overflow/height
+        menuPortalTarget={
+          typeof document !== "undefined" ? document.body : undefined
         }
-      }}
-      options={options}
-      isClearable={false}
-      isSearchable
-      styles={colourStyles}
-      placeholder={placeholder || "בחר תיק"}
-      menuPosition="fixed"
-    />
+      />
+    </div>
   );
 }

@@ -75,7 +75,9 @@ const colourStyles = {
   container: (styles) => ({
     ...styles,
   }),
-  option: (styles) => ({ ...styles }),
+  option: (styles) => ({ ...styles,
+     textAlign: "right",
+   }),
   multiValue: (styles, { data }) => ({
     ...styles,
     // minWidth: "fit-content",
