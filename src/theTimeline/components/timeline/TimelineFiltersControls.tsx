@@ -15,6 +15,7 @@ import {
   monthNames,
   origins,
   typeLabels,
+  typeColors,
   SortDirection,
 } from "@/theTimeline/common";
 import { useTimelineContext } from "@/theTimeline/context";
@@ -237,16 +238,16 @@ export default function TimelineFiltersControls({
               variant={filterType === origin ? "default" : "ghost"}
               onClick={() => setFilterType(origin)}
               size="sm"
-              className={`h-9 px-3 rounded-none text-xs ${
+              className={`h-9 px-3 rounded-none text-xs transition-colors ${
                 filterType === origin
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  ? `${
+                      (typeColors as any)[origin] ||
+                      "bg-blue-600 text-white border-blue-300"
+                    }`
                   : "bg-transparent text-slate-600 hover:bg-slate-100"
               }`}
             >
               <span className="flex-1 text-right">{typeLabels[origin]}</span>
-              {filterType === origin && (
-                <div className="w-2 h-2 rounded-full bg-white" />
-              )}
             </Button>
           ))}
         </ButtonGroup>
