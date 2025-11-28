@@ -1,61 +1,13 @@
 import { useState, useEffect } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Button,
-  Input,
-  ButtonGroup,
-} from "@/components/ui";
-import {
-  Search,
-  Star,
-  X,
-  SlidersHorizontal,
-  ArrowDown,
-  ArrowUp,
-} from "lucide-react";
+import { Button } from "@/components/ui";
+import { X, SlidersHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  courts,
-  monthNames,
-  origins,
-  typeLabels,
-} from "@/theTimeline/common";
-import { useTimelineContext } from "@/theTimeline/context";
-import GroupsDropdown from "../createEvent/GroupsDropdown";
-import CasesDropdown from "../createEvent/CasesDropdown";
-import { SortDirection } from "@/theTimeline/types";
+import TimelineFiltersControls from "./TimelineFiltersControls";
 
 export default function FloatingFilters() {
+  const [hasActiveFilters, setHasActiveFilters] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const {
-    searchQuery,
-    setSearchQuery,
-    filterYear,
-    setFilterYear,
-    filterMonth,
-    setFilterMonth,
-    filterCourt,
-    setFilterCourt,
-    filterImportant,
-    setFilterImportant,
-    filterType,
-    setFilterType,
-    availableYears,
-    availableMonths,
-    clearFilters,
-    hasActiveFilters,
-    sortDirection,
-    setSortDirection,
-    filterGroups,
-    setFilterGroups,
-    caseFilter,
-    setCaseFilter,
-  } = useTimelineContext();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -133,185 +85,14 @@ export default function FloatingFilters() {
                   <p className="text-blue-100 text-sm">פילטרים פעילים</p>
                 )}
               </div>
-
               <div className="p-6 space-y-6">
-                {/* Search */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">
-                    חיפוש
-                  </label>
-                  <div className="relative">
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input
-                      placeholder="חפש אירועים..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pr-10 h-11 border-slate-300"
-                    />
-                  </div>
-                </div>
-
-                {/* Year */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">
-                    שנה
-                  </label>
-                  <Select
-                    value={filterYear}
-                    onValueChange={(value) => {
-                      setFilterYear(value);
-                      setFilterMonth("all");
-                    }}
-                  >
-                    <SelectTrigger className="h-11 border-slate-300">
-                      <SelectValue placeholder="בחר שנה" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">כל השנים</SelectItem>
-                      {availableYears.map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Month */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">
-                    חודש
-                  </label>
-                  <Select
-                    value={filterMonth}
-                    onValueChange={setFilterMonth}
-                    disabled={filterYear === "all"}
-                  >
-                    <SelectTrigger className="h-11 border-slate-300">
-                      <SelectValue placeholder="בחר חודש" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">כל החודשים</SelectItem>
-                      {availableMonths.map((month) => (
-                        <SelectItem key={month} value={month.toString()}>
-                          {monthNames[month]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Court */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">
-                    בית משפט
-                  </label>
-                  <Select value={filterCourt} onValueChange={setFilterCourt}>
-                    <SelectTrigger className="h-11 border-slate-300">
-                      <SelectValue placeholder="בחר בית משפט" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {courts.map((c) => (
-                        <SelectItem key={`floating-court-${c}`} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Quick Filters */}
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-slate-700">
-                    סינון מהיר
-                  </label>
-
-                  <Button
-                    variant={filterImportant ? "default" : "outline"}
-                    onClick={() => setFilterImportant(!filterImportant)}
-                    className={`w-full h-12 justify-start ${
-                      filterImportant ? "bg-amber-600 hover:bg-amber-700" : ""
-                    }`}
-                  >
-                    <Star
-                      className={`w-5 h-5 ml-3 ${
-                        filterImportant ? "fill-white" : ""
-                      }`}
-                    />
-                    <span className="flex-1 text-right">אירועים חשובים</span>
-                    {filterImportant && (
-                      <div className="w-2 h-2 rounded-full bg-white" />
-                    )}
-                  </Button>
-                  <ButtonGroup>
-                    {origins.map((origin) => (
-                      <Button
-                        variant={filterType === origin ? "default" : "outline"}
-                        onClick={() => setFilterType(origin)}
-                        className={`w-full h-12 justify-start ${
-                          filterType === origin
-                            ? "bg-blue-600 hover:bg-blue-700"
-                            : ""
-                        }`}
-                      >
-                        <span className="flex-1 text-right">
-                          {typeLabels[origin]}
-                        </span>
-                        {filterType === origin && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
-                        )}
-                      </Button>
-                    ))}
-                  </ButtonGroup>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    setSortDirection(
-                      sortDirection === SortDirection.ASC
-                        ? SortDirection.DESC
-                        : SortDirection.ASC
-                    )
-                  }
-                  className="w-10 h-10 p-0"
-                  title={
-                    sortDirection === SortDirection.ASC
-                      ? "מיין לפי תאריך עולה"
-                      : "מיין לפי תאריך יורד"
-                  }
-                >
-                  {sortDirection === SortDirection.ASC ? (
-                    <ArrowUp className="w-4 h-4" />
-                  ) : (
-                    <ArrowDown className="w-4 h-4" />
-                  )}
-                </Button>
-                <GroupsDropdown
-                  selected={filterGroups}
-                  onChange={(groups) => setFilterGroups(groups)}
-                  placeholder="חפש בקבוצות..."
+                <TimelineFiltersControls
+                  layout="column"
+                  showCaseFilter
+                  clearClosesPanel
+                  onAfterClear={() => setIsOpen(false)}
+                  onHasActiveFiltersChange={setHasActiveFilters}
                 />
-                <CasesDropdown
-                  selectedCase={caseFilter}
-                  setSelectedCase={setCaseFilter}
-                  placeholder="בחר תיק..."
-                />
-                {/* Clear Filters */}
-                {hasActiveFilters && (
-                  <div className="pt-4 border-t border-slate-200">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        clearFilters();
-                        setIsOpen(false);
-                      }}
-                      className="w-full h-12 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                    >
-                      <X className="w-5 h-5 ml-2" />
-                      נקה את כל הפילטרים
-                    </Button>
-                  </div>
-                )}
               </div>
             </motion.div>
           </>

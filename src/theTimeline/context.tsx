@@ -2,6 +2,7 @@ import { getAllCases } from "@/firebase/cases";
 import { Case, Group, TimelineEventData } from "@/theTimeline/types";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useMemo, useState } from "react";
+import { useDebounce } from "use-debounce";
 import { getEvents } from "@/firebase/events";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
@@ -79,6 +80,9 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     initialData: [],
   });
 
+  // Debounce free-text search to avoid filtering on every keystroke
+  const [debouncedSearch] = useDebounce(searchQuery, 300);
+
   // Extract unique years and months from events
   const availableYears = useMemo(() => {
     const years = new Set<number>(
@@ -126,10 +130,11 @@ export const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     caseFilter !== null;
 
   const filteredEvents = events.filter((event: TimelineEventData) => {
-    const lowerSearch = searchQuery.toLowerCase();
+    const lowerSearch = debouncedSearch.toLowerCase();
+    const hasSearch = debouncedSearch.trim().length > 0;
 
     const matchesSearch =
-      !searchQuery ||
+      !hasSearch ||
       event.title?.toLowerCase().includes(lowerSearch) ||
       event.subtitle?.toLowerCase().includes(lowerSearch) ||
       event.caseNumber?.toLowerCase().includes(lowerSearch) ||

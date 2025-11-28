@@ -5,12 +5,12 @@ import EventCard from "../components/timeline/EventCard";
 import { Skeleton, Button } from "@/components/ui";
 import { addEvent } from "@/firebase/events.ts";
 import { toast } from "sonner";
-import TopBar from "../components/timeline/TopBar.tsx";
 import Stats from "../components/timeline/Stats.tsx";
 import FloatingFilters from "../components/timeline/FloatingFIlters.tsx";
 import EventDialog from "../components/timeline/EventDialog.tsx";
 import { useTimelineContext } from "../context";
 import { TimelineEventData } from "@/theTimeline/types.ts";
+import TimelineFiltersControls from "../components/timeline/TimelineFiltersControls.tsx";
 
 export default function TimelinePage() {
   const {
@@ -152,7 +152,9 @@ export default function TimelinePage() {
           </div>
 
           <Stats />
-          <TopBar />
+          <div className="rounded-2xl p-4 md:p-5 shadow-sm border border-slate-200/50 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 flex flex-wrap items-center gap-2 md:gap-3">
+            <TimelineFiltersControls layout="row" showCaseFilter />
+          </div>
           <FloatingFilters />
           {/* Timeline */}
           {isEventsLoading ? (

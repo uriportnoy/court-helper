@@ -74,7 +74,6 @@ const colourStyles = {
   }),
   container: (styles) => ({
     ...styles,
-    width: "100%",
   }),
   option: (styles) => ({ ...styles }),
   multiValue: (styles, { data }) => ({
@@ -89,4 +88,5 @@ const colourStyles = {
   }),
 };
 
+export { colourStyles };
 export default MultipleSelect;

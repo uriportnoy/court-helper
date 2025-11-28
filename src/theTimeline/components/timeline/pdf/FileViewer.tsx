@@ -32,7 +32,6 @@ export default function FileViewer({ file, open, onClose }: FileViewerProps) {
   const [loadError, setLoadError] = useState(false);
   const [summary, setSummary] = useState<string>("");
   const [summarizing, setSummarizing] = useState(false);
-  const [showShareMenu, setShowShareMenu] = useState(false);
 
   useEffect(() => {
     if (open) {
